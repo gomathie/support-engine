@@ -23,10 +23,10 @@ defineProps({
                 <span
                     class="brand-gradient flex h-9 w-9 items-center justify-center rounded-lg text-lg font-extrabold text-white"
                 >
-                    P
+                    S
                 </span>
                 <span class="text-lg font-extrabold text-navy">
-                    Pilot <span class="text-brand">Academy</span>
+                    Support <span class="text-brand">Academy</span>
                 </span>
             </div>
 
@@ -86,7 +86,7 @@ defineProps({
             </div>
 
             <p class="mt-6 text-center text-sm text-ink-dis">
-                Pilot Academy · internal support training
+                Support Academy · internal training for the PILOT platform
             </p>
         </div>
     </div>

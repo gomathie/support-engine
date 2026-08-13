@@ -35,14 +35,15 @@ class AdminPanelProvider extends PanelProvider
             // User::canAccessPanel() decides who is let through afterwards.
 
             ->colors([
-                // #0284c7 — the prototype's --primary, so the admin panel reads as
-                // the same product as the employee portal.
-                'primary' => Color::hex('#0284c7'),
-                'warning' => Color::hex('#eab308'),
-                'success' => Color::hex('#22c55e'),
-                'danger' => Color::hex('#ef4444'),
+                // The academy palette, so the admin panel reads as the same
+                // product as the employee portal.
+                'primary' => Color::hex('#1463ff'),
+                'success' => Color::hex('#19a86b'),
+                'warning' => Color::hex('#d97706'),
+                'danger' => Color::hex('#dc2626'),
+                'gray' => Color::Slate,
             ])
-            ->brandName('PILOT Training Hub')
+            ->brandName('Support Academy')
             ->favicon(asset('favicon.ico'))
 
             ->navigationGroups([

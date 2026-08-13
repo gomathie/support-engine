@@ -31,13 +31,10 @@ function submit() {
                     <span
                         class="brand-gradient flex h-10 w-10 items-center justify-center rounded-xl text-xl font-extrabold text-white"
                     >
-                        P
+                        S
                     </span>
                     <span class="text-xl leading-tight font-extrabold text-navy">
-                        Pilot <span class="text-brand">Academy</span>
-                        <span class="block text-[10px] font-semibold tracking-wide text-ink-dis uppercase">
-                            Support Team
-                        </span>
+                        Support <span class="text-brand">Academy</span>
                     </span>
                 </div>
 
@@ -116,7 +113,7 @@ function submit() {
         </div>
 
         <footer class="px-5 py-8 text-center text-sm text-ink-dis">
-            Pilot Academy · internal support training
+            Support Academy · internal training for the PILOT platform
         </footer>
     </div>
 </template>

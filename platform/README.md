@@ -1,7 +1,12 @@
-# PILOT Support Training Academy
+# Support Academy
 
-Internal training platform for new support employees. Laravel 13 + Filament 5
-admin at `/admin`, Vue 3 + Inertia employee portal, Tailwind 4, PostgreSQL 17.
+Internal training platform for new support employees learning the PILOT
+platform. Laravel 13 + Filament 5 admin at `/admin`, Vue 3 + Inertia employee
+portal, Tailwind 4, PostgreSQL 17.
+
+The look follows academy.pilot-gps.com — brand `#1463ff`, navy `#0a2540`,
+green `#19a86b`, Inter, flat white cards on slate-50 — so the internal academy
+reads as the same product family as the customer-facing one.
 
 Converted from the static HTML/CSS/JS prototype in [`../pages`](../pages),
 which is kept untouched as the visual reference. The audit and the

@@ -3,7 +3,7 @@
 
     Written against dompdf's limits rather than a browser's: no flexbox, no grid,
     no CSS custom properties, no webfonts. Absolute positioning inside a fixed
-    A4 landscape page, and the prototype's palette written out as literal hex.
+    A4 landscape page, and the academy palette written out as literal hex.
 --}}
 <!DOCTYPE html>
 <html lang="en">
@@ -17,7 +17,7 @@
             margin: 0;
             padding: 0;
             font-family: DejaVu Sans, sans-serif;
-            color: #334155;
+            color: #1e293b;
             background: #ffffff;
         }
 
@@ -27,18 +27,18 @@
             height: 210mm;
         }
 
-        /* Two nested rules in the brand blue and amber, standing in for the
-           prototype's radial gradients — dompdf renders neither gradients nor
+        /* Two nested rules in the brand blue and navy, standing in for the
+           gradient the web UI uses — dompdf renders neither gradients nor
            box-shadow. */
         .frame-outer {
             position: absolute;
             top: 10mm; left: 10mm; right: 10mm; bottom: 10mm;
-            border: 2px solid #0284c7;
+            border: 2px solid #1463ff;
         }
         .frame-inner {
             position: absolute;
             top: 13mm; left: 13mm; right: 13mm; bottom: 13mm;
-            border: 1px solid #eab308;
+            border: 1px solid #0a2540;
         }
 
         .body { position: absolute; top: 26mm; left: 26mm; right: 26mm; text-align: center; }
@@ -47,26 +47,26 @@
             font-size: 9pt;
             letter-spacing: 4pt;
             text-transform: uppercase;
-            color: #0284c7;
+            color: #1463ff;
             margin-bottom: 4mm;
         }
 
         .title {
             font-size: 30pt;
             font-weight: bold;
-            color: #0284c7;
+            color: #0a2540;
             letter-spacing: -0.5pt;
             margin: 0 0 3mm;
         }
 
-        .rule { width: 40mm; height: 3px; background: #eab308; margin: 0 auto 8mm; }
+        .rule { width: 40mm; height: 3px; background: #1463ff; margin: 0 auto 8mm; }
 
         .awarded { font-size: 10pt; color: #64748b; margin-bottom: 4mm; }
 
         .recipient {
             font-size: 26pt;
             font-weight: bold;
-            color: #334155;
+            color: #0a2540;
             margin-bottom: 6mm;
             border-bottom: 1px solid #e2e8f0;
             padding-bottom: 5mm;
@@ -74,7 +74,7 @@
 
         .for { font-size: 10pt; color: #64748b; margin-bottom: 3mm; }
 
-        .course { font-size: 16pt; font-weight: bold; color: #334155; margin-bottom: 10mm; }
+        .course { font-size: 16pt; font-weight: bold; color: #0a2540; margin-bottom: 10mm; }
 
         /* dompdf has no flexbox; a table is the reliable way to get three even
            columns that line up. */
@@ -94,7 +94,7 @@
             color: #cbd5e1;
             margin-bottom: 1.5mm;
         }
-        .meta .value { font-size: 10pt; color: #334155; font-weight: bold; }
+        .meta .value { font-size: 10pt; color: #0a2540; font-weight: bold; }
 
         .footer {
             position: absolute;
@@ -112,7 +112,7 @@
     <div class="frame-inner"></div>
 
     <div class="body">
-        <div class="eyebrow">PILOT Training Hub</div>
+        <div class="eyebrow">Support Academy</div>
 
         <h1 class="title">Certificate of Completion</h1>
         <div class="rule"></div>

@@ -54,13 +54,10 @@ function toggleTheme() {
                     <span
                         class="brand-gradient flex h-9 w-9 items-center justify-center rounded-lg text-lg font-extrabold text-white"
                     >
-                        P
+                        S
                     </span>
                     <span class="text-lg leading-tight font-extrabold text-navy">
-                        Pilot <span class="text-brand">Academy</span>
-                        <span class="block text-[10px] font-semibold tracking-wide text-ink-dis uppercase">
-                            Support Team
-                        </span>
+                        Support <span class="text-brand">Academy</span>
                     </span>
                 </Link>
 
@@ -179,7 +176,7 @@ function toggleTheme() {
         </main>
 
         <footer class="mx-auto w-full max-w-6xl px-5 py-10 text-center text-sm text-ink-dis">
-            Pilot Academy · internal support training
+            Support Academy · internal training for the PILOT platform
         </footer>
     </div>
 </template>
