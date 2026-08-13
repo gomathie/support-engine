@@ -31,16 +31,21 @@ RUN npm ci
 # Full source
 COPY . .
 
+# Storage directories Laravel expects.
+#
+# Must come before any artisan command: .dockerignore deliberately excludes the
+# host's storage/framework caches (they are machine-local junk), so these do not
+# arrive with the source, and package:discover boots the framework — which fails
+# with "Please provide a valid cache path" if the view cache directory is absent.
+RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache
+
 # Finish composer autoload + package discovery
 RUN composer dump-autoload --optimize \
     && php artisan package:discover --ansi
 
 # Build frontend assets
 RUN npm run build
-
-# Storage directories Laravel expects
-RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache \
-    && chown -R www-data:www-data storage bootstrap/cache
 
 # Ensure OS environment variables are populated in $_ENV so they override .env
 RUN echo "variables_order = \"EGPCS\"" > /usr/local/etc/php/conf.d/99-variables-order.ini
