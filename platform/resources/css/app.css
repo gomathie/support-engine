@@ -1,9 +1,239 @@
 @import 'tailwindcss';
+@plugin '@tailwindcss/typography';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+@source '../../resources/js/**/*.vue';
+@source '../../resources/views/**/*.blade.php';
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/*
+   Design tokens carried over verbatim from the prototype's styles/shared.css.
+   The values are unchanged — this is the same product, not a redesign.
+
+   The two-layer arrangement matters: the raw values live on :root and are
+   swapped by [data-theme="dark"], and @theme inline below maps them onto
+   Tailwind's colour namespace *by reference*. That means `bg-surface` compiles
+   to `var(--pilot-surface)` and follows the theme attribute at runtime, exactly
+   as the hand-written CSS did, instead of baking one theme's hex into the
+   utility and needing a `dark:` variant on every element.
+*/
+
+:root {
+    --pilot-primary: #0284c7;
+    --pilot-primary-hover: #0369a1;
+    --pilot-primary-bg: #e0f2fe;
+
+    --pilot-bg: #f1f5f9;
+    --pilot-surface: #ffffff;
+    --pilot-surface-alt: #f8fafc;
+
+    --pilot-text-pr: #334155;
+    --pilot-text-sec: #64748b;
+    --pilot-text-dis: #cbd5e1;
+
+    --pilot-line: #e2e8f0;
+    --pilot-line-strong: #cbd5e1;
+
+    --pilot-positive: #22c55e;
+    --pilot-positive-bg: #dcfce7;
+    --pilot-negative: #ef4444;
+    --pilot-negative-bg: #fee2e2;
+    --pilot-warning: #eab308;
+    --pilot-warning-dim: #ca8a04;
+    --pilot-warning-bg: #fef9c3;
+
+    --pilot-nav-bg: rgb(255 255 255 / 0.96);
+    --pilot-nav-hover: rgb(0 0 0 / 0.04);
+
+    /* Text that sits on top of a filled primary/warning surface. In light mode
+       that is the page surface colour; dark mode flips it to near-black. */
+    --pilot-on-accent: #ffffff;
+    --pilot-on-warning: #121826;
+}
+
+[data-theme='dark'] {
+    --pilot-primary: #38bdf8;
+    --pilot-primary-hover: #7dd3fc;
+    --pilot-primary-bg: #0c4a6e;
+
+    --pilot-bg: #020617;
+    --pilot-surface: #0f172a;
+    --pilot-surface-alt: #1e293b;
+
+    --pilot-text-pr: #f8fafc;
+    --pilot-text-sec: #94a3b8;
+    --pilot-text-dis: #475569;
+
+    --pilot-line: #1e293b;
+    --pilot-line-strong: #334155;
+
+    --pilot-positive: #4ade80;
+    --pilot-positive-bg: #14532d;
+    --pilot-negative: #f87171;
+    --pilot-negative-bg: #7f1d1d;
+    --pilot-warning: #facc15;
+    --pilot-warning-dim: #b45309;
+    --pilot-warning-bg: #713f12;
+
+    --pilot-nav-bg: rgb(15 23 42 / 0.96);
+    --pilot-nav-hover: rgb(255 255 255 / 0.06);
+
+    --pilot-on-accent: #020617;
+    --pilot-on-warning: #0e1420;
+}
+
+@theme inline {
+    --color-primary: var(--pilot-primary);
+    --color-primary-hover: var(--pilot-primary-hover);
+    --color-primary-bg: var(--pilot-primary-bg);
+
+    --color-canvas: var(--pilot-bg);
+    --color-surface: var(--pilot-surface);
+    --color-surface-alt: var(--pilot-surface-alt);
+
+    --color-ink: var(--pilot-text-pr);
+    --color-ink-sec: var(--pilot-text-sec);
+    --color-ink-dis: var(--pilot-text-dis);
+
+    --color-line: var(--pilot-line);
+    --color-line-strong: var(--pilot-line-strong);
+
+    --color-positive: var(--pilot-positive);
+    --color-positive-bg: var(--pilot-positive-bg);
+    --color-negative: var(--pilot-negative);
+    --color-negative-bg: var(--pilot-negative-bg);
+    --color-warning: var(--pilot-warning);
+    --color-warning-dim: var(--pilot-warning-dim);
+    --color-warning-bg: var(--pilot-warning-bg);
+
+    --color-nav: var(--pilot-nav-bg);
+    --color-nav-hover: var(--pilot-nav-hover);
+
+    --color-on-accent: var(--pilot-on-accent);
+    --color-on-warning: var(--pilot-on-warning);
+
+    --font-sans: 'Inter', 'Segoe UI', system-ui, Arial, sans-serif;
+    --font-mono: 'Courier New', ui-monospace, monospace;
+}
+
+/*
+   `dark:` is retargeted at the data attribute rather than the OS preference,
+   because the theme is an explicit user choice persisted on the account. Most
+   colour work goes through the tokens above; this is for the handful of places
+   the prototype special-cased with a [data-theme="dark"] selector.
+*/
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@layer base {
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: var(--font-sans);
+        color: var(--color-ink);
+        background: var(--color-canvas);
+        transition:
+            background-color 0.3s ease,
+            color 0.3s ease;
+    }
+
+    /* The prototype honoured this globally; keeping it means the gauge, the
+       flash highlight and every hover transition stay still for people who
+       have asked the OS for less motion. */
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            transition: none !important;
+            animation: none !important;
+            scroll-behavior: auto !important;
+        }
+    }
+}
+
+@layer components {
+    /*
+       The mono eyebrow/flag/nav treatment recurs on every page of the prototype:
+       Courier, uppercase, wide tracking. It earns a component class rather than
+       six utilities repeated across forty templates.
+    */
+    .mono-label {
+        font-family: var(--font-mono);
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+    }
+}
+
+/*
+   Rich-text lesson bodies. Mirrors the skills-module article styling: navy
+   headings, mono inline code on a tinted background, bordered tables.
+*/
+@layer components {
+    .lesson-prose {
+        --tw-prose-body: var(--color-ink-sec);
+        --tw-prose-headings: var(--color-primary);
+        --tw-prose-bold: var(--color-ink);
+        --tw-prose-links: var(--color-primary);
+        --tw-prose-bullets: var(--color-line-strong);
+        --tw-prose-hr: var(--color-line);
+        --tw-prose-quotes: var(--color-ink);
+        --tw-prose-quote-borders: var(--color-primary);
+        --tw-prose-th-borders: var(--color-line);
+        --tw-prose-td-borders: var(--color-line);
+        --tw-prose-counters: var(--color-primary);
+    }
+
+    .lesson-prose :where(code):not(:where([class~='not-prose'] *)) {
+        font-family: var(--font-mono);
+        color: var(--color-primary);
+        background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+        padding: 1px 4px;
+        border-radius: 3px;
+        font-weight: 400;
+    }
+
+    .lesson-prose :where(code)::before,
+    .lesson-prose :where(code)::after {
+        content: none;
+    }
+
+    .lesson-prose :where(th) {
+        background: var(--color-surface-alt);
+        color: var(--color-ink);
+    }
+
+    /* Author-supplied markers inside lesson HTML. `.std` is an industry-standard
+       default to confirm locally; `.fill` is a company-specific blank. Both are
+       indexed into the annotation drawer. */
+    .lesson-prose :where(.std) {
+        color: var(--color-primary);
+        background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+        border-bottom: 1px dotted var(--color-primary);
+        padding: 1px 3px;
+        border-radius: 3px;
+        scroll-margin-top: 90px;
+    }
+
+    .lesson-prose :where(.fill) {
+        color: var(--color-negative);
+        background: var(--color-negative-bg);
+        font-weight: 700;
+        padding: 1px 4px;
+        border-radius: 3px;
+        scroll-margin-top: 90px;
+    }
+
+    .lesson-prose :where(.std.flash) {
+        animation: annotation-flash 1.6s ease;
+    }
+
+    @keyframes annotation-flash {
+        0%,
+        100% {
+            background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+        }
+        30% {
+            background: var(--color-primary);
+            color: var(--color-on-accent);
+        }
+    }
 }
