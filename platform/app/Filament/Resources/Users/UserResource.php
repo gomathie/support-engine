@@ -27,6 +27,12 @@ class UserResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    protected static ?string $modelLabel = 'employee';
+
+    protected static ?string $pluralModelLabel = 'employees';
+
+    protected static ?string $recordTitleAttribute = 'name';
+
     public static function form(Schema $schema): Schema
     {
         return UserForm::configure($schema);
@@ -37,11 +43,26 @@ class UserResource extends Resource
         return UsersTable::configure($table);
     }
 
-    public static function getRelations(): array
+    /**
+     * Employee data privacy, enforced in SQL.
+     *
+     * A manager sees the people in the departments they run and nobody else.
+     * UserPolicy already says the same thing for individual records, but this
+     * keeps the list, the search and every count on it scoped too — otherwise
+     * a manager could learn the size and shape of departments they have no
+     * business seeing, without ever opening a record.
+     */
+    public static function getEloquentQuery(): Builder
     {
-        return [
-            //
-        ];
+        $query = parent::getEloquentQuery();
+
+        $user = auth()->user();
+
+        if (! $user || $user->isAdmin()) {
+            return $query;
+        }
+
+        return $query->whereIn('department_id', $user->visibleDepartmentIds());
     }
 
     public static function getPages(): array

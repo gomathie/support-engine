@@ -5,11 +5,8 @@ namespace App\Filament\Resources\DiagnosticTrees\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class DiagnosticTreesTable
@@ -18,41 +15,39 @@ class DiagnosticTreesTable
     {
         return $table
             ->columns([
-                TextColumn::make('key')
-                    ->searchable(),
                 TextColumn::make('question')
-                    ->searchable(),
+                    ->label('Symptom')
+                    ->searchable()
+                    ->weight('bold')
+                    ->wrap(),
+
                 TextColumn::make('layer_label')
-                    ->searchable(),
-                TextColumn::make('position')
-                    ->numeric()
-                    ->sortable(),
+                    ->label('Layers')
+                    ->badge(),
+
+                TextColumn::make('steps_count')
+                    ->label('Steps')
+                    ->counts('steps')
+                    ->alignEnd(),
+
+                TextColumn::make('support_cases_count')
+                    ->label('Cases worked')
+                    ->counts('supportCases')
+                    ->alignEnd()
+                    ->toggleable(),
+
                 IconColumn::make('is_published')
+                    ->label('Published')
                     ->boolean(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                TrashedFilter::make(),
-            ])
+            ->reorderable('position')
+            ->defaultSort('position')
             ->recordActions([
                 EditAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
                 ]),
             ]);
     }
