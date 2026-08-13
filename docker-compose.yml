@@ -1,0 +1,57 @@
+services:
+  # ── PostgreSQL ───────────────────────────────────────────────
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pilot
+      POSTGRES_PASSWORD: pilot_secret
+      POSTGRES_DB: pilot_lms
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Create the testing DB automatically on first start
+      - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pilot -d pilot_lms"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ── Laravel app ──────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_NAME: "PILOT Training Academy"
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_KEY: "base64:5C97YryzdFbCuj/iKEHj98TzWi6FbNfmYQoHTXoqlMA="
+      APP_URL: "http://localhost:8000"
+      DB_CONNECTION: pgsql
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: pilot_lms
+      DB_USERNAME: pilot
+      DB_PASSWORD: pilot_secret
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+      MAIL_MAILER: log
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount source for live edits during dev (optional — comment out for prod-like test)
+      - ./platform:/var/www/html
+      # Anonymous volumes to keep container-built layers for vendor/node_modules
+      - /var/www/html/vendor
+      - /var/www/html/node_modules
+
+volumes:
+  pgdata:
