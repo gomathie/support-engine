@@ -62,5 +62,29 @@ services:
       - /var/www/html/vendor
       - /var/www/html/node_modules
 
+  # ── Queue worker ─────────────────────────────────────────────
+  #
+  # QUEUE_CONNECTION is `database`, so certificate PDFs and notification emails
+  # are dispatched to a queue rather than rendered in the request that finished
+  # the course. Without something draining that queue they sit in the jobs
+  # table for ever and no certificate ever appears.
+  #
+  # Shares the app image and the same mounts, so it picks up code changes on
+  # restart like everything else.
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    command: sh -c "php artisan queue:work --tries=3 --max-time=3600 --sleep=1"
+    volumes:
+      - ./platform:/var/www/html
+      - ./docker/app.env:/var/www/html/.env:ro
+      - /var/www/html/vendor
+      - /var/www/html/node_modules
+
 volumes:
   pgdata:
