@@ -1,4 +1,4 @@
-# PILOT Training Hub — Prototype Analysis & Implementation Map
+# PILOT Support Training Academy — Prototype Analysis & Implementation Map
 
 Written before any code was changed. This is the audit of the existing
 HTML/CSS/JS prototype and the mapping of every existing feature onto the
@@ -7,24 +7,20 @@ target Laravel / Inertia+Vue / Filament / PostgreSQL architecture.
 ---
 
 ## 0. Executive summary
-Now converting to a training hub.
-The prototype was a **three-page static training hub**, not an LMS. It had no
-users, no authentication, no server, no database, and no notion of a course,
-an enrollment, a quiz score or a certificate. Persistence is per-browser and
-currently **broken** (see §1.4). Now converting to a training hub.
+The PILOT platform is a **Support Training Academy for new support employees**.
+The prototype was a **three-page static training interface**, not a fully integrated LMS. It had no
+users, no authentication, no server, no database, and no notion of an assigned course,
+an enrollment, a quiz score or a certificate. Persistence was per-browser and
+currently **broken** (see §1.4).
+
+We are converting this system into an interactive **Support Training Academy** where new support employees log in, access structured onboarding curriculum (1st-line support 2-week plan, admin panel 3-day plan, support skills, and prep materials), and **tick interactive checkboxes** as they complete each material or lesson to show their learning progress.
 
 Consequently this work is not a 1:1 port. It splits into two parts:
 
-1. **Conversion** — the existing content, layout, interactions and design
-   become real, persisted, multi-user features. This covers roughly §1–§3
-   of the prototype below.
-2. **Net-new** — authentication, roles, departments, enrollments, the quiz
-   engine, certificates, notifications, reporting and the whole admin side
-   have no prototype counterpart and are built from the target spec.
+1. **Conversion** — the existing curriculum materials, checklist items, diagnostic tools, layout, interactions and design become real, persisted, multi-user features. As new support employees complete lessons/materials, ticking the checkbox updates their `LessonProgress` state and recalculates course completion percentage in real time. This covers roughly §1–§3 of the prototype below.
+2. **Net-new** — authentication, roles, departments, employee enrollments, the quiz engine, certificates, notifications, reporting and the Filament admin management portal have no prototype counterpart and are built from the target spec.
 
-The prototype's value is as the **product specification and visual
-reference**: its content is real curriculum, and its design is the intended
-product design. Both are preserved.
+The prototype's value is as the **product specification and visual reference**: its content is real curriculum for new support employees, and its design is the intended product design. Both are preserved.
 
 ---
 
@@ -149,19 +145,19 @@ Other invariants to preserve:
 
 ### 2.1 Structural mapping
 
-The tracker's own hierarchy already matches the target course hierarchy:
+The tracker's own hierarchy matches the Support Training Academy course and material hierarchy:
 
 ```
-Prototype                    Target
+Prototype (Academy Material) Target
 ─────────────────────────    ──────────────────────────────
-DATA[] section          →    Course          (4 courses)
+DATA[] section          →    Course          (4 courses / academy tracks)
   .flag / .title        →      category / title
-  section.days[]        →    CourseModule    (24 modules)
+  section.days[]        →    CourseModule    (24 modules / day plans)
     .n                  →      title ("Day 1", "Module A")
     .t                  →      subtitle
     .topics             →      description
-    .items[]            →    Lesson          (96 lessons)
-                        →    LessonProgress  (the checkbox)
+    .items[]            →    Lesson          (96 training materials & lessons)
+                        →    LessonProgress  (checkbox completion state)
 "Complete the final test"    Quiz + QuizAttempt
 ```
 
@@ -170,14 +166,14 @@ DATA[] section          →    Course          (4 courses)
 | # | Existing feature | Current implementation | New implementation |
 | --- | --- | --- | --- |
 | 1 | Curriculum content | `DATA` const, 116 lines JS | `courses` / `course_modules` / `lessons` tables, seeded from the same content via `TrainingContentSeeder` |
-| 2 | Checklist item toggle | `STATE[key] = !STATE[key]` in memory | `POST /courses/{c}/lessons/{l}/complete` → `LessonProgress` upsert → `RecalculateCourseProgress` action |
-| 3 | Per-section counter + bar | `reduce()` over `STATE` | `course_progress.completed_lessons / total_lessons / percentage`, computed server-side, sent via Inertia props |
-| 4 | Global % gauge (SVG arc) | `stroke-dashoffset` from client count | Same SVG preserved in `ProgressGauge.vue`; value comes from `course_progress` |
-| 5 | "Saved HH:MM:SS" stamp | `Date.toLocaleTimeString()` | Inertia partial reload; `lesson_progress.completed_at` is authoritative |
+| 2 | Material/Lesson Checkbox Toggle | `STATE[key] = !STATE[key]` in memory | Employee ticks checkbox when completing a lesson/material → `POST /courses/{c}/lessons/{l}/complete` → `LessonProgress` upsert → `RecalculateCourseProgress` action |
+| 3 | Per-section counter + bar | `reduce()` over `STATE` | `course_progress.completed_lessons / total_lessons / percentage`, computed server-side from completed checkboxes, sent via Inertia props |
+| 4 | Global % gauge (SVG arc) | `stroke-dashoffset` from client count | Same SVG preserved in `ProgressGauge.vue`; percentage calculated from checked-off lessons |
+| 5 | "Saved HH:MM:SS" stamp | `Date.toLocaleTimeString()` | Inertia partial reload; `lesson_progress.completed_at` timestamp recorded upon checking the box |
 | 6 | Reset all progress | `STATE = {}` | `DELETE /my-progress/courses/{course}` guarded by policy; admin-configurable per course |
 | 7 | Section collapse | `style.display` toggle | Same interaction, Vue `ref` UI state (presentation only — stays client-side) |
-| 8 | Landing stats bar | Hard-coded `3 / 2 / 4 / 7` | `DashboardStat.vue` fed by real aggregates (assigned, in progress, completed, overdue) |
-| 9 | 3 feature cards | Static `<a class="card">` | `CourseCard.vue` over the employee's assigned courses |
+| 8 | Landing stats bar | Hard-coded `3 / 2 / 4 / 7` | `DashboardStat.vue` fed by real aggregates (assigned courses, in progress, completed materials, overdue) |
+| 9 | 3 feature cards | Static `<a class="card">` | `CourseCard.vue` over the employee's assigned academy courses |
 | 10 | Theme toggle | `localStorage.pilot_theme` | Kept client-side (pure UI preference) **and** mirrored to `users.theme_preference` so it follows the employee across devices |
 | 11 | Top nav (4 links) | Duplicated in every HTML file | `EmployeeLayout.vue` — single source, active state from Inertia `usePage().url` |
 | 12 | Mobile hamburger | `classList.toggle('open')` | Same behaviour in `EmployeeLayout.vue` |
