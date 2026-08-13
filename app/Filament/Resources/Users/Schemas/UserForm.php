@@ -10,6 +10,8 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Spatie\Permission\Models\Role as SpatieRole;
 
 class UserForm
 {
@@ -52,11 +54,28 @@ class UserForm
                 Section::make('Access')
                     ->columns(2)
                     ->schema([
+                        /*
+                         * No ->options() override here, deliberately.
+                         *
+                         * ->relationship() makes the value the role's id, which
+                         * is what the model_has_roles pivot stores. Overriding
+                         * the options with an enum-keyed list made the widget
+                         * offer role *names* instead, so an edit produced a
+                         * mixed array — the hydrated id plus the newly picked
+                         * name — and syncing it asked Postgres for
+                         * `where roles.id in (1, admin)`, which is a type error,
+                         * not a missing record.
+                         *
+                         * The labels are prettified from the enum instead.
+                         */
                         Select::make('roles')
-                            ->relationship('roles', 'name')
+                            ->relationship(name: 'roles', titleAttribute: 'name')
+                            ->getOptionLabelFromRecordUsing(
+                                fn (SpatieRole $record): string => Role::tryFrom($record->name)?->label()
+                                    ?? Str::headline($record->name),
+                            )
                             ->multiple()
                             ->preload()
-                            ->options(Role::options())
                             ->required()
                             ->helperText('Admins and managers can reach /admin; employees cannot.'),
 
