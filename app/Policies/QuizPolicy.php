@@ -15,14 +15,6 @@ class QuizPolicy
             return false;
         }
 
-        // Deliberately not a blanket bypass. Even an administrator must not be
-        // able to read another employee's in-flight attempt through the
-        // employee-facing routes, so viewAttempt() is excluded here and decides
-        // for itself.
-        if ($ability === 'viewAttempt') {
-            return null;
-        }
-
         return $user->hasRole(Role::Admin->value) ? true : null;
     }
 
@@ -55,39 +47,12 @@ class QuizPolicy
         return $quiz->hasAttemptsRemainingFor($user);
     }
 
-    /** An attempt — including its answers and score — belongs to the person who sat it. */
-    public function viewAttempt(User $user, QuizAttempt $attempt): bool
-    {
-        if (! $user->is_active) {
-            return false;
-        }
+    /*
+     * Abilities on a QuizAttempt live on QuizAttemptPolicy, not here. Laravel
+     * resolves a policy by model name, so anything defined for an attempt on
+     * this class would never be consulted.
+     */
 
-        if ($attempt->user_id === $user->id) {
-            return true;
-        }
-
-        if ($user->hasRole(Role::Admin->value)) {
-            return true;
-        }
-
-        // A manager sees results for their own departments only.
-        if ($user->hasRole(Role::Manager->value)) {
-            return in_array(
-                $attempt->user->department_id,
-                $user->visibleDepartmentIds(),
-                true,
-            );
-        }
-
-        return false;
-    }
-
-    public function submitAttempt(User $user, QuizAttempt $attempt): bool
-    {
-        return $attempt->user_id === $user->id
-            && $attempt->isInProgress()
-            && $user->is_active;
-    }
 
     /**
      * Reading the answer key. Never true for an employee — this guards the

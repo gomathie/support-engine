@@ -7,11 +7,12 @@ use App\Models\QuizAttempt;
 use App\Models\User;
 
 /**
- * Who may see and mark an attempt in the admin panel.
+ * Every ability on an attempt, for both surfaces — the employee's results
+ * screen and the examiner's grading queue.
  *
- * Distinct from QuizPolicy::viewAttempt(), which governs the employee-facing
- * results screen. Both agree on the same rule — your own, or your department's
- * if you manage it — but they guard different surfaces.
+ * Laravel resolves a policy by model name, so this class owns QuizAttempt
+ * outright. Abilities defined on QuizPolicy would never be consulted for an
+ * attempt, however sensibly they were named.
  */
 class QuizAttemptPolicy
 {
@@ -21,22 +22,37 @@ class QuizAttemptPolicy
             return false;
         }
 
-        // Grading is excluded from the administrator bypass on purpose, so the
-        // "never mark your own paper" rule below holds for everyone.
-        if ($ability === 'grade') {
+        /*
+         * Two abilities are excluded from the administrator bypass:
+         *
+         *  - grade, so "never mark your own paper" holds for everyone;
+         *  - submit, so nobody can submit an attempt that is not theirs, or one
+         *    that has already been graded.
+         */
+        if (in_array($ability, ['grade', 'submit'], true)) {
             return null;
         }
 
         return $user->hasRole(Role::Admin->value) ? true : null;
     }
 
+    /** Listing attempts in the admin panel. */
     public function viewAny(User $user): bool
     {
         return $user->hasRole(Role::Manager->value);
     }
 
+    /**
+     * An attempt — its answers, its score — belongs to the person who sat it.
+     * A manager sees their own departments; an administrator sees everything
+     * through before().
+     */
     public function view(User $user, QuizAttempt $attempt): bool
     {
+        if ($attempt->user_id === $user->id) {
+            return true;
+        }
+
         if (! $user->hasRole(Role::Manager->value)) {
             return false;
         }
@@ -48,11 +64,12 @@ class QuizAttemptPolicy
         );
     }
 
-    /**
-     * Marking is the same permission as viewing, plus the requirement that the
-     * attempt is actually gradable. An employee can never mark anything —
-     * including, especially, their own paper.
-     */
+    public function submit(User $user, QuizAttempt $attempt): bool
+    {
+        return $attempt->user_id === $user->id && $attempt->isInProgress();
+    }
+
+    /** Marking written answers. Never your own paper, whatever your role. */
     public function grade(User $user, QuizAttempt $attempt): bool
     {
         if ($attempt->user_id === $user->id) {
@@ -63,7 +80,15 @@ class QuizAttemptPolicy
             return true;
         }
 
-        return $this->view($user, $attempt);
+        if (! $user->hasRole(Role::Manager->value)) {
+            return false;
+        }
+
+        return in_array(
+            $attempt->user->department_id,
+            $user->visibleDepartmentIds(),
+            true,
+        );
     }
 
     public function create(User $user): bool

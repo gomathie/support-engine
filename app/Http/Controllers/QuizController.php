@@ -160,7 +160,7 @@ class QuizController extends Controller
             ->where('quiz_id', $quiz->id)
             ->firstOrFail();
 
-        $this->authorize('submitAttempt', $attempt);
+        $this->authorize('submit', $attempt);
 
         $grade->handle($attempt, $request->submissions());
 
@@ -170,7 +170,7 @@ class QuizController extends Controller
     /** The marked paper. Answers and explanations are only ever shown here. */
     public function result(Request $request, QuizAttempt $attempt): Response
     {
-        $this->authorize('viewAttempt', $attempt);
+        $this->authorize('view', $attempt);
 
         $attempt->load(['quiz.course', 'answers.question.options']);
 

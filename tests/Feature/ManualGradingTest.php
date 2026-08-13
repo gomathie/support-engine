@@ -276,6 +276,65 @@ class ManualGradingTest extends TestCase
         $this->assertFalse($this->employee()->can('grade', $attempt));
     }
 
+    // ─── THE HTTP ROUND TRIP ─────────────────────────────────
+
+    /**
+     * The whole flow over HTTP rather than through the actions: start, submit,
+     * land on the result. The action-level tests miss policy regressions, and a
+     * broken authorize() here takes the entire quiz feature down.
+     */
+    public function test_an_employee_can_submit_a_quiz_over_http(): void
+    {
+        [$course, $quiz, $user] = $this->scenario();
+
+        $mcq = QuizQuestion::factory()->for($quiz)->withOptions(4, [1])->create();
+        $correct = $mcq->options()->where('is_correct', true)->first();
+
+        $this->actingAs($user);
+
+        $this->post(route('quizzes.start', [$course->slug, $quiz->id]))->assertOk();
+
+        $attempt = QuizAttempt::query()->where('user_id', $user->id)->firstOrFail();
+
+        $this->post(route('quizzes.submit', [$course->slug, $quiz->id]), [
+            'attempt_id' => $attempt->id,
+            'answers' => [
+                ['question_id' => $mcq->id, 'option_ids' => [$correct->id]],
+            ],
+        ])->assertRedirect(route('attempts.show', $attempt));
+
+        $this->get(route('attempts.show', $attempt))->assertOk();
+
+        $this->assertSame('100.00', $attempt->fresh()->score);
+        $this->assertTrue($attempt->fresh()->passed);
+    }
+
+    public function test_an_employee_can_submit_a_written_answer_over_http(): void
+    {
+        [$course, $quiz, $user] = $this->scenario();
+
+        $written = $this->writtenQuestion($quiz);
+
+        $this->actingAs($user);
+        $this->post(route('quizzes.start', [$course->slug, $quiz->id]))->assertOk();
+
+        $attempt = QuizAttempt::query()->where('user_id', $user->id)->firstOrFail();
+
+        $this->post(route('quizzes.submit', [$course->slug, $quiz->id]), [
+            'attempt_id' => $attempt->id,
+            'answers' => [
+                [
+                    'question_id' => $written->id,
+                    'option_ids' => [],
+                    'text' => str_repeat('A considered answer. ', 50),
+                ],
+            ],
+        ])->assertRedirect();
+
+        $this->assertTrue($attempt->fresh()->awaitsReview());
+        $this->assertNotEmpty($attempt->fresh()->answers()->first()->text_answer);
+    }
+
     // ─── EMPLOYEE VIEW ───────────────────────────────────────
 
     public function test_the_results_screen_shows_the_waiting_state_and_no_score(): void
