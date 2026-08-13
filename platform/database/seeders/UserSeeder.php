@@ -18,7 +18,6 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $support = Department::query()->where('name', 'Technical Support')->first();
-        $operations = Department::query()->where('name', 'Operations')->first();
 
         $admin = $this->make('Ada Okonkwo', 'admin@pilot.test', $support, [
             'job_title' => 'Head of Technical Support',
@@ -41,14 +40,6 @@ class UserSeeder extends Seeder
             'employee_number' => 'PT-0003',
         ]);
         $employee->syncRoles([Role::Employee->value]);
-
-        // A second employee outside the manager's departments, so authorization
-        // tests have somebody the manager must *not* be able to see.
-        $outsider = $this->make('Tom Lindqvist', 'operations@pilot.test', $operations, [
-            'job_title' => 'Fleet Coordinator',
-            'employee_number' => 'PT-0004',
-        ]);
-        $outsider->syncRoles([Role::Employee->value]);
     }
 
     private function make(string $name, string $email, ?Department $department, array $extra = []): User

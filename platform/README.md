@@ -1,58 +1,132 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PILOT Support Training Academy
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Internal training platform for new support employees. Laravel 13 + Filament 5
+admin at `/admin`, Vue 3 + Inertia employee portal, Tailwind 4, PostgreSQL 17.
 
-## About Laravel
+Converted from the static HTML/CSS/JS prototype in [`../pages`](../pages),
+which is kept untouched as the visual reference. The audit and the
+feature-by-feature mapping are in
+[`../docs/IMPLEMENTATION_MAP.md`](../docs/IMPLEMENTATION_MAP.md).
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Running it
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### Docker (recommended)
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+cd ..                 # the repository root, where docker-compose.yml lives
+docker compose up -d
+docker compose exec app php artisan migrate --seed
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+| Service | | |
+| --- | --- | --- |
+| `app` | http://localhost:8080 | Laravel, `artisan serve` |
+| `db` | localhost:5433 | PostgreSQL 17 |
+| `queue` | — | `queue:work`, renders certificates and sends mail |
 
-## Contributing
+The `queue` service is not optional in practice: certificate PDFs and
+notification emails are dispatched to a queue, so without a worker draining it
+a completed course never produces a downloadable certificate.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Application config for the containers lives in
+[`../docker/app.env`](../docker/app.env), mounted over `.env`. It is
+deliberately **not** in docker-compose's `environment:` block — see the note in
+that file for why.
 
-## Code of Conduct
+### On the host
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+The app needs `pdo_pgsql`, which is often not enabled in a stock Windows PHP
+build, and `php.ini` usually sits in a directory that needs an elevated shell to
+write to. Rather than changing PHP globally — which would break other projects
+sharing that install — this project ships its own ini and points PHP at it with
+`PHPRC`:
 
-## Security Vulnerabilities
+```powershell
+.\setup-php-ini.ps1   # once: generates platform/php.ini with the extensions on
+.\dev.ps1             # starts PostgreSQL, migrations, artisan serve, queue, vite
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## Accounts
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+One per role, created by `UserSeeder`. All three use the password `password`;
+they exist for local development only.
+
+| Email | Role | Sees |
+| --- | --- | --- |
+| `admin@pilot.test` | Admin | Everything |
+| `manager@pilot.test` | Manager | Technical Support only |
+| `employee@pilot.test` | Employee | Their own training |
+
+---
+
+## Tests
+
+```bash
+docker compose exec app php artisan test
+```
+
+They run against `pilot_lms_testing` in the same container, configured by
+[`.env.testing`](.env.testing). Note that `.env.testing` *replaces* `.env`
+rather than layering on it, so anything needed to boot — `APP_KEY` in
+particular — has to be present in it.
+
+`TestCase` refuses to run if the database name does not contain `test`.
+`RefreshDatabase` runs `migrate:fresh`, and a misconfigured environment
+pointing at the development database will destroy it silently otherwise.
+
+PostgreSQL rather than SQLite in memory, on purpose: the schema uses `jsonb`
+and the course search uses `ILIKE`, neither of which SQLite reproduces
+faithfully.
+
+---
+
+## Architecture
+
+Business logic lives in `app/Actions`, never in Vue components:
+
+| | |
+| --- | --- |
+| `Progress\RecalculateCourseProgress` | The only place a course percentage is decided |
+| `Progress\CompleteLesson` | Ticking a lesson off, and undoing it |
+| `Quiz\StartQuizAttempt` | Starts or resumes an attempt, enforces the attempt limit |
+| `Quiz\GradeQuizAttempt` | Scores server-side; the browser only ever submits option ids |
+| `Enrollment\EnrollEmployee` | Assignment, restoring revoked enrollments, due dates |
+| `Enrollment\SyncAssignmentRules` | Turns assignment rules into enrollments |
+| `Certificates\IssueCertificate` | Idempotent issuance; queues the PDF render |
+| `Support\BuildCaseNote` | Rebuilds the Support Panel case note |
+
+### Things worth knowing before changing them
+
+- **Quiz answer keys never reach the browser.** `QuizController::start()`
+  assembles the payload by hand rather than serialising the model, so
+  `is_correct` and `explanation` cannot leak. `QuizOption` also hides
+  `is_correct` at the model level as a backstop. There is a test asserting the
+  string `is_correct` is absent from the taking-a-quiz response.
+- **The pass mark is snapshotted onto each attempt.** Raising a quiz's
+  `passing_score` cannot retroactively fail somebody who already sat it.
+- **Uploads and certificates go to the `private` disk**, which has no URL.
+  They are served only through policy-checked controllers.
+- **`course_progress` is a rollup**, recalculated on every lesson tick and
+  every graded attempt. The dashboard and every report read it directly rather
+  than recomputing percentages.
+- **`lessons.course_id` is denormalised** from the module. `Lesson::saving()`
+  keeps it in sync; do not set it by hand.
+- **Assignment rules are rows, not code.** "Operations gets Fleet Safety
+  Training" is a record in `assignment_rules`, evaluated live so moving
+  somebody between departments changes what they are assigned.
+
+### Scheduled work
+
+Needs `php artisan schedule:work` in development, or a cron entry calling
+`schedule:run` in production.
+
+| Command | When | |
+| --- | --- | --- |
+| `training:send-reminders` | Weekdays 08:00 | Due-soon and overdue notifications |
+| `training:sync-assignments` | Hourly | Enrols anyone the rules now match |
+
+Both take `--dry-run` / are idempotent, so they are safe to run by hand.
