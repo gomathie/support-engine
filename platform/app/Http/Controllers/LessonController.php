@@ -137,10 +137,13 @@ class LessonController extends Controller
      */
     private function navigation(Course $course, Lesson $lesson): array
     {
+        // Both tables carry a course_id, so every column here is qualified —
+        // an unqualified one makes PostgreSQL reject the query as ambiguous.
         $ordered = Lesson::query()
-            ->where('course_id', $course->id)
-            ->where('is_published', true)
             ->join('course_modules', 'course_modules.id', '=', 'lessons.course_module_id')
+            ->where('lessons.course_id', $course->id)
+            ->where('lessons.is_published', true)
+            ->where('course_modules.is_published', true)
             ->orderBy('course_modules.position')
             ->orderBy('lessons.position')
             ->select('lessons.id', 'lessons.slug', 'lessons.title')

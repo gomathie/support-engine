@@ -65,7 +65,9 @@ return [
                 'img[src|alt|width|height]',
                 'figure', 'figcaption',
             ]),
-            'HTML.AllowedClasses' => 'std,fill,box,good,note,k,hint,lede,eyebrow,tw',
+            // Attr.AllowedClasses, not HTML.AllowedClasses — the latter is not a
+            // HTMLPurifier directive and makes it throw on first use.
+            'Attr.AllowedClasses' => 'std,fill,box,good,note,k,hint,lede,eyebrow,tw',
             'Attr.EnableID' => true,
             'Attr.IDPrefix' => 'lesson-',
             'AutoFormat.AutoParagraph' => false,
