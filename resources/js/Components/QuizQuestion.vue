@@ -50,6 +50,7 @@ const isSelected = (optionId) => (props.modelValue.option_ids ?? []).includes(op
                 <p class="mt-1 text-xs text-ink-dis">
                     {{ question.points }} {{ question.points === 1 ? 'point' : 'points' }}
                     <span v-if="question.multiple"> · select all that apply</span>
+                    <span v-if="question.type === 'written'"> · marked by an examiner</span>
                 </p>
             </div>
         </div>
@@ -89,7 +90,24 @@ const isSelected = (optionId) => (props.modelValue.option_ids ?? []).includes(op
             </button>
         </div>
 
-        <!-- Short answer -->
+        <!-- Written answer: long-form, read by an examiner. -->
+        <div v-else-if="question.type === 'written'" class="pl-9">
+            <textarea
+                :value="modelValue.text ?? ''"
+                rows="8"
+                maxlength="8000"
+                placeholder="Explain what you would check or configure, in what sequence, and how you would confirm it worked."
+                class="w-full resize-y rounded-lg border border-line bg-surface px-3.5 py-2.5 text-sm leading-relaxed text-ink placeholder:text-ink-dis focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none"
+                @input="updateText"
+            ></textarea>
+
+            <p class="mt-1.5 flex justify-between text-xs text-ink-dis">
+                <span>A complete answer covers what, in what order, and how you confirm it.</span>
+                <span>{{ (modelValue.text ?? '').length }} / 8000</span>
+            </p>
+        </div>
+
+        <!-- Short answer: matched automatically against accepted answers. -->
         <div v-else class="pl-9">
             <input
                 type="text"

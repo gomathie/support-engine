@@ -27,8 +27,31 @@ defineProps({
                 ← {{ course.title }}
             </Link>
 
+            <!-- ─── AWAITING REVIEW ─────────────────────────── -->
+            <div v-if="attempt.awaiting_review" class="card mb-8 border-warning-dim/40 p-9 text-center">
+                <div class="mb-3 text-4xl">⏳</div>
+
+                <h1 class="mb-2 text-xl font-extrabold text-navy">With an examiner</h1>
+
+                <p class="mx-auto mb-4 max-w-md text-sm leading-relaxed text-ink-sec">
+                    Your written answers are being marked by hand.
+                    {{ attempt.outstanding }}
+                    {{ attempt.outstanding === 1 ? 'answer is' : 'answers are' }} still to be read.
+                    You will see your result here once they are done.
+                </p>
+
+                <StatusPill label="Awaiting review" tone="warning" />
+
+                <p class="mt-4 text-sm text-ink-dis">
+                    Submitted
+                    {{ attempt.completed_at ? new Date(attempt.completed_at).toLocaleString() : '' }}
+                    · attempt {{ attempt.attempt_number }}
+                </p>
+            </div>
+
             <!-- ─── SCORE ───────────────────────────────────── -->
             <div
+                v-else
                 class="card mb-8 p-9 text-center"
                 :class="attempt.passed ? 'border-ok/40' : 'border-negative/40'"
             >
@@ -50,6 +73,10 @@ defineProps({
                     {{ attempt.points_earned }} of {{ attempt.points_possible }} points ·
                     attempt {{ attempt.attempt_number }} · pass mark {{ attempt.passing_score }}%
                 </p>
+
+                <p v-if="attempt.reviewed_at" class="mt-1 text-xs text-ink-dis">
+                    Written answers marked by an examiner.
+                </p>
             </div>
 
             <!-- ─── FEEDBACK ────────────────────────────────── -->
@@ -65,20 +92,33 @@ defineProps({
                     <div class="mb-4 flex items-start gap-3">
                         <span
                             class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                            :class="answer.is_correct ? 'bg-ok' : 'bg-negative'"
+                            :class="
+                                answer.awaiting_review
+                                    ? 'bg-warning-dim'
+                                    : answer.is_correct
+                                      ? 'bg-ok'
+                                      : 'bg-negative'
+                            "
                         >
-                            {{ answer.is_correct ? '✓' : '✕' }}
+                            {{ answer.awaiting_review ? '…' : answer.is_correct ? '✓' : '✕' }}
                         </span>
 
-                        <p class="flex-1 text-base leading-relaxed font-medium text-navy">
+                        <p class="flex-1 text-base leading-relaxed font-medium whitespace-pre-line text-navy">
                             {{ answer.prompt }}
                         </p>
 
                         <span
                             class="shrink-0 text-sm font-semibold"
-                            :class="answer.is_correct ? 'text-ok' : 'text-negative'"
+                            :class="
+                                answer.awaiting_review
+                                    ? 'text-ink-dis'
+                                    : answer.is_correct
+                                      ? 'text-ok'
+                                      : 'text-negative'
+                            "
                         >
-                            {{ answer.points_awarded }}/{{ answer.points }}
+                            <template v-if="answer.awaiting_review">— /{{ answer.points }}</template>
+                            <template v-else>{{ answer.points_awarded }}/{{ answer.points }}</template>
                         </span>
                     </div>
 
@@ -104,6 +144,31 @@ defineProps({
                             <span class="text-ink">{{ option.label }}</span>
                         </li>
                     </ul>
+
+                    <!-- Written answer: what they wrote, plus the examiner's note. -->
+                    <div v-else-if="answer.requires_review" class="space-y-3 pl-9 text-sm">
+                        <div>
+                            <p class="mb-1 text-xs font-semibold text-ink-dis uppercase">
+                                Your answer
+                            </p>
+                            <p class="rounded-xl bg-surface-alt px-4 py-3 leading-relaxed whitespace-pre-line text-ink">
+                                {{ answer.text_answer || 'No answer submitted.' }}
+                            </p>
+                        </div>
+
+                        <div v-if="answer.grader_feedback">
+                            <p class="mb-1 text-xs font-semibold text-ink-dis uppercase">
+                                Examiner feedback
+                            </p>
+                            <p class="rounded-xl bg-brand-soft px-4 py-3 leading-relaxed whitespace-pre-line text-brand">
+                                {{ answer.grader_feedback }}
+                            </p>
+                        </div>
+
+                        <p v-else-if="answer.awaiting_review" class="text-ink-dis italic">
+                            Not yet marked.
+                        </p>
+                    </div>
 
                     <!-- Short answer -->
                     <div v-else class="space-y-1 pl-9 text-sm">

@@ -179,7 +179,19 @@ class QuizForm
                                 Textarea::make('explanation')
                                     ->rows(2)
                                     ->columnSpanFull()
-                                    ->helperText('Shown after grading, when feedback is enabled.'),
+                                    ->helperText('Shown to the employee after grading, when '
+                                        .'feedback is enabled.'),
+
+                                // The examiner's rubric. Never sent to the
+                                // employee — QuizController omits it from the
+                                // results payload.
+                                Textarea::make('marking_guidance')
+                                    ->label('Marking guidance (examiner only)')
+                                    ->rows(4)
+                                    ->columnSpanFull()
+                                    ->visible(fn (Get $get) => $get('type') === QuestionType::Written->value)
+                                    ->helperText('Shown beside the answer in the grading queue. '
+                                        .'Never shown to the employee.'),
 
                                 Repeater::make('options')
                                     ->relationship()
@@ -188,6 +200,9 @@ class QuizForm
                                     ->addActionLabel('Add option')
                                     ->defaultItems(2)
                                     ->columns(4)
+                                    // Written answers have no options — a human
+                                    // marks them against the rubric above.
+                                    ->visible(fn (Get $get) => $get('type') !== QuestionType::Written->value)
                                     ->schema([
                                         TextInput::make('label')
                                             ->hiddenLabel()

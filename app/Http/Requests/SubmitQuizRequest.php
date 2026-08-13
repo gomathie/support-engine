@@ -45,7 +45,10 @@ class SubmitQuizRequest extends FormRequest
                 ),
             ],
 
-            'answers.*.text' => ['sometimes', 'nullable', 'string', 'max:1000'],
+            // Generous because written answers are essays — the source exam
+            // asks for a sequence of actions, checks and verification steps.
+            // Short answers are a line or two and stay well inside this.
+            'answers.*.text' => ['sometimes', 'nullable', 'string', 'max:8000'],
         ];
     }
 

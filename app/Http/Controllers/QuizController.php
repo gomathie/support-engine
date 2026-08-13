@@ -191,12 +191,20 @@ class QuizController extends Controller
             'attempt' => [
                 'id' => $attempt->id,
                 'attempt_number' => $attempt->attempt_number,
-                'score' => (float) $attempt->score,
+
+                // Null while an examiner still has written answers to mark.
+                // Showing the objective half alone would read as a final mark,
+                // and usually as a fail.
+                'score' => $attempt->score === null ? null : (float) $attempt->score,
+
                 'points_earned' => $attempt->points_earned,
                 'points_possible' => $attempt->points_possible,
                 'passed' => $attempt->passed,
                 'passing_score' => $attempt->passing_score,
                 'completed_at' => $attempt->completed_at?->toIso8601String(),
+                'awaiting_review' => $attempt->awaitsReview(),
+                'outstanding' => $attempt->ungradedAnswers()->count(),
+                'reviewed_at' => $attempt->reviewed_at?->toIso8601String(),
             ],
 
             'answers' => $showFeedback
@@ -213,6 +221,13 @@ class QuizController extends Controller
                         'points' => $question->points,
                         'explanation' => $question->explanation,
                         'text_answer' => $answer->text_answer,
+
+                        // Written answers: whether an examiner has been yet,
+                        // and what they said. `marking_guidance` is never sent
+                        // — that is the examiner's rubric, not the employee's.
+                        'requires_review' => $question->requiresManualGrading(),
+                        'awaiting_review' => $answer->awaitsGrading(),
+                        'grader_feedback' => $answer->grader_feedback,
 
                         'options' => $question->type === QuestionType::ShortAnswer
                             ? []

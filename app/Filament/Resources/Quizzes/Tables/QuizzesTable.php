@@ -42,6 +42,21 @@ class QuizzesTable
                     ->counts('questions')
                     ->alignEnd(),
 
+                // A choice question with nothing ticked as correct can never be
+                // answered right. The imported exam arrives in exactly that
+                // state, so it needs to be visible rather than discovered when
+                // everybody scores zero.
+                TextColumn::make('needs_key')
+                    ->label('No answer key')
+                    ->state(fn (Quiz $record) => $record->questions
+                        ->filter(fn ($q) => $q->needsAnswerKey())
+                        ->count() ?: null)
+                    ->badge()
+                    ->color('danger')
+                    ->placeholder('—')
+                    ->tooltip('Multiple-choice questions with no correct option ticked')
+                    ->alignEnd(),
+
                 TextColumn::make('points')
                     ->label('Points')
                     ->state(fn (Quiz $record) => $record->totalPoints())
