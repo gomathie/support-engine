@@ -116,8 +116,13 @@
 
     <div class="body">
         {{-- dompdf reads this from disk rather than over HTTP, so it needs an
-             absolute filesystem path, not asset(). --}}
-        @php($logo = public_path('images/logo.png'))
+             absolute filesystem path, not asset().
+
+             And it decodes the image to a full bitmap in memory whatever size
+             it is drawn at, so this points at the 450px print copy rather than
+             the 2356px web logo — the latter exhausted PHP's memory limit
+             mid-render. --}}
+        @php($logo = public_path('images/logo-print.png'))
         @if (file_exists($logo))
             <img src="{{ $logo }}" class="logo" alt="PILOT">
         @endif
