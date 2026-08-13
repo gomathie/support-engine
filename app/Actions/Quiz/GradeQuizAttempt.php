@@ -2,10 +2,7 @@
 
 namespace App\Actions\Quiz;
 
-use App\Actions\Progress\CompleteLesson;
-use App\Actions\Progress\RecalculateCourseProgress;
 use App\Enums\AttemptStatus;
-use App\Enums\CompletionRequirement;
 use App\Enums\QuestionType;
 use App\Models\QuizAnswer;
 use App\Models\QuizAttempt;
@@ -13,17 +10,20 @@ use App\Models\QuizQuestion;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Scores an attempt.
+ * Marks an attempt.
  *
- * Everything here happens server-side by design. The browser only ever sends
- * option ids and free text; it is never told which option is correct, and it
- * plays no part in deciding the score.
+ * Objective questions are scored here and now. Written ones cannot be — they go
+ * to an examiner, and the attempt sits at `pending_review` until every one has
+ * been marked, at which point FinaliseQuizAttempt computes the real score.
+ *
+ * Everything happens server-side by design. The browser only ever sends option
+ * ids and free text; it is never told which option is correct, and it plays no
+ * part in deciding the score.
  */
 class GradeQuizAttempt
 {
     public function __construct(
-        private readonly RecalculateCourseProgress $recalculate,
-        private readonly CompleteLesson $completeLesson,
+        private readonly FinaliseQuizAttempt $finalise,
     ) {}
 
     /**
@@ -32,32 +32,35 @@ class GradeQuizAttempt
     public function handle(QuizAttempt $attempt, array $submissions = []): QuizAttempt
     {
         return DB::transaction(function () use ($attempt, $submissions): QuizAttempt {
-            $quiz = $attempt->quiz;
-
-            $questions = $quiz->questions()->with('options')->get()->keyBy('id');
-
+            $questions = $attempt->quiz->questions()->with('options')->get();
             $byQuestion = collect($submissions)->keyBy('question_id');
 
-            $pointsPossible = 0;
-            $pointsEarned = 0;
+            $autoPoints = 0;
+            $autoPossible = 0;
+            $manualPossible = 0;
 
             foreach ($questions as $question) {
-                $pointsPossible += $question->points;
-
                 $submission = $byQuestion->get($question->id);
 
-                // An unanswered question scores zero but is still recorded, so
-                // the attempt review shows every question rather than only the
-                // ones that were reached.
-                $selectedIds = array_values(array_map(
-                    'intval',
-                    $submission['option_ids'] ?? [],
-                ));
+                // Unanswered questions are still recorded, so the review screen
+                // shows every question rather than only the ones reached.
+                $selectedIds = array_values(array_map('intval', $submission['option_ids'] ?? []));
                 $text = $submission['text'] ?? null;
 
-                $isCorrect = $this->isCorrect($question, $selectedIds, $text);
+                $manual = $question->type->requiresManualGrading();
+
+                if ($manual) {
+                    $manualPossible += $question->points;
+                } else {
+                    $autoPossible += $question->points;
+                }
+
+                $isCorrect = $manual ? false : $this->isCorrect($question, $selectedIds, $text);
                 $awarded = $isCorrect ? $question->points : 0;
-                $pointsEarned += $awarded;
+
+                if (! $manual) {
+                    $autoPoints += $awarded;
+                }
 
                 QuizAnswer::query()->updateOrCreate(
                     [
@@ -69,42 +72,38 @@ class GradeQuizAttempt
                         'text_answer' => $text,
                         'is_correct' => $isCorrect,
                         'points_awarded' => $awarded,
+
+                        // Null marks it as "not yet looked at", which is what
+                        // holds the attempt in review. Objective answers are
+                        // settled the moment they are recorded.
+                        'graded_at' => $manual ? null : now(),
+
                         'answered_at' => now(),
                     ],
                 );
             }
 
-            $score = $pointsPossible > 0
-                ? round($pointsEarned / $pointsPossible * 100, 2)
-                : 0.0;
-
-            // The snapshot taken at start time, not the quiz's current setting.
-            $passMark = $attempt->passing_score ?? $quiz->passing_score;
-
             $attempt->forceFill([
-                'status' => AttemptStatus::Completed,
-                'points_earned' => $pointsEarned,
-                'points_possible' => $pointsPossible,
-                'score' => $score,
-                'passed' => $score >= $passMark,
+                'auto_points_earned' => $autoPoints,
+                'points_possible' => $autoPossible + $manualPossible,
+                'manual_points_possible' => $manualPossible,
                 'completed_at' => now(),
             ])->save();
 
-            // A passing attempt can complete the lesson it is attached to, and
-            // in either case the course rollup needs recomputing.
-            if ($attempt->passed && $quiz->lesson_id) {
-                $lesson = $quiz->lesson;
+            if ($manualPossible > 0) {
+                // Deliberately no score yet: the objective half alone would read
+                // as a final mark and a fail.
+                $attempt->forceFill([
+                    'status' => AttemptStatus::PendingReview,
+                    'points_earned' => null,
+                    'score' => null,
+                    'passed' => null,
+                ])->save();
 
-                if ($lesson && $lesson->completion_requirement === CompletionRequirement::Quiz) {
-                    $this->completeLesson->handle($attempt->user, $lesson);
-
-                    return $attempt->refresh();
-                }
+                return $attempt->refresh();
             }
 
-            $this->recalculate->handle($attempt->user, $attempt->course);
-
-            return $attempt->refresh();
+            return $this->finalise->handle($attempt->refresh());
         });
     }
 
@@ -133,15 +132,21 @@ class GradeQuizAttempt
             ->values()
             ->all();
 
+        // A question whose answer key was never set cannot be got right. It is
+        // surfaced as "needs an answer key" in the admin rather than silently
+        // marking everyone wrong for ever.
+        if ($correctIds === []) {
+            return false;
+        }
+
         $given = collect($selectedIds)->unique()->sort()->values()->all();
 
         if ($given === []) {
             return false;
         }
 
-        // Multiple-choice is all-or-nothing: every correct option and no
-        // incorrect ones. Partial credit would let somebody tick every box and
-        // score.
+        // All-or-nothing: every correct option and no incorrect ones. Partial
+        // credit would let somebody tick every box and score.
         return $given === $correctIds;
     }
 
