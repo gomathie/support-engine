@@ -54,7 +54,7 @@ services:
       - "8080:8000"
     volumes:
       # Mount source for live edits during dev (optional — comment out for prod-like test)
-      - ./platform:/var/www/html
+      - .:/var/www/html
       # Layered over the mount above: the host .env points at 127.0.0.1, which
       # is correct on the host and wrong inside the network.
       - ./docker/app.env:/var/www/html/.env:ro
@@ -81,7 +81,7 @@ services:
         condition: service_healthy
     command: sh -c "php artisan queue:work --tries=3 --max-time=3600 --sleep=1"
     volumes:
-      - ./platform:/var/www/html
+      - .:/var/www/html
       - ./docker/app.env:/var/www/html/.env:ro
       - /var/www/html/vendor
       - /var/www/html/node_modules

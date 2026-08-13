@@ -1,13 +1,39 @@
-.git
-.gitignore
+# Rebuilt inside the image, so copying them in only invalidates layer cache
+# and risks host-built artifacts (native modules, absolute paths) leaking in.
 node_modules
 vendor
-*.log
+public/build
+
+# Local machine config — php.ini hard-codes a Windows extension_dir.
+php.ini
+*.ps1
+
+# Secrets and local state
 .env
 .env.backup
 .env.production
-docker
-docs
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+.phpunit.result.cache
+.phpunit.cache
+
+# Not needed at runtime
+.git
+.gitignore
+.gitattributes
+.editorconfig
+.dockerignore
 Dockerfile
 docker-compose.yml
-.dockerignore
+docker
+docs
+README.md
+*.log
+
+# Editors
+.idea
+.vscode
+.zed
+.cursor

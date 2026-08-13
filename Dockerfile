@@ -21,15 +21,15 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 # PHP deps first (layer cache)
-COPY platform/composer.json platform/composer.lock ./
+COPY composer.json composer.lock ./
 RUN composer install --no-scripts --no-autoloader --prefer-dist
 
 # Node deps (layer cache)
-COPY platform/package.json platform/package-lock.json ./
+COPY package.json package-lock.json ./
 RUN npm ci
 
 # Full source
-COPY platform/ .
+COPY . .
 
 # Finish composer autoload + package discovery
 RUN composer dump-autoload --optimize \
