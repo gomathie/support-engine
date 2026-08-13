@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
 
 class AuthenticationTest extends TestCase
@@ -14,7 +14,7 @@ class AuthenticationTest extends TestCase
     {
         $this->get(route('login'))
             ->assertOk()
-            ->assertSee('Auth/Login');
+            ->assertInertia(fn (AssertableInertia $page) => $page->component('Auth/Login'));
     }
 
     public function test_employee_can_sign_in(): void
