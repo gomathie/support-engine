@@ -50,7 +50,7 @@ const icon = computed(() => {
 <template>
     <Link
         :href="route('courses.show', course.slug)"
-        class="group relative flex flex-col overflow-hidden rounded-2xl border border-line bg-surface p-8 pb-7 text-ink no-underline transition-all duration-250 hover:-translate-y-1 hover:border-ink-dis hover:shadow-[0_16px_48px_rgba(0,0,0,.1)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary dark:hover:shadow-[0_16px_48px_rgba(0,0,0,.3)]"
+        class="group relative flex flex-col overflow-hidden rounded-2xl border border-glass-border bg-glass-bg backdrop-blur-md p-8 pb-7 text-ink no-underline transition-all duration-300 hover:-translate-y-2 hover:border-primary hover:shadow-xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary dark:hover:shadow-[0_20px_50px_rgba(129,140,248,0.15)]"
     >
         <div
             class="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br opacity-0 transition-opacity duration-350 group-hover:opacity-100"

@@ -69,7 +69,7 @@ const formatDate = (iso) =>
         <!-- ─── STATS BAR ──────────────────────────────────── -->
         <div class="mx-auto -mt-10 mb-15 max-w-[1200px] px-6">
             <div
-                class="flex flex-wrap justify-center gap-12 rounded-[14px] border border-line bg-surface px-8 py-7"
+                class="flex flex-wrap justify-center gap-12 rounded-[14px] border border-glass-border bg-glass-bg backdrop-blur-md px-8 py-7 shadow-lg transition-all duration-300 hover:scale-[1.01] hover:shadow-xl"
             >
                 <DashboardStat :value="stats.assigned" label="Assigned" />
                 <DashboardStat :value="stats.in_progress" label="In Progress" />
@@ -84,14 +84,14 @@ const formatDate = (iso) =>
             <h2 class="mono-label mb-3 text-[11px] tracking-[2.5px] text-ink-sec">
                 Upcoming &amp; overdue
             </h2>
-            <div class="overflow-hidden rounded-lg border border-line bg-surface">
+            <div class="overflow-hidden rounded-lg border border-glass-border bg-glass-bg backdrop-blur-md shadow-md">
                 <Link
                     v-for="item in due_soon"
                     :key="item.course_slug"
                     :href="route('courses.show', item.course_slug)"
-                    class="flex items-center gap-3 border-b border-line px-4 py-3 no-underline last:border-b-0 hover:bg-surface-alt"
+                    class="group flex items-center gap-3 border-b border-glass-border px-4 py-3 no-underline last:border-b-0 hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors duration-250"
                 >
-                    <span class="flex-1 text-[13px] text-ink">{{ item.course_title }}</span>
+                    <span class="flex-1 text-[13px] text-ink transition-transform duration-250 group-hover:translate-x-1">{{ item.course_title }}</span>
                     <StatusPill
                         :label="item.is_overdue ? 'Overdue' : 'Due ' + formatDate(item.due_at)"
                         :tone="item.is_overdue ? 'negative' : 'warning'"
@@ -139,14 +139,14 @@ const formatDate = (iso) =>
                 <h2 class="mono-label mb-3 text-[11px] tracking-[2.5px] text-ink-sec">
                     Recent quiz results
                 </h2>
-                <div class="overflow-hidden rounded-lg border border-line bg-surface">
+                <div class="overflow-hidden rounded-lg border border-glass-border bg-glass-bg backdrop-blur-md shadow-md">
                     <Link
                         v-for="result in recent_results"
                         :key="result.id"
                         :href="route('attempts.show', result.id)"
-                        class="flex items-center gap-3 border-b border-line px-4 py-3 no-underline last:border-b-0 hover:bg-surface-alt"
+                        class="group flex items-center gap-3 border-b border-glass-border px-4 py-3 no-underline last:border-b-0 hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors duration-250"
                     >
-                        <div class="min-w-0 flex-1">
+                        <div class="min-w-0 flex-1 transition-transform duration-250 group-hover:translate-x-1">
                             <div class="truncate text-[13px] text-ink">{{ result.quiz_title }}</div>
                             <div class="mono-label text-[9px] tracking-[1px] text-ink-dis">
                                 {{ result.course_title }}
@@ -170,18 +170,18 @@ const formatDate = (iso) =>
                 <h2 class="mono-label mb-3 text-[11px] tracking-[2.5px] text-ink-sec">
                     Recommended for you
                 </h2>
-                <div class="overflow-hidden rounded-lg border border-line bg-surface">
+                <div class="overflow-hidden rounded-lg border border-glass-border bg-glass-bg backdrop-blur-md shadow-md">
                     <Link
                         v-for="course in recommended"
                         :key="course.slug"
                         :href="route('courses.show', course.slug)"
-                        class="block border-b border-line px-4 py-3 no-underline last:border-b-0 hover:bg-surface-alt"
+                        class="group block border-b border-glass-border px-4 py-3 no-underline last:border-b-0 hover:bg-white/40 dark:hover:bg-slate-800/40 transition-colors duration-250"
                     >
-                        <div class="mono-label text-[9px] tracking-[2px] text-ink-dis">
+                        <div class="mono-label text-[9px] tracking-[2px] text-ink-dis transition-transform duration-250 group-hover:translate-x-1">
                             {{ course.category }}
                         </div>
-                        <div class="text-[13px] font-bold text-ink">{{ course.title }}</div>
-                        <p class="mt-1 line-clamp-2 text-xs text-ink-sec">{{ course.summary }}</p>
+                        <div class="text-[13px] font-bold text-ink transition-transform duration-250 group-hover:translate-x-1">{{ course.title }}</div>
+                        <p class="mt-1 line-clamp-2 text-xs text-ink-sec transition-transform duration-250 group-hover:translate-x-1">{{ course.summary }}</p>
                     </Link>
                 </div>
             </div>
