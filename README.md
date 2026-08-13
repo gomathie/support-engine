@@ -1,275 +1,163 @@
-# PILOT Support Training Academy
+# Support Training Hub
 
 An interactive onboarding platform for new support employees. Trainees work through structured curriculum tracks — 1st-line support (2 weeks), admin panel (3 days), and support skills modules — **ticking checkboxes** as they complete each lesson to show their progress in real time.
 
 ## What it does
 
-| Feature                | Description                                                                                                |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------- |
-| **Training Tracker**   | 4 curriculum tracks, 24 modules, 96 lessons with interactive checkbox completion                           |
-| **Progress Dashboard** | SVG circular gauge, per-section progress bars, and completion counters — all driven by checked-off lessons |
-| **Support Panel**      | Diagnostic decision trees, priority matrix, and case-note generator for hands-on practice                  |
-| **Skills Module**      | Long-form reference documentation with sticky TOC, scroll-spy, and annotated "standard default" markers    |
-| **Quiz Engine**        | Timed assessments with scoring, pass marks, and attempt history                                            |
-| **Certificates**       | Auto-generated PDF certificates upon course completion                                                     |
-| **Admin Portal**       | Full Filament admin for managing courses, employees, departments, enrollments, and reporting               |
+| Feature | Description |
+| --- | --- |
+| **Training Tracker** | Curriculum tracks broken into modules and lessons, with interactive checkbox completion |
+| **Progress Dashboard** | Circular gauge, per-course progress bars and completion counters — all driven by checked-off lessons |
+| **Support Panel** | 13 diagnostic decision trees (102 checks), a priority matrix, and a case-note generator for live calls |
+| **Quiz Engine** | Timed assessments with server-side scoring, pass marks and attempt history |
+| **Certificates** | Auto-generated PDF certificates on course completion, with public verification links |
+| **Admin Portal** | Filament admin for courses, employees, departments, enrollments, assignment rules and reporting |
 
 ## Tech Stack
 
-| Layer    | Technology                                                           |
-| -------- | -------------------------------------------------------------------- |
-| Backend  | Laravel 13 (PHP 8.3)                                                 |
-| Admin    | Filament 5                                                           |
-| Frontend | Vue 3 + Inertia 3                                                    |
-| Styling  | Tailwind CSS 4 (Vibrant Indigo + Deep Dark Mode & Glassmorphism)     |
-| Database | PostgreSQL 17                                                        |
-| Auth     | Laravel Breeze + Spatie Permission (Roles: Admin, Manager, Employee) |
-| PDF      | barryvdh/laravel-dompdf                                              |
+| Layer | Technology |
+| --- | --- |
+| Backend | Laravel 13 (PHP 8.3) |
+| Admin | Filament 5 |
+| Frontend | Vue 3 + Inertia 3 |
+| Styling | Tailwind CSS 4 — academy palette (`#1463ff` brand, `#0a2540` navy, `#19a86b` green) |
+| Database | PostgreSQL 17 |
+| Auth | Laravel session auth + Spatie Permission (Admin, Manager, Employee) |
+| PDF | barryvdh/laravel-dompdf |
 
-## User Roles & Permissions
+## User Roles
 
-The application features exactly 3 roles with granular permissions:
+1. **Admin** — creates users, assigns roles, authors all content, sees every department.
+2. **Manager** — sees only the departments they run; assigns training and reads their reports.
+3. **Employee** — enrols in courses, ticks off progress, takes assessments, earns certificates.
 
-1. **Admin**: Can create users, assign roles, define role permissions, and configure system-wide policies.
-2. **Manager**: Granted content-management rights (by the Admin) to create/edit courses, lessons, and quizzes for training their employees.
-3. **Employee**: Enrolls in courses, ticks off progress, takes quizzes, and views their dashboard.
+Authorization is enforced server-side by policies, not by hiding links. Managers are scoped in SQL as well as per-record, so they cannot learn the shape of departments they do not run.
 
 ## Quick Start (Docker)
 
 ```bash
-# Build and start everything (app + PostgreSQL)
 docker compose up --build -d
-
-# Run migrations and seed the database
-docker compose exec app php artisan migrate --force
-docker compose exec app php artisan db:seed
-
-# Open in browser
-# http://localhost:8000
+docker compose exec app php artisan migrate --seed
 ```
+
+| Service | | |
+| --- | --- | --- |
+| `app` | http://localhost:8080 | Laravel |
+| `db` | localhost:5433 | PostgreSQL 17 |
+| `queue` | — | `queue:work` — renders certificates, sends mail |
+
+The `queue` service is not optional in practice: certificate PDFs and notification emails are dispatched to a queue, so without a worker draining it a completed course never produces a downloadable certificate.
+
+Container config lives in [`docker/app.env`](docker/app.env), mounted over `.env`. It is deliberately **not** in docker-compose's `environment:` block — variables set there land in `$_SERVER`, which Laravel's env repository reads *before* `$_ENV`, so they silently outrank `phpunit.xml`. See the note in that file.
 
 ### Test Accounts (seeded)
 
-| Role           | Email                   | Password   |
-| -------------- | ----------------------- | ---------- |
-| Admin          | `admin@pilot.test`      | `password` |
-| Manager        | `manager@pilot.test`    | `password` |
-| Employee       | `employee@pilot.test`   | `password` |
-| Employee (Ops) | `operations@pilot.test` | `password` |
+| Role | Email | Password |
+| --- | --- | --- |
+| Admin | `admin@pilot.test` | `password` |
+| Manager | `manager@pilot.test` | `password` |
+| Employee | `employee@pilot.test` | `password` |
 
-## Running Tests
-
-Tests run against PostgreSQL (not SQLite) to match production behavior with JSONB columns and ILIKE queries.
-
-```bash
-# Inside Docker
-docker compose exec app php artisan test
-
-# Locally (requires PostgreSQL with pilot_lms_testing database)
-cd platform
-php artisan test
-```
+Sign in at `/login` — there is one login page for everyone, and admins and managers are redirected into `/admin` automatically.
 
 ## Local Development (without Docker)
 
-```bash
-cd platform
+The app needs `pdo_pgsql`, which is often not enabled in a stock Windows PHP build, and `php.ini` usually sits in a directory needing an elevated shell to write to. Rather than changing PHP globally — which would break other projects sharing that install — this project generates its own ini and points PHP at it with `PHPRC`:
 
-# Install dependencies
-composer install
-npm install
-
-# Configure environment
-cp .env.example .env
-php artisan key:generate
-
-# Set DB_CONNECTION=pgsql and your PostgreSQL credentials in .env
-
-# Migrate and seed
-php artisan migrate
-php artisan db:seed
-
-# Start dev server (Laravel + Vite concurrently)
-composer dev
+```powershell
+.\setup-php-ini.ps1   # once: generates ./php.ini with the extensions enabled
+.\dev.ps1             # PostgreSQL, migrations, artisan serve, queue, vite
 ```
+
+## Running Tests
+
+```bash
+docker compose exec app php artisan test
+```
+
+Tests run against `pilot_lms_testing`, configured by [`.env.testing`](.env.testing). Note that `.env.testing` **replaces** `.env` rather than layering on it, so anything needed to boot — `APP_KEY` in particular — has to be present in it.
+
+`TestCase` refuses to run unless the database name contains `test`. `RefreshDatabase` runs `migrate:fresh`, and a misconfigured environment pointing at the development database would destroy it silently otherwise.
+
+PostgreSQL rather than SQLite in memory, on purpose: the schema uses `jsonb` and the course search uses `ILIKE`, neither of which SQLite reproduces faithfully.
 
 ## Project Structure
 
 ```
 support-engine/
-├── platform/              ← Laravel application
-│   ├── app/
-│   │   ├── Actions/       ← Business logic (RecalculateCourseProgress, GradeQuizAttempt, etc.)
-│   │   ├── Enums/         ← Role, CourseStatus, etc.
-│   │   ├── Filament/      ← Admin panel resources
-│   │   ├── Http/          ← Controllers, Requests, Resources
-│   │   ├── Jobs/          ← Queued jobs (certificate generation, notifications)
-│   │   ├── Models/        ← Eloquent models (20 models)
-│   │   └── Policies/      ← Authorization policies
-│   ├── database/
-│   │   ├── migrations/    ← 23 migrations
-│   │   └── seeders/       ← Training content, users, roles, diagnostic trees
-│   ├── resources/
-│   │   ├── css/           ← Tailwind entry point
-│   │   └── js/            ← Vue components + Inertia pages
-│   └── tests/
-│       └── Feature/       ← Auth, Authorization, Certificates, Enrollment, Progress, Quiz tests
-├── pages/                 ← Original static prototype (visual reference)
-├── docs/                  ← Implementation map + training plans
-├── docker-compose.yml     ← App + PostgreSQL services
-└── Dockerfile             ← PHP 8.3 + Node 22 image
+├── app/
+│   ├── Actions/           ← Business logic (RecalculateCourseProgress, GradeQuizAttempt, …)
+│   ├── Console/Commands/  ← training:send-reminders, training:sync-assignments
+│   ├── Enums/             ← Role, CourseStatus, LessonType, ProgressStatus, …
+│   ├── Filament/          ← Admin resources, relation managers, widgets, reports
+│   ├── Http/              ← Controllers, form requests, middleware
+│   ├── Jobs/              ← RenderCertificatePdf
+│   ├── Models/            ← Eloquent models
+│   ├── Notifications/     ← CourseAssigned, TrainingDue
+│   └── Policies/          ← Authorization
+├── database/
+│   ├── migrations/        ← 24 migrations
+│   └── seeders/           ← Roles, users, curriculum, diagnostic trees, assignment rules
+├── resources/
+│   ├── css/app.css        ← Tailwind theme + design tokens
+│   ├── js/                ← Vue components, layouts and Inertia pages
+│   └── views/             ← Inertia root + certificate PDF template
+├── tests/Feature/         ← Auth, authorization, progress, quizzes, certificates, admin
+├── docker/                ← app.env, init-test-db.sql
+├── docs/                  ← Implementation map + source training plans
+├── docker-compose.yml     ← app + db + queue
+└── Dockerfile             ← PHP 8.3 + Node 22
 ```
-
-## How Progress Tracking Works
-
-1. Employee logs in and sees their assigned courses on the dashboard
-2. Each course contains modules (day plans) with individual lessons (training materials)
-3. Employee studies the material and **ticks the checkbox** next to each completed lesson
-4. Checkbox toggle → `POST /courses/{c}/lessons/{l}/complete` → `LessonProgress` record created
-5. `RecalculateCourseProgress` action updates section counters, progress bars, and the SVG gauge
-6. Managers and admins can monitor employee progress through the Filament reporting panel
-
-## System Documentation
-
-- [PILOT GPS Platform Docs](https://docs.pilot-gps.com/)
-- [Implementation Map](docs/IMPLEMENTATION_MAP.md) — full prototype audit and architecture mapping
-- [1st-Line Support Training Plan](<docs/PILOT%20System%20Training%20Plan%20for%201st-Line%20Support%20(2%20Weeks).md>)
-- [Admin Panel Training Plan](docs/Training%20Plan%20for%203%20Days_%20PILOT%20Administrative%20Panel.md)
-
-# Support Training Hub
-
-Internal training platform for new support employees learning the PILOT
-platform. Laravel 13 + Filament 5 admin at `/admin`, Vue 3 + Inertia employee
-portal, Tailwind 4, PostgreSQL 17.
-
-The look follows academy.pilot-gps.com — brand `#1463ff`, navy `#0a2540`,
-green `#19a86b`, Inter, flat white cards on slate-50 — so the internal academy
-reads as the same product family as the customer-facing one.
-
-Converted from the static HTML/CSS/JS prototype in [`../pages`](../pages),
-which is kept untouched as the visual reference. The audit and the
-feature-by-feature mapping are in
-[`../docs/IMPLEMENTATION_MAP.md`](../docs/IMPLEMENTATION_MAP.md).
-
----
-
-## Running it
-
-### Docker (recommended)
-
-```bash
-cd ..                 # the repository root, where docker-compose.yml lives
-docker compose up -d
-docker compose exec app php artisan migrate --seed
-```
-
-| Service |                       |                                                   |
-| ------- | --------------------- | ------------------------------------------------- |
-| `app`   | http://localhost:8080 | Laravel, `artisan serve`                          |
-| `db`    | localhost:5433        | PostgreSQL 17                                     |
-| `queue` | —                     | `queue:work`, renders certificates and sends mail |
-
-The `queue` service is not optional in practice: certificate PDFs and
-notification emails are dispatched to a queue, so without a worker draining it
-a completed course never produces a downloadable certificate.
-
-Application config for the containers lives in
-[`../docker/app.env`](../docker/app.env), mounted over `.env`. It is
-deliberately **not** in docker-compose's `environment:` block — see the note in
-that file for why.
-
-### On the host
-
-The app needs `pdo_pgsql`, which is often not enabled in a stock Windows PHP
-build, and `php.ini` usually sits in a directory that needs an elevated shell to
-write to. Rather than changing PHP globally — which would break other projects
-sharing that install — this project ships its own ini and points PHP at it with
-`PHPRC`:
-
-```powershell
-.\setup-php-ini.ps1   # once: generates platform/php.ini with the extensions on
-.\dev.ps1             # starts PostgreSQL, migrations, artisan serve, queue, vite
-```
-
----
-
-## Accounts
-
-One per role, created by `UserSeeder`. All three use the password `password`;
-they exist for local development only.
-
-| Email                 | Role     | Sees                   |
-| --------------------- | -------- | ---------------------- |
-| `admin@pilot.test`    | Admin    | Everything             |
-| `manager@pilot.test`  | Manager  | Technical Support only |
-| `employee@pilot.test` | Employee | Their own training     |
-
----
-
-## Tests
-
-```bash
-docker compose exec app php artisan test
-```
-
-They run against `pilot_lms_testing` in the same container, configured by
-[`.env.testing`](.env.testing). Note that `.env.testing` _replaces_ `.env`
-rather than layering on it, so anything needed to boot — `APP_KEY` in
-particular — has to be present in it.
-
-`TestCase` refuses to run if the database name does not contain `test`.
-`RefreshDatabase` runs `migrate:fresh`, and a misconfigured environment
-pointing at the development database will destroy it silently otherwise.
-
-PostgreSQL rather than SQLite in memory, on purpose: the schema uses `jsonb`
-and the course search uses `ILIKE`, neither of which SQLite reproduces
-faithfully.
-
----
 
 ## Architecture
 
 Business logic lives in `app/Actions`, never in Vue components:
 
-|                                      |                                                              |
-| ------------------------------------ | ------------------------------------------------------------ |
-| `Progress\RecalculateCourseProgress` | The only place a course percentage is decided                |
-| `Progress\CompleteLesson`            | Ticking a lesson off, and undoing it                         |
-| `Quiz\StartQuizAttempt`              | Starts or resumes an attempt, enforces the attempt limit     |
-| `Quiz\GradeQuizAttempt`              | Scores server-side; the browser only ever submits option ids |
-| `Enrollment\EnrollEmployee`          | Assignment, restoring revoked enrollments, due dates         |
-| `Enrollment\SyncAssignmentRules`     | Turns assignment rules into enrollments                      |
-| `Certificates\IssueCertificate`      | Idempotent issuance; queues the PDF render                   |
-| `Support\BuildCaseNote`              | Rebuilds the Support Panel case note                         |
+| | |
+| --- | --- |
+| `Progress\RecalculateCourseProgress` | The only place a course percentage is decided |
+| `Progress\CompleteLesson` | Ticking a lesson off, and undoing it |
+| `Quiz\StartQuizAttempt` | Starts or resumes an attempt, enforces the attempt limit |
+| `Quiz\GradeQuizAttempt` | Scores server-side; the browser only ever submits option ids |
+| `Enrollment\EnrollEmployee` | Assignment, restoring revoked enrollments, due dates |
+| `Enrollment\SyncAssignmentRules` | Turns assignment rules into enrollments |
+| `Certificates\IssueCertificate` | Idempotent issuance; queues the PDF render |
+| `Support\BuildCaseNote` | Rebuilds the Support Panel case note |
 
 ### Things worth knowing before changing them
 
-- **Quiz answer keys never reach the browser.** `QuizController::start()`
-  assembles the payload by hand rather than serialising the model, so
-  `is_correct` and `explanation` cannot leak. `QuizOption` also hides
-  `is_correct` at the model level as a backstop. There is a test asserting the
-  string `is_correct` is absent from the taking-a-quiz response.
-- **The pass mark is snapshotted onto each attempt.** Raising a quiz's
-  `passing_score` cannot retroactively fail somebody who already sat it.
-- **Uploads and certificates go to the `private` disk**, which has no URL.
-  They are served only through policy-checked controllers.
-- **`course_progress` is a rollup**, recalculated on every lesson tick and
-  every graded attempt. The dashboard and every report read it directly rather
-  than recomputing percentages.
-- **`lessons.course_id` is denormalised** from the module. `Lesson::saving()`
-  keeps it in sync; do not set it by hand.
-- **Assignment rules are rows, not code.** "Operations gets Fleet Safety
-  Training" is a record in `assignment_rules`, evaluated live so moving
-  somebody between departments changes what they are assigned.
+- **Quiz answer keys never reach the browser.** `QuizController::start()` assembles the payload by hand rather than serialising the model, so `is_correct` and `explanation` cannot leak. `QuizOption` also hides `is_correct` at the model level as a backstop, and a test asserts the string is absent from the response.
+- **The pass mark is snapshotted onto each attempt.** Raising a quiz's `passing_score` cannot retroactively fail somebody who already sat it.
+- **A quiz's scope is derived, not stored.** Final exam / module test / lesson check comes from whether `course_module_id` and `lesson_id` are set, so the two cannot drift apart.
+- **Uploads and certificates go to the `private` disk**, which has no URL. They are served only through policy-checked controllers.
+- **`course_progress` is a rollup**, recalculated on every lesson tick and every graded attempt. The dashboard and every report read it directly rather than recomputing percentages.
+- **`lessons.course_id` is denormalised** from the module. `Lesson::saving()` keeps it in sync; do not set it by hand.
+- **Assignment rules are rows, not code.** "Operations gets Fleet Safety Training" is a record in `assignment_rules`, evaluated live, so moving somebody between departments changes what they are assigned.
+- **Filament's published assets are committed** (`public/css|js|fonts/filament`). The Dockerfile does not run `filament:assets`, so deleting them leaves the admin panel unstyled in a fresh build.
 
 ### Scheduled work
 
-Needs `php artisan schedule:work` in development, or a cron entry calling
-`schedule:run` in production.
+Needs `php artisan schedule:work` in development, or a cron entry calling `schedule:run` in production.
 
-| Command                     | When           |                                    |
-| --------------------------- | -------------- | ---------------------------------- |
-| `training:send-reminders`   | Weekdays 08:00 | Due-soon and overdue notifications |
-| `training:sync-assignments` | Hourly         | Enrols anyone the rules now match  |
+| Command | When | |
+| --- | --- | --- |
+| `training:send-reminders` | Weekdays 08:00 | Due-soon and overdue notifications |
+| `training:sync-assignments` | Hourly | Enrols anyone the rules now match |
 
-Both take `--dry-run` / are idempotent, so they are safe to run by hand.
+Both are idempotent and `training:send-reminders` takes `--dry-run`, so they are safe to run by hand.
+
+## How Progress Tracking Works
+
+1. Employee signs in and sees assigned courses, plus a **next lesson** call to action.
+2. Each course contains modules, and each module holds lessons.
+3. The employee studies the material and **ticks the checkbox** on each completed lesson.
+4. That posts to `/courses/{course}/lessons/{lesson}/complete`, creating a `LessonProgress` row.
+5. `RecalculateCourseProgress` recomputes the rollup — counters, percentage, status — and issues a certificate if the course is now complete.
+6. Managers and admins monitor it through the Filament report, filterable by department, course, status and date, with CSV export.
+
+## Documentation
+
+- [PILOT GPS Platform Docs](https://docs.pilot-gps.com/)
+- [Implementation Map](docs/IMPLEMENTATION_MAP.md) — prototype audit and architecture mapping
+- [1st-Line Support Training Plan](<docs/PILOT%20System%20Training%20Plan%20for%201st-Line%20Support%20(2%20Weeks).md>)
+- [Admin Panel Training Plan](docs/Training%20Plan%20for%203%20Days_%20PILOT%20Administrative%20Panel.md)

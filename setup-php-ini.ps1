@@ -1,6 +1,6 @@
 <#
-    Generates platform/php.ini from your system php.ini with the extensions this
-    project needs enabled (pdo_pgsql, pgsql, gd, intl, sodium).
+    Generates php.ini in the project root from your system php.ini, with the
+    extensions this project needs enabled (pdo_pgsql, pgsql, gd, intl, sodium).
 
     Why this exists: the system php.ini lives in a protected directory
     (C:\Program Files\...) and editing it needs an elevated shell. Rather than
