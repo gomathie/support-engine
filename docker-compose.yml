@@ -44,7 +44,20 @@ services:
       CACHE_STORE: database
       QUEUE_CONNECTION: database
       MAIL_MAILER: log
-    command: sh -c "php artisan config:cache && php artisan serve --host=0.0.0.0 --port=8000"
+    # No config:cache here.
+    #
+    # A cached config is frozen at container start, and nothing can override it
+    # afterwards — not phpunit.xml's <env> block, not anything. That silently
+    # sent the test suite at APP_ENV=local (so CSRF was enforced and every POST
+    # got a 419), at QUEUE_CONNECTION=database (so queued jobs never ran), and
+    # at the development database instead of pilot_lms_testing.
+    #
+    # It was only there to work around `artisan serve` dropping DB_HOST when it
+    # spawns its child process; AppServiceProvider now adds those variables to
+    # ServeCommand::$passthroughVariables instead, which fixes the cause.
+    #
+    # Cache config in a production image, never in a dev container.
+    command: sh -c "php artisan config:clear && php artisan serve --host=0.0.0.0 --port=8000"
     ports:
       - "8080:8000"
     volumes:
