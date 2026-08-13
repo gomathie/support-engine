@@ -27,6 +27,12 @@ class QuizResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
+    protected static ?string $modelLabel = 'assessment';
+
+    protected static ?string $pluralModelLabel = 'assessments';
+
+    protected static ?string $recordTitleAttribute = 'title';
+
     public static function form(Schema $schema): Schema
     {
         return QuizForm::configure($schema);
@@ -37,11 +43,23 @@ class QuizResource extends Resource
         return QuizzesTable::configure($table);
     }
 
-    public static function getRelations(): array
+    /**
+     * Translates the form's scope choice into the pair of foreign keys that
+     * actually record it, clearing the one the chosen scope does not use.
+     *
+     * Shared by the create and edit pages, and by the "add final exam" action
+     * on a course, so all three agree on what a scope means.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    public static function applyScope(array $data, string $scope): array
     {
-        return [
-            //
-        ];
+        return match ($scope) {
+            Quiz::SCOPE_MODULE => [...$data, 'lesson_id' => null],
+            Quiz::SCOPE_LESSON => [...$data, 'course_module_id' => null],
+            default => [...$data, 'course_module_id' => null, 'lesson_id' => null],
+        };
     }
 
     public static function getPages(): array

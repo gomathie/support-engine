@@ -36,7 +36,9 @@ class SupportPanelController extends Controller
                 'id' => $tree->id,
                 'key' => $tree->key,
                 'question' => $tree->question,
+                'category' => $tree->category ?: 'Other',
                 'layer_label' => $tree->layer_label,
+                'description' => $tree->description,
                 'steps' => $tree->steps->map(fn ($step) => [
                     'id' => $step->id,
                     'prompt' => $step->prompt,
@@ -48,6 +50,17 @@ class SupportPanelController extends Controller
                     'fix' => $step->fix,
                 ])->all(),
             ])->all(),
+
+            // Category order is fixed rather than alphabetical: it runs in the
+            // order the layers do, so scanning the list teaches the model.
+            'categories' => $trees
+                ->pluck('category')
+                ->map(fn (?string $c) => $c ?: 'Other')
+                ->unique()
+                ->values()
+                ->all(),
+
+            'layers' => $this->layerModel(),
 
             'case' => $case ? [
                 'id' => $case->id,
@@ -103,6 +116,25 @@ class SupportPanelController extends Controller
         $case->save();
 
         return back();
+    }
+
+    /**
+     * The seven layers, top down. Doctrine rather than data — the same for
+     * every desk — so it lives in code rather than a table somebody has to seed.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function layerModel(): array
+    {
+        return [
+            ['n' => 1, 'name' => 'Access & rights', 'look' => "Failed Login Attempts, Blocked Users, Disabled Users → then the user's rights"],
+            ['n' => 2, 'name' => 'Contract & modules', 'look' => 'Is the module on the contract? A missing button is usually this, not a bug'],
+            ['n' => 3, 'name' => 'Interface & filters', 'look' => 'List filters, group selection, columns, date range'],
+            ['n' => 4, 'name' => 'Object config', 'look' => 'Object card, tariff, device ID/type, temporary blocking'],
+            ['n' => 5, 'name' => 'Sensor config', 'look' => 'Field mapping → conversion formula → calibration table, in that order'],
+            ['n' => 6, 'name' => 'Device & data', 'look' => 'Sensors tracing, satellite count, Connection Lost, Devices offline'],
+            ['n' => 7, 'name' => 'Relay', 'look' => 'Statistics: Queue, Err, Send, Ack'],
+        ];
     }
 
     /**

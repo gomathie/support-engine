@@ -44,6 +44,20 @@ class LessonResource extends Resource
         ];
     }
 
+    /** @return array<int, string> */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title', 'description'];
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'Course' => $record->course?->title ?? '—',
+            'Module' => $record->module?->title ?? '—',
+        ];
+    }
+
     public static function getPages(): array
     {
         return [

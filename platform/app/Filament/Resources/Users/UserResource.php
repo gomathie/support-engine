@@ -65,6 +65,20 @@ class UserResource extends Resource
         return $query->whereIn('department_id', $user->visibleDepartmentIds());
     }
 
+    /** @return array<int, string> */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'email', 'employee_number'];
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'Department' => $record->department?->name ?? '—',
+            'Role' => $record->getRoleNames()->implode(', '),
+        ];
+    }
+
     public static function getPages(): array
     {
         return [

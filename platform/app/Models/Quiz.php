@@ -29,6 +29,16 @@ class Quiz extends Model
 {
     use HasFactory, SoftDeletes;
 
+    /**
+     * What the quiz is attached to. Derived from course_module_id and
+     * lesson_id rather than stored, so the two cannot drift apart.
+     */
+    public const SCOPE_FINAL = 'final';
+
+    public const SCOPE_MODULE = 'module';
+
+    public const SCOPE_LESSON = 'lesson';
+
     protected function casts(): array
     {
         return [
@@ -80,6 +90,24 @@ class Quiz extends Model
     public function isFinalAssessment(): bool
     {
         return $this->course_module_id === null && $this->lesson_id === null;
+    }
+
+    public function scope(): string
+    {
+        return match (true) {
+            $this->lesson_id !== null => self::SCOPE_LESSON,
+            $this->course_module_id !== null => self::SCOPE_MODULE,
+            default => self::SCOPE_FINAL,
+        };
+    }
+
+    public function scopeLabel(): string
+    {
+        return match ($this->scope()) {
+            self::SCOPE_LESSON => 'Knowledge check',
+            self::SCOPE_MODULE => 'Module test',
+            default => 'Final exam',
+        };
     }
 
     public function totalPoints(): int

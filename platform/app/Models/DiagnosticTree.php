@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['key', 'question', 'layer_label', 'description', 'position', 'is_published'])]
+#[Fillable(['key', 'question', 'category', 'layer_label', 'description', 'position', 'is_published'])]
 class DiagnosticTree extends Model
 {
     use HasFactory, SoftDeletes;

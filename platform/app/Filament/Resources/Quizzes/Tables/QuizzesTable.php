@@ -2,14 +2,16 @@
 
 namespace App\Filament\Resources\Quizzes\Tables;
 
+use App\Models\Course;
+use App\Models\Quiz;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Actions\RestoreBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 class QuizzesTable
@@ -18,47 +20,70 @@ class QuizzesTable
     {
         return $table
             ->columns([
-                TextColumn::make('course.title')
-                    ->searchable(),
-                TextColumn::make('course_module_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('lesson.title')
-                    ->searchable(),
                 TextColumn::make('title')
-                    ->searchable(),
+                    ->searchable()
+                    ->weight('bold')
+                    ->wrap()
+                    ->description(fn (Quiz $record) => $record->course?->title),
+
+                TextColumn::make('scope')
+                    ->label('Type')
+                    ->state(fn (Quiz $record) => $record->scopeLabel())
+                    ->badge()
+                    ->color(fn (Quiz $record) => match ($record->scope()) {
+                        Quiz::SCOPE_FINAL => 'primary',
+                        Quiz::SCOPE_MODULE => 'warning',
+                        default => 'gray',
+                    })
+                    ->description(fn (Quiz $record) => $record->module?->title ?? $record->lesson?->title),
+
+                TextColumn::make('questions_count')
+                    ->label('Questions')
+                    ->counts('questions')
+                    ->alignEnd(),
+
+                TextColumn::make('points')
+                    ->label('Points')
+                    ->state(fn (Quiz $record) => $record->totalPoints())
+                    ->alignEnd()
+                    ->toggleable(),
+
                 TextColumn::make('passing_score')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('max_attempts')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('time_limit_minutes')
-                    ->numeric()
-                    ->sortable(),
-                IconColumn::make('shuffle_questions')
-                    ->boolean(),
-                IconColumn::make('shuffle_options')
-                    ->boolean(),
-                IconColumn::make('show_feedback')
-                    ->boolean(),
+                    ->label('Pass')
+                    ->suffix('%')
+                    ->alignEnd(),
+
+                TextColumn::make('attempts_count')
+                    ->label('Attempts')
+                    ->counts('attempts')
+                    ->alignEnd(),
+
+                // Average of graded attempts — the quickest read on whether an
+                // assessment is pitched right.
+                TextColumn::make('average')
+                    ->label('Avg score')
+                    ->state(function (Quiz $record): string {
+                        $avg = $record->attempts()->completed()->avg('score');
+
+                        return $avg === null ? '—' : round($avg).'%';
+                    })
+                    ->alignEnd(),
+
                 IconColumn::make('is_published')
+                    ->label('Published')
                     ->boolean(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('deleted_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TrashedFilter::make(),
+                SelectFilter::make('course_id')
+                    ->label('Course')
+                    ->options(fn () => Course::query()->orderBy('title')->pluck('title', 'id')->all())
+                    ->searchable(),
+
+                Filter::make('final_only')
+                    ->label('Final exams only')
+                    ->query(fn ($query) => $query->whereNull('course_module_id')->whereNull('lesson_id')),
+
+                TernaryFilter::make('is_published'),
             ])
             ->recordActions([
                 EditAction::make(),
@@ -66,9 +91,13 @@ class QuizzesTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('course_id')
+            ->emptyStateHeading('No assessments yet')
+            ->emptyStateDescription(
+                'A final exam gates course completion and the certificate. Module tests and '
+                .'lesson knowledge checks are optional.'
+            );
     }
 }

@@ -6,23 +6,34 @@ use App\Enums\QuestionType;
 use App\Models\Course;
 use App\Models\CourseModule;
 use App\Models\Lesson;
+use App\Models\Quiz;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class QuizForm
 {
+    /**
+     * What a quiz is attached to used to be expressed by leaving two selects
+     * blank, which nobody could be expected to guess. It is now an explicit
+     * choice, and the selects appear only when they are relevant.
+     *
+     * The field is not persisted — the scope *is* the pair of foreign keys, and
+     * storing it twice would let the two disagree. CreateQuiz and EditQuiz
+     * translate it back into those keys on save.
+     */
     public static function configure(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Section::make('Quiz')
-                    ->columns(2)
+                Section::make('What is this assessment for?')
                     ->schema([
                         Select::make('course_id')
                             ->label('Course')
@@ -31,16 +42,31 @@ class QuizForm
                             ->required()
                             ->live(),
 
-                        TextInput::make('title')->required()->maxLength(255),
+                        Radio::make('scope')
+                            ->hiddenLabel()
+                            ->options([
+                                Quiz::SCOPE_FINAL => 'Final exam for the whole course',
+                                Quiz::SCOPE_MODULE => 'End-of-module test',
+                                Quiz::SCOPE_LESSON => 'Knowledge check on one lesson',
+                            ])
+                            ->descriptions([
+                                Quiz::SCOPE_FINAL => 'Unlocks once every lesson is complete. Passing it '
+                                    .'completes the course and issues the certificate.',
+                                Quiz::SCOPE_MODULE => 'Sits at the end of one module.',
+                                Quiz::SCOPE_LESSON => 'Attached to a single lesson. Set that lesson\'s '
+                                    .'completion requirement to "quiz" to make it mandatory.',
+                            ])
+                            ->default(Quiz::SCOPE_FINAL)
+                            ->required()
+                            ->live()
+                            ->dehydrated(false)
+                            ->afterStateHydrated(function (Radio $component, ?Quiz $record): void {
+                                $component->state($record?->scope() ?? Quiz::SCOPE_FINAL);
+                            }),
 
-                        Textarea::make('description')->rows(2)->columnSpanFull(),
-
-                        // A quiz attached to neither is the course's final
-                        // assessment. Attaching it to a module or a lesson makes
-                        // it an end-of-module test or a knowledge check.
                         Select::make('course_module_id')
-                            ->label('Module (optional)')
-                            ->options(fn ($get) => $get('course_id')
+                            ->label('Module')
+                            ->options(fn (Get $get) => $get('course_id')
                                 ? CourseModule::query()
                                     ->where('course_id', $get('course_id'))
                                     ->orderBy('position')
@@ -48,18 +74,35 @@ class QuizForm
                                     ->all()
                                 : [])
                             ->searchable()
-                            ->helperText('Leave both blank to make this the final assessment.'),
+                            ->required()
+                            ->visible(fn (Get $get) => $get('scope') === Quiz::SCOPE_MODULE),
 
                         Select::make('lesson_id')
-                            ->label('Lesson (optional)')
-                            ->options(fn ($get) => $get('course_id')
+                            ->label('Lesson')
+                            ->options(fn (Get $get) => $get('course_id')
                                 ? Lesson::query()
                                     ->where('course_id', $get('course_id'))
                                     ->orderBy('position')
                                     ->pluck('title', 'id')
                                     ->all()
                                 : [])
-                            ->searchable(),
+                            ->searchable()
+                            ->required()
+                            ->visible(fn (Get $get) => $get('scope') === Quiz::SCOPE_LESSON),
+                    ]),
+
+                Section::make('Details')
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('title')
+                            ->required()
+                            ->maxLength(255)
+                            ->columnSpanFull(),
+
+                        Textarea::make('description')
+                            ->rows(2)
+                            ->columnSpanFull()
+                            ->helperText('Shown to the employee before they begin.'),
                     ]),
 
                 Section::make('Rules')
@@ -72,7 +115,8 @@ class QuizForm
                             ->maxValue(100)
                             ->default(70)
                             ->required()
-                            ->helperText('Snapshotted onto each attempt, so raising it later cannot retroactively fail anyone.'),
+                            ->helperText('Snapshotted onto each attempt, so raising it later cannot '
+                                .'retroactively fail anyone.'),
 
                         TextInput::make('max_attempts')
                             ->numeric()
@@ -89,15 +133,19 @@ class QuizForm
                         Toggle::make('shuffle_options'),
                         Toggle::make('show_feedback')
                             ->default(true)
-                            ->helperText('Show which questions were wrong, and the explanation, after submitting.'),
+                            ->helperText('Show which questions were wrong, and the explanation, after '
+                                .'submitting.'),
 
-                        Toggle::make('is_published')->columnSpanFull(),
+                        Toggle::make('is_published')
+                            ->columnSpanFull()
+                            ->helperText('Unpublished assessments are invisible to employees, and a '
+                                .'course with an unpublished final exam completes on lessons alone.'),
                     ]),
 
                 Section::make('Questions')
                     ->description(
                         'Correct answers live only here. They are stripped from the payload the '
-                        .'employee\'s browser receives, and are only revealed on the results screen '
+                        .'employee\'s browser receives, and are revealed on the results screen only '
                         .'after an attempt has been graded.'
                     )
                     ->schema([
@@ -105,7 +153,8 @@ class QuizForm
                             ->relationship()
                             ->orderColumn('position')
                             ->collapsible()
-                            ->itemLabel(fn (array $state): ?string => $state['prompt'] ?? null)
+                            ->collapsed()
+                            ->itemLabel(fn (array $state): ?string => $state['prompt'] ?? 'New question')
                             ->addActionLabel('Add question')
                             ->defaultItems(0)
                             ->columns(2)
@@ -137,9 +186,12 @@ class QuizForm
                                     ->orderColumn('position')
                                     ->columnSpanFull()
                                     ->addActionLabel('Add option')
+                                    ->defaultItems(2)
                                     ->columns(4)
                                     ->schema([
                                         TextInput::make('label')
+                                            ->hiddenLabel()
+                                            ->placeholder('Answer text')
                                             ->required()
                                             ->columnSpan(3),
 
@@ -147,9 +199,12 @@ class QuizForm
                                             ->label('Correct')
                                             ->columnSpan(1),
                                     ])
-                                    ->helperText(fn ($get) => $get('type') === QuestionType::ShortAnswer->value
-                                        ? 'For short answer these are the accepted answers — tick every one, matching is case-insensitive.'
-                                        : 'Tick every correct option. Multiple choice is graded all-or-nothing.'),
+                                    ->helperText(fn (Get $get) => $get('type') === QuestionType::ShortAnswer->value
+                                        ? 'For short answer these are the accepted answers — add every '
+                                          .'acceptable wording and tick them all. Matching ignores case '
+                                          .'and extra spacing.'
+                                        : 'Tick every correct option. Multiple choice is graded '
+                                          .'all-or-nothing, so a partly-right answer scores zero.'),
                             ]),
                     ]),
             ]);

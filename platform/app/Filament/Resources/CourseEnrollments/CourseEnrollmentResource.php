@@ -44,6 +44,33 @@ class CourseEnrollmentResource extends Resource
         ];
     }
 
+    /** Overdue and unfinished — the number a manager should act on. */
+    public static function getNavigationBadge(): ?string
+    {
+        $overdue = static::getModel()::query()
+            ->overdue()
+            ->whereNotExists(function ($sub): void {
+                $sub->selectRaw(1)
+                    ->from('course_progress')
+                    ->whereColumn('course_progress.user_id', 'course_enrollments.user_id')
+                    ->whereColumn('course_progress.course_id', 'course_enrollments.course_id')
+                    ->where('course_progress.status', 'completed');
+            })
+            ->count();
+
+        return $overdue > 0 ? (string) $overdue : null;
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Past their deadline and not complete';
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'danger';
+    }
+
     public static function getPages(): array
     {
         return [

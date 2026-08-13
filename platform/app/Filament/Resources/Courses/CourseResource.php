@@ -39,6 +39,48 @@ class CourseResource extends Resource
         return CoursesTable::configure($table);
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\ModulesRelationManager::class,
+            RelationManagers\QuizzesRelationManager::class,
+        ];
+    }
+
+    /** @return array<int, string> */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['title', 'summary', 'category'];
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'Category' => $record->category,
+            'Status' => $record->status->label(),
+        ];
+    }
+
+    /** Drafts are the thing an author forgets about, so surface the count. */
+    public static function getNavigationBadge(): ?string
+    {
+        $drafts = static::getModel()::query()
+            ->where('status', \App\Enums\CourseStatus::Draft->value)
+            ->count();
+
+        return $drafts > 0 ? (string) $drafts : null;
+    }
+
+    public static function getNavigationBadgeTooltip(): ?string
+    {
+        return 'Unpublished drafts';
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return 'warning';
+    }
+
     public static function getPages(): array
     {
         return [
