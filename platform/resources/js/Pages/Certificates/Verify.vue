@@ -19,15 +19,14 @@ defineProps({
 
     <div class="flex min-h-screen items-center justify-center bg-canvas px-5 py-12">
         <div class="w-full max-w-lg">
-            <div class="mb-8 flex items-center justify-center gap-2.5">
-                <span
-                    class="brand-gradient flex h-9 w-9 items-center justify-center rounded-lg text-lg font-extrabold text-white"
-                >
-                    S
-                </span>
-                <span class="text-lg font-extrabold text-navy">
-                    Support <span class="text-brand">Academy</span>
-                </span>
+            <div class="mb-8 flex flex-col items-center gap-3 text-center">
+                <img src="/images/logo.png" alt="PILOT" class="h-10 w-auto dark:hidden" />
+                <img
+                    src="/images/logo-white.png"
+                    alt="PILOT"
+                    class="hidden h-10 w-auto dark:block"
+                />
+                <span class="text-lg font-bold text-navy">Support Training Hub</span>
             </div>
 
             <div class="card p-9 text-center" :class="valid ? 'border-ok/40' : 'border-negative/40'">
@@ -86,7 +85,7 @@ defineProps({
             </div>
 
             <p class="mt-6 text-center text-sm text-ink-dis">
-                Support Academy · internal training for the PILOT platform
+                Support Training Hub · PILOT platform onboarding
             </p>
         </div>
     </div>

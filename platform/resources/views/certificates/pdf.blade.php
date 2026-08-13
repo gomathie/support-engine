@@ -41,7 +41,10 @@
             border: 1px solid #0a2540;
         }
 
-        .body { position: absolute; top: 26mm; left: 26mm; right: 26mm; text-align: center; }
+        .body { position: absolute; top: 22mm; left: 26mm; right: 26mm; text-align: center; }
+
+        /* Height only — dompdf keeps the aspect ratio from the file. */
+        .logo { height: 12mm; margin-bottom: 5mm; }
 
         .eyebrow {
             font-size: 9pt;
@@ -112,6 +115,13 @@
     <div class="frame-inner"></div>
 
     <div class="body">
+        {{-- dompdf reads this from disk rather than over HTTP, so it needs an
+             absolute filesystem path, not asset(). --}}
+        @php($logo = public_path('images/logo.png'))
+        @if (file_exists($logo))
+            <img src="{{ $logo }}" class="logo" alt="PILOT">
+        @endif
+
         <div class="eyebrow">Support Training Hub</div>
 
         <h1 class="title">Certificate of Completion</h1>

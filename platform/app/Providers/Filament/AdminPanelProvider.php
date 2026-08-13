@@ -44,6 +44,13 @@ class AdminPanelProvider extends PanelProvider
                 'gray' => Color::Slate,
             ])
             ->brandName('Support Training Hub')
+
+            // The light lockup is navy-on-transparent and vanishes against
+            // Filament's dark sidebar, hence the separate dark asset.
+            ->brandLogo(asset('images/logo.png'))
+            ->darkModeBrandLogo(asset('images/logo-white.png'))
+            ->brandLogoHeight('1.75rem')
+
             ->favicon(asset('favicon.ico'))
 
             ->navigationGroups([
