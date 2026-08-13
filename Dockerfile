@@ -37,7 +37,17 @@ COPY . .
 # host's storage/framework caches (they are machine-local junk), so these do not
 # arrive with the source, and package:discover boots the framework — which fails
 # with "Please provide a valid cache path" if the view cache directory is absent.
-RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache \
+# Listed one per path rather than with brace expansion: RUN uses /bin/sh, which
+# is dash here, and dash does not expand braces — the brace form silently
+# created a single directory literally named "{sessions,views,cache}".
+RUN mkdir -p \
+        storage/framework/sessions \
+        storage/framework/views \
+        storage/framework/cache/data \
+        storage/app/private \
+        storage/app/public \
+        storage/logs \
+        bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
 # Finish composer autoload + package discovery
