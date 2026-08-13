@@ -106,6 +106,31 @@ class AdminPanelTest extends TestCase
         }
     }
 
+    /**
+     * The relation managers are how seeded content actually gets edited, so a
+     * course edit screen that 500s takes the whole authoring workflow with it.
+     */
+    public function test_the_course_screen_renders_its_relation_managers(): void
+    {
+        ['course' => $course] = $this->seedContent();
+
+        $this->actingAs($this->admin())
+            ->get(CourseResource::getUrl('edit', ['record' => $course]))
+            ->assertSuccessful()
+            ->assertSee('Modules')
+            ->assertSee('Assessments');
+    }
+
+    public function test_the_module_screen_renders_its_lessons(): void
+    {
+        ['module' => $module] = $this->seedContent();
+
+        $this->actingAs($this->admin())
+            ->get(CourseModuleResource::getUrl('edit', ['record' => $module]))
+            ->assertSuccessful()
+            ->assertSee('Lessons');
+    }
+
     public function test_the_dashboard_widgets_render(): void
     {
         Bus::fake();
