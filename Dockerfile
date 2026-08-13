@@ -60,6 +60,13 @@ RUN npm run build
 # Ensure OS environment variables are populated in $_ENV so they override .env
 RUN echo "variables_order = \"EGPCS\"" > /usr/local/etc/php/conf.d/99-variables-order.ini
 
+# dompdf holds the whole page, an embedded font subset and every decoded image
+# in memory at once. One certificate peaks around 73MB, so PHP's stock 128MB
+# leaves no room for a second render in the same process — which is exactly
+# what the test suite does. Raising it here rather than per-request keeps the
+# queue worker, the test run and artisan on the same footing.
+RUN echo "memory_limit = 512M" > /usr/local/etc/php/conf.d/99-memory-limit.ini
+
 EXPOSE 8000
 
 # Default: run the dev server; docker-compose can override for tests
