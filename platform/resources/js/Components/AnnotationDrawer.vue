@@ -55,7 +55,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown));
     >
         <div
             v-if="open"
-            class="fixed inset-0 z-100 bg-[rgba(11,15,25,.55)] backdrop-blur-[2px]"
+            class="fixed inset-0 z-100 bg-navy/50"
             @click.self="emit('close')"
         >
             <div

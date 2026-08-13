@@ -62,7 +62,7 @@ const finished = computed(() => props.courses.filter((c) => c.status === 'comple
             <!-- Next lesson: the primary action on this page. -->
             <div
                 v-if="next_lesson"
-                class="mt-6 rounded-xl bg-white/10 p-4 backdrop-blur-none sm:p-5"
+                class="mt-6 rounded-xl bg-white/10 p-4 sm:p-5"
             >
                 <div class="flex flex-wrap items-center justify-between gap-4">
                     <div class="min-w-0 flex-1">
