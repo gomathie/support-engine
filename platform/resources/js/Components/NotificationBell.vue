@@ -50,12 +50,12 @@ onUnmounted(() => {
     <div ref="root" class="relative">
         <button
             type="button"
-            class="relative flex cursor-pointer items-center justify-center rounded-[5px] border border-line px-2 py-1.5 text-ink-sec transition-all duration-250 hover:border-primary hover:text-primary"
+            class="relative flex cursor-pointer items-center justify-center rounded-lg p-2 text-ink-sec transition-colors hover:bg-nav-hover hover:text-brand"
             :aria-label="`Notifications${count ? ` (${count} unread)` : ''}`"
             :aria-expanded="open"
             @click="open = !open"
         >
-            <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24">
+            <svg class="h-[18px] w-[18px] fill-current" viewBox="0 0 24 24">
                 <path
                     d="M12 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 006 14h12a1 1 0 00.707-1.707L18 11.586V8a6 6 0 00-6-6zM12 22a2.5 2.5 0 002.45-2h-4.9A2.5 2.5 0 0012 22z"
                 />
@@ -77,18 +77,16 @@ onUnmounted(() => {
         >
             <div
                 v-if="open"
-                class="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-lg border border-line bg-surface shadow-xl"
+                class="card absolute right-0 z-50 mt-2 w-80 overflow-hidden shadow-xl"
                 role="dialog"
                 aria-label="Notifications"
             >
-                <div class="flex items-center gap-2 border-b border-line bg-surface-alt px-3.5 py-2.5">
-                    <span class="mono-label flex-1 text-[10px] tracking-[2px] text-ink-sec">
-                        Notifications
-                    </span>
+                <div class="flex items-center gap-2 border-b border-line bg-surface-alt px-4 py-3">
+                    <span class="flex-1 text-sm font-bold text-navy">Notifications</span>
                     <button
                         v-if="count"
                         type="button"
-                        class="mono-label cursor-pointer text-[9px] tracking-[1px] text-primary"
+                        class="cursor-pointer text-xs font-semibold text-brand"
                         @click="markAllRead"
                     >
                         Mark all read
@@ -99,7 +97,7 @@ onUnmounted(() => {
                     <div
                         v-for="notification in notifications"
                         :key="notification.id"
-                        class="border-b border-line px-3.5 py-3 last:border-b-0 hover:bg-surface-alt"
+                        class="border-b border-line px-4 py-3 last:border-b-0 hover:bg-surface-alt"
                     >
                         <component
                             :is="notification.url ? Link : 'div'"
@@ -109,21 +107,21 @@ onUnmounted(() => {
                         >
                             <div class="flex items-start gap-2">
                                 <span
-                                    class="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
+                                    class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full"
                                     :class="
                                         notification.type === 'training_overdue'
                                             ? 'bg-negative'
-                                            : 'bg-primary'
+                                            : 'bg-brand'
                                     "
                                 ></span>
                                 <div class="min-w-0 flex-1">
-                                    <div class="text-[12px] font-bold text-ink">
+                                    <div class="text-sm font-semibold text-navy">
                                         {{ notification.title }}
                                     </div>
-                                    <div class="truncate text-[12px] text-ink-sec">
+                                    <div class="truncate text-sm text-ink-sec">
                                         {{ notification.body }}
                                     </div>
-                                    <div class="mono-label mt-1 text-[9px] tracking-[1px] text-ink-dis">
+                                    <div class="mt-1 text-xs text-ink-dis">
                                         {{ relative(notification.created_at) }}
                                     </div>
                                 </div>
@@ -131,7 +129,7 @@ onUnmounted(() => {
                         </component>
                     </div>
 
-                    <p v-if="!count" class="px-3.5 py-6 text-center text-[12px] text-ink-dis">
+                    <p v-if="!count" class="px-4 py-8 text-center text-sm text-ink-dis">
                         Nothing new.
                     </p>
                 </div>

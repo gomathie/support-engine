@@ -1,9 +1,4 @@
 <script setup>
-/**
- * The prototype's only feedback was a "saved 14:32:07" text stamp that lied —
- * the write it reported had actually thrown. These are real server
- * confirmations, flashed from the session after a successful write.
- */
 import { computed, ref, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 
@@ -32,16 +27,16 @@ watch(message, (value) => {
     >
         <div
             v-if="message && visible"
-            class="fixed top-[66px] right-6 z-100 max-w-sm rounded-md border px-4 py-3 shadow-lg"
+            class="fixed top-20 right-5 z-30 max-w-sm rounded-xl border px-4 py-3 shadow-lg"
             :class="
                 isError
                     ? 'border-negative bg-negative-bg text-negative'
-                    : 'border-positive bg-positive-bg text-positive'
+                    : 'border-ok bg-positive-bg text-ok'
             "
             role="status"
             aria-live="polite"
         >
-            <p class="text-xs leading-relaxed">{{ message }}</p>
+            <p class="text-sm leading-relaxed font-medium">{{ message }}</p>
         </div>
     </Transition>
 </template>

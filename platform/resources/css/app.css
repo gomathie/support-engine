@@ -5,91 +5,116 @@
 @source '../../resources/views/**/*.blade.php';
 
 /*
-   Design tokens carried over verbatim from the prototype's styles/shared.css.
-   The values are unchanged — this is the same product, not a redesign.
+   Palette adopted from academy.pilot-gps.com, so the internal support academy
+   reads as the same product family as the customer-facing one.
 
-   The two-layer arrangement matters: the raw values live on :root and are
-   swapped by [data-theme="dark"], and @theme inline below maps them onto
-   Tailwind's colour namespace *by reference*. That means `bg-surface` compiles
-   to `var(--pilot-surface)` and follows the theme attribute at runtime, exactly
-   as the hand-written CSS did, instead of baking one theme's hex into the
-   utility and needing a `dark:` variant on every element.
+   Three brand colours and stock Tailwind slate for everything else. No
+   translucency, no blur, no radial glows — the light theme is flat white
+   surfaces on a slate-50 page, which is what makes it comfortable to read for
+   an hour at a time.
+
+   The two-layer arrangement is kept: raw values on :root, swapped by
+   [data-theme="dark"], mapped onto Tailwind's colour namespace by reference in
+   @theme inline below. That means `bg-surface` compiles to
+   `var(--pilot-surface)` and follows the theme attribute at runtime, rather
+   than baking one theme's hex into the utility and needing a `dark:` variant
+   on every element.
 */
 
 :root {
-    /* Vibrant Indigo Primary */
-    --pilot-primary: #4f46e5;
-    --pilot-primary-hover: #4338ca;
-    --pilot-primary-bg: #eef2ff;
+    /* academy brand */
+    --pilot-brand: #1463ff;
+    --pilot-brand-hover: #0f4fd8;
+    --pilot-brand-soft: #eff5ff;
+    --pilot-navy: #0a2540;
+    --pilot-ok: #19a86b;
+
+    --pilot-primary: var(--pilot-brand);
+    --pilot-primary-hover: var(--pilot-brand-hover);
+    --pilot-primary-bg: var(--pilot-brand-soft);
 
     --pilot-bg: #f8fafc;
     --pilot-surface: #ffffff;
     --pilot-surface-alt: #f1f5f9;
-    
-    /* Glassmorphism Variables */
-    --pilot-glass-bg: rgb(255 255 255 / 0.75);
-    --pilot-glass-border: rgb(255 255 255 / 0.4);
 
-    --pilot-text-pr: #0f172a;
+    /* Headings take the navy; body copy is slate-800, which is the academy's
+       pairing and holds contrast without the harshness of pure black. */
+    --pilot-heading: #0a2540;
+    --pilot-text-pr: #1e293b;
     --pilot-text-sec: #475569;
     --pilot-text-dis: #94a3b8;
 
     --pilot-line: #e2e8f0;
     --pilot-line-strong: #cbd5e1;
 
-    --pilot-positive: #10b981;
-    --pilot-positive-bg: #d1fae5;
-    --pilot-negative: #ef4444;
-    --pilot-negative-bg: #fee2e2;
-    --pilot-warning: #f59e0b;
-    --pilot-warning-dim: #d97706;
-    --pilot-warning-bg: #fef3c7;
+    --pilot-positive: #19a86b;
+    --pilot-positive-bg: #ecfdf5;
+    --pilot-negative: #dc2626;
+    --pilot-negative-bg: #fef2f2;
+    --pilot-warning: #d97706;
+    --pilot-warning-dim: #b45309;
+    --pilot-warning-bg: #fffbeb;
 
-    --pilot-nav-bg: rgb(255 255 255 / 0.96);
-    --pilot-nav-hover: rgb(79 70 229 / 0.05);
+    --pilot-nav-bg: #ffffff;
+    --pilot-nav-hover: #f1f5f9;
+
+    --pilot-on-accent: #ffffff;
+    --pilot-on-warning: #ffffff;
+}
+
+/*
+   The academy itself is light only. Dark mode is kept here because the app
+   already offers the choice and people work evening shifts — but it follows
+   the same rule: flat surfaces, no translucency, brand lifted to stay legible
+   against a dark ground.
+*/
+[data-theme='dark'] {
+    --pilot-brand: #4d8dff;
+    --pilot-brand-hover: #7aa9ff;
+    --pilot-brand-soft: #10233f;
+    --pilot-navy: #e2e8f0;
+    --pilot-ok: #34d399;
+
+    --pilot-primary: var(--pilot-brand);
+    --pilot-primary-hover: var(--pilot-brand-hover);
+    --pilot-primary-bg: var(--pilot-brand-soft);
+
+    --pilot-bg: #0b1220;
+    --pilot-surface: #111a2e;
+    --pilot-surface-alt: #172136;
+
+    --pilot-heading: #f1f5f9;
+    --pilot-text-pr: #e2e8f0;
+    --pilot-text-sec: #94a3b8;
+    --pilot-text-dis: #64748b;
+
+    --pilot-line: #1e293b;
+    --pilot-line-strong: #334155;
+
+    --pilot-positive: #34d399;
+    --pilot-positive-bg: #06301f;
+    --pilot-negative: #f87171;
+    --pilot-negative-bg: #3b0d0d;
+    --pilot-warning: #fbbf24;
+    --pilot-warning-dim: #f59e0b;
+    --pilot-warning-bg: #3a2a06;
+
+    --pilot-nav-bg: #111a2e;
+    --pilot-nav-hover: #172136;
 
     --pilot-on-accent: #ffffff;
     --pilot-on-warning: #1e293b;
 }
 
-[data-theme='dark'] {
-    /* Bright Indigo for Dark Mode */
-    --pilot-primary: #818cf8;
-    --pilot-primary-hover: #a5b4fc;
-    --pilot-primary-bg: #312e81;
-
-    /* Deep Premium Dark Background */
-    --pilot-bg: #0b0f19;
-    --pilot-surface: #111827;
-    --pilot-surface-alt: #1f2937;
-    
-    /* Glassmorphism Variables */
-    --pilot-glass-bg: rgb(17 24 39 / 0.75);
-    --pilot-glass-border: rgb(255 255 255 / 0.1);
-
-    --pilot-text-pr: #f8fafc;
-    --pilot-text-sec: #94a3b8;
-    --pilot-text-dis: #475569;
-
-    --pilot-line: #1f2937;
-    --pilot-line-strong: #374151;
-
-    --pilot-positive: #34d399;
-    --pilot-positive-bg: #064e3b;
-    --pilot-negative: #f87171;
-    --pilot-negative-bg: #7f1d1d;
-    --pilot-warning: #fbbf24;
-    --pilot-warning-dim: #b45309;
-    --pilot-warning-bg: #713f12;
-
-    --pilot-nav-bg: rgb(17 24 39 / 0.96);
-    --pilot-nav-hover: rgb(129 140 248 / 0.1);
-
-    --pilot-on-accent: #0f172a;
-    --pilot-on-warning: #0f172a;
-}
-
 @theme inline {
+    /* academy names, so `bg-brand` / `text-navy` / `bg-ok` read the same way
+       they do in the customer-facing academy codebase */
+    --color-brand: var(--pilot-brand);
+    --color-brand-hover: var(--pilot-brand-hover);
+    --color-brand-soft: var(--pilot-brand-soft);
+    --color-navy: var(--pilot-navy);
+    --color-ok: var(--pilot-ok);
+
     --color-primary: var(--pilot-primary);
     --color-primary-hover: var(--pilot-primary-hover);
     --color-primary-bg: var(--pilot-primary-bg);
@@ -97,9 +122,8 @@
     --color-canvas: var(--pilot-bg);
     --color-surface: var(--pilot-surface);
     --color-surface-alt: var(--pilot-surface-alt);
-    --color-glass-bg: var(--pilot-glass-bg);
-    --color-glass-border: var(--pilot-glass-border);
 
+    --color-heading: var(--pilot-heading);
     --color-ink: var(--pilot-text-pr);
     --color-ink-sec: var(--pilot-text-sec);
     --color-ink-dis: var(--pilot-text-dis);
@@ -121,16 +145,9 @@
     --color-on-accent: var(--pilot-on-accent);
     --color-on-warning: var(--pilot-on-warning);
 
-    --font-sans: 'Inter', 'Segoe UI', system-ui, Arial, sans-serif;
-    --font-mono: 'Courier New', ui-monospace, monospace;
+    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
 
-/*
-   `dark:` is retargeted at the data attribute rather than the OS preference,
-   because the theme is an explicit user choice persisted on the account. Most
-   colour work goes through the tokens above; this is for the handful of places
-   the prototype special-cased with a [data-theme="dark"] selector.
-*/
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 @layer base {
@@ -142,14 +159,15 @@
         font-family: var(--font-sans);
         color: var(--color-ink);
         background: var(--color-canvas);
-        transition:
-            background-color 0.3s ease,
-            color 0.3s ease;
     }
 
-    /* The prototype honoured this globally; keeping it means the gauge, the
-       flash highlight and every hover transition stay still for people who
-       have asked the OS for less motion. */
+    h1,
+    h2,
+    h3,
+    h4 {
+        color: var(--color-heading);
+    }
+
     @media (prefers-reduced-motion: reduce) {
         *,
         *::before,
@@ -163,43 +181,75 @@
 
 @layer components {
     /*
-       The mono eyebrow/flag/nav treatment recurs on every page of the prototype:
-       Courier, uppercase, wide tracking. It earns a component class rather than
-       six utilities repeated across forty templates.
+       The academy's chip: tiny, uppercase, wide-tracked, on a tinted pill.
+       Used for course level, content type, status and the "required" marker.
     */
-    .mono-label {
-        font-family: var(--font-mono);
+    .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        border-radius: 0.375rem;
+        padding: 0.125rem 0.5rem;
+        font-size: 11px;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.15em;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+    }
+
+    /* The standard surface: white card, hairline border, soft shadow, and a
+       half-step lift on hover. Every panel in the app is one of these. */
+    .card {
+        background: var(--color-surface);
+        border: 1px solid var(--color-line);
+        border-radius: 1rem;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+
+    .card-interactive {
+        transition:
+            box-shadow 0.2s ease,
+            transform 0.2s ease,
+            border-color 0.2s ease;
+    }
+
+    .card-interactive:hover {
+        box-shadow: 0 4px 12px -2px rgb(0 0 0 / 0.08);
+        transform: translateY(-2px);
+    }
+
+    /* The gradient the academy uses for its hero banner, logo tile and card
+       thumbnails. Defined once so all three stay in step. */
+    .brand-gradient {
+        background-image: linear-gradient(to bottom right, var(--color-brand), var(--color-navy));
     }
 }
 
-/*
-   Rich-text lesson bodies. Mirrors the skills-module article styling: navy
-   headings, mono inline code on a tinted background, bordered tables.
-*/
+/* Rich-text lesson bodies, matching the academy's .prose-lesson treatment:
+   navy headings, generous line height, comfortable measure. */
 @layer components {
     .lesson-prose {
-        --tw-prose-body: var(--color-ink-sec);
-        --tw-prose-headings: var(--color-primary);
-        --tw-prose-bold: var(--color-ink);
-        --tw-prose-links: var(--color-primary);
+        --tw-prose-body: var(--color-ink);
+        --tw-prose-headings: var(--color-heading);
+        --tw-prose-bold: var(--color-heading);
+        --tw-prose-links: var(--color-brand);
         --tw-prose-bullets: var(--color-line-strong);
         --tw-prose-hr: var(--color-line);
         --tw-prose-quotes: var(--color-ink);
-        --tw-prose-quote-borders: var(--color-primary);
+        --tw-prose-quote-borders: var(--color-brand);
         --tw-prose-th-borders: var(--color-line);
         --tw-prose-td-borders: var(--color-line);
-        --tw-prose-counters: var(--color-primary);
+        --tw-prose-counters: var(--color-brand);
+
+        line-height: 1.7;
     }
 
     .lesson-prose :where(code):not(:where([class~='not-prose'] *)) {
-        font-family: var(--font-mono);
-        color: var(--color-primary);
-        background: color-mix(in srgb, var(--color-primary) 10%, transparent);
-        padding: 1px 4px;
-        border-radius: 3px;
-        font-weight: 400;
+        color: var(--color-brand);
+        background: var(--color-brand-soft);
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-weight: 500;
     }
 
     .lesson-prose :where(code)::before,
@@ -209,27 +259,40 @@
 
     .lesson-prose :where(th) {
         background: var(--color-surface-alt);
-        color: var(--color-ink);
+        color: var(--color-heading);
     }
 
-    /* Author-supplied markers inside lesson HTML. `.std` is an industry-standard
-       default to confirm locally; `.fill` is a company-specific blank. Both are
-       indexed into the annotation drawer. */
+    .lesson-prose :where(img),
+    .lesson-prose :where(video) {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    .lesson-prose :where(table) {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    /* Author-supplied markers inside lesson HTML. `.std` is an
+       industry-standard default to confirm locally; `.fill` is a
+       company-specific blank. Both are indexed into the annotation drawer. */
     .lesson-prose :where(.std) {
-        color: var(--color-primary);
-        background: color-mix(in srgb, var(--color-primary) 10%, transparent);
-        border-bottom: 1px dotted var(--color-primary);
-        padding: 1px 3px;
-        border-radius: 3px;
+        color: var(--color-brand);
+        background: var(--color-brand-soft);
+        border-bottom: 1px dotted var(--color-brand);
+        padding: 1px 4px;
+        border-radius: 4px;
         scroll-margin-top: 90px;
     }
 
     .lesson-prose :where(.fill) {
         color: var(--color-negative);
         background: var(--color-negative-bg);
-        font-weight: 700;
+        font-weight: 600;
         padding: 1px 4px;
-        border-radius: 3px;
+        border-radius: 4px;
         scroll-margin-top: 90px;
     }
 
@@ -240,10 +303,10 @@
     @keyframes annotation-flash {
         0%,
         100% {
-            background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+            background: var(--color-brand-soft);
         }
         30% {
-            background: var(--color-primary);
+            background: var(--color-brand);
             color: var(--color-on-accent);
         }
     }

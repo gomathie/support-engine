@@ -1,20 +1,16 @@
 <script setup>
 /**
- * The circular gauge from the Training Tracker header.
+ * Circular progress ring. r=42 in a 100×100 box gives a circumference of ~264,
+ * which is the stroke-dasharray; the arc is drawn by moving stroke-dashoffset
+ * from 264 (empty) to 0 (full), rotated -90° so it starts at twelve o'clock.
  *
- * Geometry is unchanged from the prototype: r=42 in a 100x100 box, giving a
- * circumference of ~264, which is the stroke-dasharray. The arc is drawn by
- * moving stroke-dashoffset from 264 (empty) to 0 (full) and rotating -90deg so
- * it starts at twelve o'clock.
- *
- * The difference is where the number comes from: the server, not a count of
- * ticked boxes in the browser.
+ * The value comes from the server, not from counting ticked boxes in the page.
  */
 import { computed } from 'vue';
 
 const props = defineProps({
     percentage: { type: Number, default: 0 },
-    size: { type: Number, default: 108 },
+    size: { type: Number, default: 96 },
     label: { type: String, default: 'complete' },
 });
 
@@ -22,6 +18,8 @@ const CIRCUMFERENCE = 264;
 
 const clamped = computed(() => Math.min(100, Math.max(0, props.percentage)));
 const offset = computed(() => CIRCUMFERENCE - (clamped.value / 100) * CIRCUMFERENCE);
+
+const stroke = computed(() => (clamped.value >= 100 ? 'var(--color-ok)' : 'var(--color-brand)'));
 </script>
 
 <template>
@@ -32,16 +30,16 @@ const offset = computed(() => CIRCUMFERENCE - (clamped.value / 100) * CIRCUMFERE
                 cy="50"
                 r="42"
                 fill="none"
-                stroke="var(--color-line-strong)"
-                stroke-width="7"
+                stroke="var(--color-surface-alt)"
+                stroke-width="8"
             />
             <circle
                 cx="50"
                 cy="50"
                 r="42"
                 fill="none"
-                stroke="var(--color-warning)"
-                stroke-width="7"
+                :stroke="stroke"
+                stroke-width="8"
                 :stroke-dasharray="CIRCUMFERENCE"
                 :stroke-dashoffset="offset"
                 stroke-linecap="round"
@@ -51,12 +49,10 @@ const offset = computed(() => CIRCUMFERENCE - (clamped.value / 100) * CIRCUMFERE
         </svg>
 
         <div class="absolute inset-0 flex flex-col items-center justify-center">
-            <span class="font-mono text-[22px] leading-none font-bold tracking-[-1px] text-warning">
+            <span class="text-xl leading-none font-extrabold text-navy">
                 {{ Math.round(clamped) }}%
             </span>
-            <span class="mono-label mt-0.5 text-[9px] tracking-[2px] text-ink-dis">
-                {{ label }}
-            </span>
+            <span class="mt-0.5 text-[10px] font-medium text-ink-dis">{{ label }}</span>
         </div>
     </div>
 </template>

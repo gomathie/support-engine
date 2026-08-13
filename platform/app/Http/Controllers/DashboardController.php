@@ -5,18 +5,21 @@ namespace App\Http\Controllers;
 use App\Enums\ProgressStatus;
 use App\Models\Course;
 use App\Models\CourseProgress;
+use App\Models\Lesson;
 use App\Models\QuizAttempt;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
+/**
+ * The employee's landing page, framed around a new starter's first weeks.
+ *
+ * The single most useful thing this screen can do is answer "what do I do
+ * next?" in one click, so `next_lesson` is computed server-side and given the
+ * primary call to action.
+ */
 class DashboardController extends Controller
 {
-    /**
-     * The landing page. Reproduces the prototype's index.html — hero, stats bar,
-     * course cards — but every number is a real aggregate rather than the
-     * hard-coded 3 / 2 / 4 / 7.
-     */
     public function __invoke(Request $request): Response
     {
         $user = $request->user();
@@ -27,7 +30,6 @@ class DashboardController extends Controller
             ->whereHas('course', fn ($q) => $q->visible())
             ->get();
 
-        // One pass over the rollup rather than a query per tile.
         $byStatus = $progress->groupBy(fn (CourseProgress $p) => $p->status->value);
 
         $dueSoon = $user->enrollments()
@@ -42,16 +44,25 @@ class DashboardController extends Controller
             ->take(5)
             ->values();
 
+        $completedCount = $byStatus->get(ProgressStatus::Completed->value, collect())->count();
+
         return Inertia::render('Dashboard', [
             'stats' => [
                 'assigned' => $progress->count(),
                 'in_progress' => $byStatus->get(ProgressStatus::InProgress->value, collect())->count(),
-                'completed' => $byStatus->get(ProgressStatus::Completed->value, collect())->count(),
+                'completed' => $completedCount,
                 'overdue' => $dueSoon->filter(fn ($e) => $e->isOverdue())->count(),
                 'overall_percentage' => $progress->isEmpty()
                     ? 0
                     : round($progress->avg(fn (CourseProgress $p) => (float) $p->percentage), 1),
             ],
+
+            // Drives the "start here" panel: somebody who has not opened
+            // anything yet gets a different, more directive screen.
+            'is_new_starter' => $progress->isNotEmpty()
+                && $progress->every(fn (CourseProgress $p) => $p->status === ProgressStatus::NotStarted),
+
+            'next_lesson' => $this->nextLesson($user, $progress),
 
             'courses' => $progress
                 ->sortBy(fn (CourseProgress $p) => [$p->isComplete() ? 1 : 0, $p->course->title])
@@ -84,7 +95,6 @@ class DashboardController extends Controller
 
             'certificates_count' => $user->certificates()->count(),
 
-            // Published, optional courses nobody has assigned to them yet.
             'recommended' => Course::query()
                 ->published()
                 ->where('is_required', false)
@@ -99,6 +109,69 @@ class DashboardController extends Controller
                     'difficulty' => $course->difficulty,
                 ])->all(),
         ]);
+    }
+
+    /**
+     * The first unfinished lesson in the most urgent unfinished course.
+     *
+     * "Most urgent" means: whatever is already underway, then anything with a
+     * deadline soonest, then required before optional. Picking up where they
+     * left off beats starting something new.
+     *
+     * @param  \Illuminate\Support\Collection<int, CourseProgress>  $progress
+     * @return array<string, mixed>|null
+     */
+    private function nextLesson($user, $progress): ?array
+    {
+        $candidates = $progress->reject(fn (CourseProgress $p) => $p->isComplete());
+
+        if ($candidates->isEmpty()) {
+            return null;
+        }
+
+        $dueDates = $user->enrollments()
+            ->whereIn('course_id', $candidates->pluck('course_id'))
+            ->pluck('due_at', 'course_id');
+
+        $target = $candidates
+            ->sortBy(fn (CourseProgress $p) => [
+                $p->status === ProgressStatus::InProgress ? 0 : 1,
+                $dueDates[$p->course_id] ?? '9999-12-31',
+                $p->course->is_required ? 0 : 1,
+                $p->course->title,
+            ])
+            ->first();
+
+        $completedIds = $user->lessonProgress()
+            ->where('course_id', $target->course_id)
+            ->whereNotNull('completed_at')
+            ->pluck('lesson_id');
+
+        $lesson = Lesson::query()
+            ->join('course_modules', 'course_modules.id', '=', 'lessons.course_module_id')
+            ->where('lessons.course_id', $target->course_id)
+            ->where('lessons.is_published', true)
+            ->where('course_modules.is_published', true)
+            ->whereNotIn('lessons.id', $completedIds)
+            ->orderBy('course_modules.position')
+            ->orderBy('lessons.position')
+            ->select('lessons.id', 'lessons.slug', 'lessons.title', 'course_modules.title as module_title')
+            ->first();
+
+        if (! $lesson) {
+            return null;
+        }
+
+        return [
+            'title' => $lesson->title,
+            'module_title' => $lesson->module_title,
+            'course_title' => $target->course->title,
+            'course_slug' => $target->course->slug,
+            'url' => route('lessons.show', [$target->course->slug, $lesson->slug]),
+            'percentage' => (float) $target->percentage,
+            'completed_lessons' => $target->completed_lessons,
+            'total_lessons' => $target->total_lessons,
+        ];
     }
 
     /** @return array<string, mixed> */
