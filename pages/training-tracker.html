@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PILOT training tracker</title>
+<link rel="stylesheet" href="../styles/shared.css">
+<link rel="stylesheet" href="training-tracker/styles.css">
+</head>
+<body>
+<!-- ─── SITE NAV ──────────────────────────────────── -->
+<nav class="topnav" id="topnav">
+  <div class="topnav-in">
+    <a class="logo-link" href="../index.html">
+      <img src="https://pilot-telematics.com/wp-content/themes/pilot/assets/images/logo.png" alt="PILOT logo" class="pilot-logo">
+      <span class="logo-text">PILOT <b>Training Hub</b></span>
+    </a>
+    <div class="nav-spacer"></div>
+    <div class="nav-links" id="siteNavLinks">
+      <a class="nav-link" href="../index.html">Home</a>
+      <a class="nav-link active" href="training-tracker.html">Training Tracker</a>
+      <a class="nav-link" href="support-panel.html">Support Panel</a>
+      <a class="nav-link" href="skills-module.html">Skills Module</a>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme"></button>
+    <button class="hamburger" id="siteHamburger" aria-label="Toggle navigation">&#9776;</button>
+  </div>
+</nav>
+<div class="wrap">
+
+  <div class="header">
+    <div class="gauge-box">
+      <svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="42" fill="none" stroke="#2A3A52" stroke-width="7"/>
+        <circle id="gaugeArc" cx="50" cy="50" r="42" fill="none" stroke="#E8A33D" stroke-width="7"
+          stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round" transform="rotate(-90 50 50)"/>
+      </svg>
+      <div class="gauge-pct"><span class="num" id="gaugeNum">0%</span><span class="lbl">complete</span></div>
+    </div>
+    <div class="title-block">
+      <p class="eyebrow">Flight plan // onboarding</p>
+      <h1>PILOT system training tracker</h1>
+      <p class="sub">1st-line support (2 weeks) &middot; admin panel (3 days) &middot; support skills (A&ndash;D)</p>
+      <div class="stat-row">
+        <div class="stat"><b id="doneCount">0</b> / <span id="totalCount">0</span> tasks checked off</div>
+        <div class="stat" id="lastSaved">not yet saved</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="sections"></div>
+
+  <div class="reset-row">
+    <button class="reset-btn" id="resetBtn">reset all progress</button>
+  </div>
+</div>
+
+<script src="training-tracker/script.js"></script>
+<script src="../scripts/shared.js"></script>
+</body>
+</html>

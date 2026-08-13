@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Light Theme (PILOT brand from pilot-telematics.com) */
+  --primary: #0284c7;
+  --primary-hover: #0369a1;
+  --primary-bg: #e0f2fe;
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --surface-alt: #f8fafc;
+  --text-pr: #334155;
+  --text-sec: #64748b;
+  --text-dis: #cbd5e1;
+  --line: #e2e8f0;
+  --line-strong: #cbd5e1;
+
+  --positive: #22c55e;
+  --positive-bg: #dcfce7;
+  --negative: #ef4444;
+  --negative-bg: #fee2e2;
+  --warning: #eab308;
+  --warning-dim: #ca8a04;
+  --warning-bg: #fef9c3;
+
+  --nav-bg: rgba(255, 255, 255, 0.96);
+  --nav-text: #334155;
+  --nav-hover: rgba(0, 0, 0, 0.04);
+
+  --mono: 'Courier New', ui-monospace, monospace;
+  --sans: 'Inter', 'Segoe UI', system-ui, Arial, sans-serif;
+  --transition: all 0.25s ease;
+}
+
+[data-theme="dark"] {
+  /* Dark Theme */
+  --primary: #38bdf8;
+  --primary-hover: #7dd3fc;
+  --primary-bg: #0c4a6e;
+  --bg: #020617; /* Very dark slate */
+  --surface: #0f172a; /* Slate 900 */
+  --surface-alt: #1e293b; /* Slate 800 */
+  --text-pr: #f8fafc;
+  --text-sec: #94a3b8;
+  --text-dis: #475569;
+  --line: #1e293b;
+  --line-strong: #334155;
+
+  --positive: #4ade80;
+  --positive-bg: #14532d;
+  --negative: #f87171;
+  --negative-bg: #7f1d1d;
+  --warning: #facc15;
+  --warning-dim: #b45309;
+  --warning-bg: #713f12;
+
+  --nav-bg: rgba(15, 23, 42, 0.96);
+  --nav-text: #f8fafc;
+  --nav-hover: rgba(255, 255, 255, 0.06);
+}
+
+/* Base resets */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--sans);
+  color: var(--text-pr);
+  background: var(--bg);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ─── SITE NAV ──────────────────────────────────── */
+.topnav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+.topnav-in {
+  max-width: 1200px; margin: 0 auto; padding: 0 24px;
+  display: flex; align-items: center; height: 54px; gap: 12px;
+}
+.topnav .logo-link {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; flex-shrink: 0;
+}
+.topnav .logo-link img { height: 24px; width: auto; }
+/* Invert white logo in light mode if needed, or we'll swap the image source via JS/CSS */
+[data-theme="light"] .topnav .logo-link img.pilot-logo {
+  filter: brightness(0) invert(0.2); /* Make it slate-800 for light mode */
+}
+:root:not([data-theme="dark"]) .topnav .logo-link img.pilot-logo {
+  filter: brightness(0) invert(0.2); /* Default light mode fallback */
+}
+
+.topnav .logo-text {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 2.5px;
+  color: var(--primary); text-transform: uppercase; white-space: nowrap;
+}
+.topnav .logo-text b { color: var(--text-pr); letter-spacing: 1px; }
+.topnav .nav-spacer { flex: 1; }
+.topnav .nav-links { display: flex; gap: 4px; align-items: center; }
+.topnav .nav-link {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase;
+  text-decoration: none; color: var(--text-sec); padding: 7px 12px;
+  border-radius: 5px; border: 1px solid transparent; transition: var(--transition);
+  white-space: nowrap;
+}
+.topnav .nav-link:hover {
+  color: var(--text-pr); background: var(--nav-hover); border-color: var(--line);
+}
+.topnav .nav-link.active {
+  color: var(--surface); background: var(--primary); border-color: var(--primary); font-weight: 700;
+}
+[data-theme="dark"] .topnav .nav-link.active {
+  color: #020617; /* Dark text on light blue primary for dark mode */
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+  background: none; border: 1px solid var(--line); color: var(--text-sec);
+  border-radius: 5px; padding: 6px 8px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; transition: var(--transition);
+}
+.theme-toggle:hover { color: var(--primary); border-color: var(--primary); }
+.theme-toggle svg { width: 16px; height: 16px; fill: currentColor; }
+
+/* Mobile Menu */
+.topnav .hamburger {
+  display: none; background: none; border: 1px solid var(--line); color: var(--text-sec);
+  border-radius: 5px; padding: 7px 9px; cursor: pointer; font-size: 16px; line-height: 1;
+}
+.topnav .hamburger:hover { color: var(--text-pr); border-color: var(--text-pr); }
+
+@media(max-width: 768px) {
+  .topnav .nav-links {
+    display: none; position: absolute; top: 54px; left: 0; right: 0;
+    background: var(--nav-bg); border-bottom: 1px solid var(--line);
+    flex-direction: column; padding: 10px 16px; gap: 4px;
+    backdrop-filter: blur(14px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  .topnav .nav-links.open { display: flex; }
+  .topnav .hamburger { display: block; }
+}
+
+@media(prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PILOT Support Skills Module</title>
+<link rel="stylesheet" href="../styles/shared.css">
+<link rel="stylesheet" href="skills-module/styles.css">
+<nav class="topnav" id="topnav">
+  <div class="topnav-in">
+    <a class="logo-link" href="../index.html">
+      <img src="https://pilot-telematics.com/wp-content/themes/pilot/assets/images/logo.png" alt="PILOT logo" class="pilot-logo">
+      <span class="logo-text">PILOT <b>Training Hub</b></span>
+    </a>
+    <div class="nav-spacer"></div>
+    <div class="nav-links" id="siteNavLinks">
+      <a class="nav-link" href="../index.html">Home</a>
+      <a class="nav-link" href="training-tracker.html">Training Tracker</a>
+      <a class="nav-link" href="support-panel.html">Support Panel</a>
+      <a class="nav-link active" href="skills-module.html">Skills Module</a>
+    </div>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme"></button>
+    <button class="hamburger" id="siteHamburger" aria-label="Toggle navigation">&#9776;</button>
+  </div>
+</nav>
+
+<div class="mast"><div class="mast-in">
+  <div class="t">PILOT <b>SUPPORT SKILLS MODULE</b></div>
+  <div class="sp"></div>
+  <button class="menub" id="menub">Contents</button>
+  <button class="gapbtn" id="gapbtn">— standard defaults</button>
+</div></div>
+
+<div class="shell">
+  <nav class="toc" id="toc">
+    <div class="grp">Supplement</div>
+    <a href="#top">Front matter</a>
+    <div class="grp">Module A · Communication</div>
+    <a href="#a1">Anatomy of a contact</a>
+    <a href="#a2">Diagnostic questions</a>
+    <a href="#a3">Difficult conversations</a>
+    <a href="#a4">Writing it down</a>
+    <div class="grp">Module B · Troubleshooting</div>
+    <a href="#b1">Three instruments</a>
+    <a href="#b2">The layer model</a>
+    <a href="#b3">The method</a>
+    <a href="#b4">Diagnostic trees</a>
+    <a href="#b5">Layer 7 · relay</a>
+    <a href="#b6">When to stop</a>
+    <div class="grp">Module C · Workflows</div>
+    <a href="#c1">Lifecycle</a>
+    <a href="#c2">Who does what</a>
+    <a href="#c3">Escalation</a>
+    <a href="#c4">Special cases</a>
+    <div class="grp">Module D · Standards</div>
+    <a href="#d1">Three kinds of ticket</a>
+    <a href="#d2">Priority</a>
+    <a href="#d3">Knowledge capture</a>
+    <a href="#d4">Metrics</a>
+    <a href="#d5">Driver data</a>
+    <div class="grp">Reference</div>
+    <a href="#docmap">Documentation map</a>
+    <a href="#integration">Integration options</a>
+    <a href="#checklist">Prep checklist</a>
+  </nav>
+
+  <article id="top">
+    <p class="eyebrow">PILOT training programme — supplement</p>
+    <h1 class="doc">Support Skills Module</h1>
+    <p class="sub">Communication · Troubleshooting methodology · Escalation workflows · Industry standard practice</p>
+
+    <p><b>Goal.</b> To complement the existing product training (PILOT platform, 2 weeks / Admin panel, 3 days) with the practical skills a 1st-line support engineer needs to handle a real customer case from first contact to resolution or handover.</p>
+    <p><b>Format.</b> Four modules. Each can be delivered as a standalone block or woven into the existing day-by-day plan — see <a href="#integration">Integration options</a>.</p>
+    <p><b>Revision 4.</b> Modules A–D are a <b>supplement</b>. The two existing training plans are internal, authoritative, and correct — no flow, step, sequence or terminology from them has been altered or contradicted here. Everything below is additive.</p>
+
+    <div class="box">
+      <p>Some passages draw on the public PILOT documentation. <b>Treat it as a reference, not an authority</b> — it does not cover everything the internal plans do; see <a href="#docmap">Documentation map</a>. Where the public documentation and the internal plans differ, the plans win.</p>
+      <p>Passages marked <span class="std">like this</span> are pre-filled with <b>common telematics-industry defaults</b>. They are safe starting points, not verified local facts — confirm each against your own processes before delivery. Use the <b>defaults</b> button in the header to review every one in a list. The governing rule for anything you cannot resolve or authorise yourself is simple: <b>contact your head of technical support.</b></p>
+    </div>
+
+    <h2 id="mod-a">Module A · Communication with customers</h2>
+    <p><b>Goal.</b> The engineer can run a support conversation that gets the information needed, sets accurate expectations, and leaves the customer feeling handled — even when the answer is "no" or "not yet."</p>
+
+    <h3 id="a1">A1. The anatomy of a support contact</h3>
+    <ul>
+      <li>The four phases: <b>Acknowledge → Diagnose → Act → Close.</b> Most bad support calls fail because the engineer skips straight to Act.</li>
+      <li><b>Acknowledge:</b> restate the problem in your own words before touching the system. It proves you listened, and catches misunderstandings in the first 30 seconds instead of the twentieth minute.</li>
+      <li><b>Close:</b> never end without three things stated out loud — what was done, what happens next, and who does it.</li>
+    </ul>
+
+    <h3 id="a2">A2. Asking the right diagnostic questions</h3>
+    <p>This is the core skill. The customer reports a <b>symptom</b>; the engineer needs <b>facts</b>. Work the ladder top to bottom, never skip:</p>
+    <div class="tw"><table>
+      <thead><tr><th style="width:120px">Question type</th><th style="width:180px">Purpose</th><th>PILOT example</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Scope</td><td>Is it one thing or everything?</td><td>"Is it this one vehicle, or all of them?"</td></tr>
+        <tr><td class="k">Timeline</td><td>When did it start? What changed?</td><td>"When did you last see correct data? Did anything change around then?" — then verify against <b>Audit history</b>, which logs changes to object settings. Customers routinely forget a change they made.</td></tr>
+        <tr><td class="k">Reproduction</td><td>Can we see it happen?</td><td>"Can you open the object list right now and tell me what you see next to the vehicle name?"</td></tr>
+        <tr><td class="k">Identity</td><td>Who and what exactly?</td><td>"Which login are you using? What's the object name or IMEI?"</td></tr>
+        <tr><td class="k">Expectation</td><td>What did they expect vs. get?</td><td>"What number were you expecting to see there?"</td></tr>
+      </tbody>
+    </table></div>
+    <p><b>Key principle: ask open, then narrow.</b> Start with "Tell me what you're seeing" (open), not "Is the ignition sensor configured?" (narrow). A narrow first question makes the customer answer <em>your</em> theory instead of describing <em>their</em> reality.</p>
+    <h4>Anti-patterns to train out</h4>
+    <ul>
+      <li><b>Leading the witness</b> — "So the device is offline, right?" The customer will agree just to move on.</li>
+      <li><b>The jargon wall</b> — "Have you checked the contract-level module activation?" Ask instead: "Let me check something on my side."</li>
+      <li><b>Assuming rights</b> — the customer says "the object disappeared." It may never have been theirs to see. Verify before you believe.</li>
+    </ul>
+
+    <h3 id="a3">A3. Difficult conversations</h3>
+    <ul>
+      <li><b>The customer is angry.</b> Let them finish. Do not defend the product mid-sentence. Then acknowledge the impact ("You've had no tracking on that vehicle for two days — I understand why that's a problem"), not the emotion ("I understand you're frustrated," which reads as scripted).</li>
+      <li><b>You don't know the answer.</b> Say so plainly and commit to a next step and a time. "I don't know yet. I'm going to check with <span class="std">our 2nd-line support team (or your head of technical support if you're not sure who owns it)</span> and come back to you by [timeframe]." Never guess out loud — a wrong guess from support becomes a fact in the customer's head.</li>
+      <li><b>It's the customer's fault.</b> Never say that. Say what will fix it: "The notification's time window was set to weekdays only — let's widen that now and I'll show you where it lives."</li>
+      <li><b>The answer is no.</b> State the no, the reason, and the nearest alternative. "That action isn't available because the module isn't on your contract. What I can do is…"</li>
+      <li><b>Buying time.</b> Silence on a call reads as incompetence. Narrate: "I'm opening Sensors tracing now to see what the device actually sent — give me about a minute."</li>
+    </ul>
+
+    <h3 id="a4">A4. Writing it down</h3>
+    <p>Tickets are read by people who weren't on the call — a 2nd-line engineer, or you in three weeks. A usable ticket note contains:</p>
+    <ol>
+      <li>What the customer reported (their words)</li>
+      <li>What you verified (facts, with object names / IMEI / login / timestamps)</li>
+      <li>What you ruled out and how</li>
+      <li>What you did</li>
+      <li>What's outstanding and who owns it</li>
+    </ol>
+    <p><span class="std">Most telematics desks run on a helpdesk platform such as Jira Service Management, Zendesk or Freshdesk (PILOT's own vendor portal at helpdesk.pilot-gps.com is Jira Service Management). At minimum a ticket carries: customer / contract, object name or IMEI, category (Incident / Service request / Problem — see D1), priority (P1&ndash;P5 — see D2), channel, and the customer's own words. Confirm your desk's exact system and required fields with your head of technical support.</span></p>
+
+    <h4>Module A assignments</h4>
+    <ol>
+      <li><b>Question drill.</b> Trainer gives a one-line symptom ("My reports are empty"). Trainee produces five questions before proposing any cause. Repeat with four different symptoms.</li>
+      <li><b>Rewrite the jargon.</b> Take five sentences from the PILOT manual and rewrite each for a non-technical fleet manager.</li>
+      <li><b>Role-play: the angry customer.</b> Trainer plays a customer whose vehicle showed no data all weekend. Trainee runs the full Acknowledge → Diagnose → Act → Close cycle.</li>
+      <li><b>Role-play: the "no".</b> Customer wants a feature not on their tariff. Trainee delivers the no and the alternative.</li>
+      <li><b>Ticket writing.</b> Write up role-play 3 to the five-point standard above. Trainer grades on whether a colleague could pick it up cold.</li>
+    </ol>
+
+    <hr>
+    <h2 id="mod-b">Module B · Troubleshooting methodology</h2>
+    <p><b>Goal.</b> The engineer diagnoses by elimination against a known model of the system, using PILOT's own diagnostic tools, rather than guessing from memory.</p>
+
+    <h3 id="b1">B1. Three instruments, learned before anything else</h3>
+    <p>PILOT ships with three tools that answer the three questions almost every case turns on. A trainee who knows only these three is already more useful than one who has memorised every menu.</p>
+    <div class="tw"><table>
+      <thead><tr><th style="width:150px">Instrument</th><th style="width:170px">Where</th><th>The question it answers</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Sensors tracing</td><td>Right-click an object → Sensors tracing</td><td><b>What did the device actually send?</b> Raw, unprocessed data in real time: exact time of reception, latitude/longitude/altitude, speed, direction, <b>number of satellites</b>, and readings from additional sensors (temperature, fuel, battery, pressure). Table or chart, and downloadable.</td></tr>
+        <tr><td class="k">Audit history</td><td>Admin panel → object → Audit</td><td><b>What changed, and who changed it?</b> Logs changes to settings on the object. Use it to check the customer's "nothing changed" claim.</td></tr>
+        <tr><td class="k">Admin reports</td><td>Admin panel → Admin section</td><td><b>Did they even reach us?</b> Failed Login Attempts (username, number of attempts, times), Login History, Blocked Users, Disabled Users, Password Reset, User Activity.</td></tr>
+      </tbody>
+    </table></div>
+    <div class="box good">
+      <p><b>Why Sensors tracing is the hinge of the whole method.</b> Nearly every "the numbers are wrong" case reduces to one question: did the device send bad data, or did we interpret good data badly? Sensors tracing answers it in about thirty seconds and splits the problem cleanly in half. Teach it on day one of this module, not as an advanced topic.</p>
+      <p>It also exposes <b>satellite count</b> — which turns "the position jumps around" from a mystery into a reading.</p>
+    </div>
+
+    <h3 id="b2">B2. The layer model: work top-down</h3>
+    <p>Almost every PILOT issue lives in one of seven layers. Faults are far more common at the top of this list than the bottom — but engineers instinctively reach for the bottom ("must be the device"). <b>Always check top-down.</b></p>
+    <div class="tw"><table>
+      <thead><tr><th style="width:34px">#</th><th style="width:140px">Layer</th><th style="width:180px">Typical failure</th><th>The check</th></tr></thead>
+      <tbody>
+        <tr><td class="k">1</td><td><b>Access &amp; rights</b></td><td>Can't log in; can't see an object</td><td>Admin → <b>Failed Login Attempts</b>, <b>Blocked Users</b>, <b>Disabled Users</b>. Then the user's rights.</td></tr>
+        <tr><td class="k">2</td><td><b>Contract &amp; modules</b></td><td>Feature or menu item entirely absent</td><td>Admin panel → contract → Modules. <b>The actions available in the object right-click menu depend on the modules in the contract</b> — a "missing button" is usually this, not a bug.</td></tr>
+        <tr><td class="k">3</td><td><b>Interface &amp; filters</b></td><td>"It's gone" but it isn't</td><td>Object list filters, group selection, column config, date range.</td></tr>
+        <tr><td class="k">4</td><td><b>Object configuration</b></td><td>One object wrong or silent</td><td>Object card, tariff, device ID/type, and <b>Temporary blocking</b> — an object deliberately suspended (e.g. seasonal equipment) looks exactly like a fault.</td></tr>
+        <tr><td class="k">5</td><td><b>Sensor configuration</b></td><td>Data arrives, numbers are wrong</td><td>Field mapping, <b>conversion formula</b>, calibration table. Confirm against Sensors tracing.</td></tr>
+        <tr><td class="k">6</td><td><b>Device &amp; data flow</b></td><td>No data, or bad data, from one unit</td><td><b>Sensors tracing</b> (time of last reception, satellites), <b>Connection Lost</b> report (where and when connection dropped, duration, address), <b>Devices offline</b> report.</td></tr>
+        <tr><td class="k">7</td><td><b>Relay &amp; integration</b></td><td>Data fine in PILOT, missing in the customer's own system</td><td>Admin → <b>Statistics</b>: check <b>Queue</b>, <b>Err</b>, <b>Send</b>, <b>Ack</b>. See B5.</td></tr>
+      </tbody>
+    </table></div>
+    <p><b>Rule of thumb:</b> affects everything → layers 1–2. Affects one object → 4–6. Affects one screen → layer 3. Fine in PILOT but missing downstream → layer 7. Scope tells you where to start; that's why the Scope question in Module A comes first.</p>
+
+    <h3 id="b3">B3. The method</h3>
+    <ol>
+      <li><b>Reproduce or observe.</b> Do not diagnose a story. Get to the screen — via the customer's description, a screenshot, or a test account.</li>
+      <li><b>Establish scope.</b> One object / one user / everything. This selects your layer.</li>
+      <li><b>Bisect.</b> Cut the problem in half. Does another user see it? Does another object have it? Did it work yesterday? Every answer halves the search space.</li>
+      <li><b>Change one thing at a time.</b> Two changes at once means you learn nothing from the result.</li>
+      <li><b>Fix the config — then fix the history.</b> Correcting a formula or calibration table changes <em>new</em> data only. Historical reports stay wrong until you run <b>Recalculate</b> (specify the agent, choose the recalculation type, set the period, run, then re-check the report). Telling a customer "fixed" without recalculating guarantees a callback.</li>
+      <li><b>Confirm the fix with the customer</b>, not with yourself. "Refresh and tell me what you see now."</li>
+      <li><b>Record the cause</b>, not just the fix. <span class="std">Write it up as a KCS article in the team knowledge base (see D3) — the helpdesk's linked knowledge base, or PILOT's own FAQ / uploaded-documents area. If no store exists yet, your head of technical support can point you to where known issues live.</span></li>
+    </ol>
+    <div class="box good">
+      <p><b>The Master status trap — teach this explicitly.</b></p>
+      <p>The documentation describes a <b>Master status</b>, granted on admin-panel login, carrying unlimited rights in the system.</p>
+      <p>Whatever it is called in your build, the operational consequence is what matters: <b>"it works for me" proves nothing about the customer's experience.</b> A large share of rights-related cases are simply invisible from a support login. Reproduce as the user, or check that user's rights directly — never conclude from your own session.</p>
+    </div>
+
+    <h3 id="b4">B4. Worked diagnostic trees</h3>
+    <p>These sit <b>behind</b> the four scenarios already in Day 11–12 of the support plan — same scenarios, with the diagnostic order made explicit. Each is ordered so the cheapest, most common cause is checked first.</p>
+
+    <div class="tree">
+      <div class="h">"I can't log in"</div>
+      <ol>
+        <li>Admin → <b>Failed Login Attempts</b>. Are their attempts arriving at all? The report gives username, number of attempts, and times. No attempts logged = they aren't reaching the login they think they are (wrong URL, wrong portal, cached page).</li>
+        <li>Attempts arriving but failing → Admin → <b>Blocked Users</b> and <b>Disabled Users</b>.</li>
+        <li>Check <b>Password Reset</b> history — someone may have reset it already.</li>
+        <li>Is the contract itself blocked (non-payment)? → layer 2.</li>
+        <li>Is it just them, or their whole company?</li>
+      </ol>
+      <p class="note">everyone = layer 2; one person = layer 1</p>
+    </div>
+
+    <div class="tree">
+      <div class="h">"An object disappeared from my list"</div>
+      <ol>
+        <li>Does it exist in the admin panel at all?</li>
+        <li>Does <b>this user</b> have rights to it? Remember the Master trap — check their rights, don't check your own view.</li>
+        <li>Is a filter, group selection, or column config hiding it? (layer 3)</li>
+        <li>Is <b>Temporary blocking</b> switched on? A suspended object is intentional, not a fault — and the customer's colleague may have done it to stop the subscription charge.</li>
+        <li>Was it moved to another contract, or deleted? Deleting an object removes all its data and history; restoring requires a system administrator.</li>
+      </ol>
+    </div>
+
+    <div class="tree">
+      <div class="h">"The fuel / mileage numbers are wrong"</div>
+      <ol>
+        <li>Open <b>Sensors tracing</b>. Is data arriving, and what is the raw value? This single step decides everything that follows.</li>
+        <li>Raw value is wrong or absent → the problem is layer 6 (device), not configuration. Stop tuning formulas.</li>
+        <li>Raw value is correct but the display is wrong → layer 5. Check the field mapping first, then the <b>conversion formula</b>, then the calibration table — <b>in that order, because that is the order the system applies them.</b> The guide is explicit: the formula runs on the data as soon as it arrives from the sensor, <em>before</em> the calibration table. Debugging the table while a formula is quietly mangling its input is wasted time.</li>
+        <li>Use the <b>Test</b> button on the formula field rather than reasoning about it. It lets you feed in real or chosen values and shows the result.</li>
+        <li>Check the calibration table's two switches: <b>Select nearest value</b> (round to the closest calibration point, versus interpolating between surrounding points) and <b>Calibration first</b> (check the table first; fall back to the standard algorithm if no exact match). These quietly change results and are a common cause of "close but wrong."</li>
+        <li><b>Numbers intermittently absent rather than wrong?</b> Look for a division in the formula. If the divisor can arrive as 0 or undefined, the calculation errors — the documented fix is a conditional guard on the divisor.</li>
+        <li>Was the number ever right, or wrong from day one? Check <b>Audit history</b> for a settings change that lines up with the date.</li>
+        <li>After fixing: run <b>Recalculate</b> for the affected period, or the customer's reports stay wrong.</li>
+      </ol>
+      <p class="note">never right = configuration; recently wrong = a change (audit it) or the device</p>
+    </div>
+
+    <div class="tree">
+      <div class="h">"I'm not getting notifications"</div>
+      <ol>
+        <li>Is the <b>Notifications</b> module active on the contract? Without it there is no Notifications tab at all.</li>
+        <li>Does the notification exist?</li>
+        <li><b>Is the object or tag actually selected in it?</b> A notification applies to specific objects or to a tag group. A vehicle added later is not covered automatically.</li>
+        <li><b>Check the notification's time window</b> — time zone, days of the week, and time intervals. A rule set for weekdays 09:00–18:00 is silent on a Saturday and looks broken. This is the single most-missed cause.</li>
+        <li><b>Check the geofence scope</b> if the Geofences module is active: Anywhere / In selected zones / Outside selected zones.</li>
+        <li><b>Check the "For all users" flag.</b> If off, colleagues won't receive it — which is exactly the shape of "my manager gets them and I don't."</li>
+        <li>Check the delivery method: SMS, Push, Email, Alert (in-system pop-up), Control Room, Webhook, Command, Command template, or Telegram.</li>
+        <li>For email: is the address <b>verified</b>? The public guide places this under Account settings → Privacy → Notification settings; your plan calls the same area contract settings. Same place, house vocabulary.</li>
+        <li>Finally: spam folder.</li>
+      </ol>
+      <p class="note">work outside-in: module → rule → scope → schedule → delivery → mailbox</p>
+    </div>
+
+    <div class="tree">
+      <div class="h">"No data from a vehicle"</div>
+      <ol>
+        <li><b>Sensors tracing</b> — when was the last reception? What is the satellite count?</li>
+        <li>Check the <b>Connection Lost</b> report: it gives the start and stop time of the outage, its duration, and <b>the address where connection was lost</b>. A pattern of drops at the same location is an installation or coverage story, not a platform one.</li>
+        <li>Is <b>Temporary blocking</b> on? (Free to check, and it is not a fault.)</li>
+        <li>Does the device ID / IMEI in the object card match the physical unit? Is the device type correct?</li>
+        <li>Has it <b>ever</b> reported? Never = configuration or installation. Stopped = power, connection, or hardware.</li>
+        <li><span class="std">Once you've confirmed it's not blocking, filtering, rights or config and the raw feed is dead at the device: if it <b>never</b> reported after install it's an installation/wiring job; if it <b>stopped</b>, it's power, SIM/connection or hardware. Either way, hand it to the installer / hardware team &mdash; route via your head of technical support if that team isn't directly reachable.</span></li>
+      </ol>
+    </div>
+
+    <h3 id="b5">B5. Layer 7: data reaching PILOT but not the customer's own system</h3>
+    <p>Customers who relay data to an external system (their own ERP, a municipal platform, a partner) produce a distinct class of ticket: <b>the data is correct in PILOT and missing downstream.</b> It is not diagnosable with any of the layers above, and it is the one area where the public guide has a troubleshooting page of its own.</p>
+    <p>Start at Admin → <b>Statistics</b> and read four metrics:</p>
+    <div class="tw"><table>
+      <thead><tr><th style="width:170px">Symptom</th><th style="width:170px">Reading</th><th>Check</th></tr></thead>
+      <tbody>
+        <tr><td>Nothing arrives downstream</td><td>—</td><td>Endpoint enabled? Object relay enabled? External ID correct? Host / Port / Format / Path correct? Credentials (Uspw) valid? Any errors in Statistics?</td></tr>
+        <tr><td><b>Queue</b> keeps growing</td><td>Packets accumulating, undeliverable</td><td>External server unavailable, wrong connection settings, or the receiving system is refusing the connection.</td></tr>
+        <tr><td><b>Err</b> climbing</td><td>Errors on send</td><td>Availability of the external system, authentication, transmission protocol, schedule settings, restrictions on the receiving side.</td></tr>
+        <tr><td><b>Send</b> rising, <b>Ack</b> stuck at zero</td><td>We transmit; they never confirm</td><td>Protocol settings, External ID, JSON config, credentials, error messages in Statistics.</td></tr>
+        <tr><td>A new object isn't relaying</td><td>—</td><td>Is an <b>Auto add</b> rule enabled for that contract? Was the object created <em>after</em> the rule was configured? Does the object belong to the right contract?</td></tr>
+        <tr><td>No statistics shown at all</td><td>—</td><td>Usually benign: nothing transmitted yet, period too short, or the endpoint is new.</td></tr>
+      </tbody>
+    </table></div>
+    <p><b>Documented best practice:</b> one endpoint per external system; configure Auto add when every new object in a contract should relay to the same place; before deleting an endpoint, check how many objects depend on it; and when troubleshooting, always start from Statistics.</p>
+
+    <h3 id="b6">B6. When to stop</h3>
+    <p>1st line's job is not to solve everything — it's to solve the known and cleanly hand over the unknown. Teach the stop conditions explicitly:</p>
+    <ul>
+      <li>You've worked all applicable layers and found nothing.</li>
+      <li>The fix requires access or rights you don't have.</li>
+      <li>It's affecting multiple customers → this is an incident, not a ticket. Escalate immediately, don't keep debugging.</li>
+      <li><span class="std">A common default: stop and escalate after about 30 minutes of investigation with no meaningful progress on a P1/P2 (proportionally longer for lower-priority tickets). Escalate to your head of technical support with the handover from C3 &mdash; a clean early handover beats sitting on a ticket.</span></li>
+    </ul>
+
+    <h4>Module B assignments</h4>
+    <ol>
+      <li><b>Instrument drill.</b> Open Sensors tracing on a live object and read out the last reception time, satellite count, and one sensor value. Then find the same object's last settings change in Audit history. Repeat until it takes under a minute.</li>
+      <li><b>Layer sorting.</b> Trainer lists 15 symptoms; trainee assigns each to a layer and names the first check. Speed matters — this should become reflex.</li>
+      <li><b>Broken sandbox.</b> Trainer breaks 6 things in the test environment in advance: block a user, deactivate a module, set a wrong sensor formula, apply a hidden list filter, mismatch an IMEI, and switch on Temporary blocking for one object. Trainee diagnoses each without being told the category. <b>This is the single highest-value exercise in the module.</b></li>
+      <li><b>The Master trap.</b> Trainer restricts a test user's rights to one object. Trainee — logged in with support rights — must explain why the customer can't see the other vehicles, without ever having seen the problem themselves.</li>
+      <li><b>Notification hunt.</b> Trainer configures a notification with a weekday-only time window, then reports "no alerts at the weekend." Trainee finds it.</li>
+      <li><b>Recalculate drill.</b> Fix a wrong calibration table, then make yesterday's report correct. Trainee must realise the second step is needed without being prompted.</li>
+      <li><b>Write a tree.</b> Trainee produces their own diagnostic tree for a symptom not covered above, and defends the order of checks.</li>
+    </ol>
+
+    <hr>
+    <h2 id="mod-c">Module C · Real support workflows and escalation</h2>
+    <p><b>Goal.</b> The engineer knows what happens to a ticket, who owns what, and when to let go of it.</p>
+    <div class="box good">
+      <p>This module is inherently company-specific, so the answers below are filled in with <b>common telematics-desk defaults</b> (marked <span class="std">like this</span>). Treat each as a sensible starting point and confirm it with your team leads. The standing rule for anything you can't resolve or authorise yourself: <b>contact your head of technical support.</b></p>
+    </div>
+
+    <h3 id="c1">C1. The lifecycle of a request</h3>
+    <ul>
+      <li>Channels a request can arrive on: <span class="std">phone, email and a self-service helpdesk portal are the industry norm; many telematics desks also take WhatsApp and partner-relayed requests. Whatever the channel, every request becomes a ticket.</span></li>
+      <li>Logging: what must be created, and when. <span class="std">Raise a ticket for every contact at the moment of contact &mdash; never work off memory or a chat thread. Minimum fields: customer / contract, object / IMEI, symptom in the customer's words, channel, and priority.</span></li>
+      <li>Priority definitions and target response times. <span class="std">Common telematics SLA defaults: <b>P1</b> respond &le;15 min / restore &le;4 h; <b>P2</b> &le;1 h / &le;8 h; <b>P3</b> &le;4 h / &le;2 business days; <b>P4</b> &le;1 business day / &le;5 days; <b>P5</b> best-effort. Priority itself comes from the D2 matrix. Confirm your contractual SLAs with your head of technical support.</span></li>
+      <li>Status meanings and who is allowed to close a ticket. <span class="std">Standard lifecycle: New &rarr; Open / In progress &rarr; Pending customer &rarr; Escalated &rarr; Resolved &rarr; Closed. The engineer who resolves a ticket closes it; tickets pending customer confirmation auto-close after a set period (commonly 3&ndash;5 business days). Only the ticket owner or a team lead reopens a closed ticket.</span></li>
+    </ul>
+
+    <h3 id="c2">C2. Who does what</h3>
+    <p>A one-page map of the org from a support engineer's point of view. The <b>owns</b> boundaries below are common telematics-desk defaults; fill in the real names and channels locally. Where a contact isn't yet defined, the default route is <b>your head of technical support.</b></p>
+    <div class="tw"><table>
+      <thead><tr><th style="width:145px">Team / role</th><th style="width:180px">Owns</th><th>Send them</th><th style="width:130px">Contact</th></tr></thead>
+      <tbody>
+        <tr><td class="k">1st line (you)</td><td>Known issues, config, how-to, account/rights</td><td>—</td><td>—</td></tr>
+        <tr><td class="k">2nd line</td><td><span class="std">Complex or cross-layer faults; anything needing deeper platform access than 1st line holds</span></td><td>Every applicable layer worked, nothing found</td><td><span class="std">via your head of technical support</span></td></tr>
+        <tr><td class="k">Development</td><td><span class="std">Reproducible defects in the product itself</span></td><td>Reproducible bugs — not config questions</td><td><span class="std">via head of technical support (bug report)</span></td></tr>
+        <tr><td class="k">Installers</td><td><span class="std">Physical device, wiring, SIM / power, install quality, on-site fixes</span></td><td>Device never reported, wiring, repeated drops at one location</td><td><span class="std">via head of technical support</span></td></tr>
+        <tr><td class="k">Integrations</td><td><span class="std">Data relay / endpoints, layer-7 delivery to external systems, API / webhook config</span></td><td>Layer 7: endpoints, Queue/Err/Ack, external systems</td><td><span class="std">via head of technical support</span></td></tr>
+        <tr><td class="k">Sales</td><td><span class="std">Contracts, tariffs, upgrades, module activation, commercial terms</span></td><td>Tariff, upgrades, module activation, commercial</td><td><span class="std">Account manager / sales</span></td></tr>
+        <tr><td class="k">Finance</td><td><span class="std">Invoicing, payments, manual debits, blocked-for-non-payment</span></td><td>Payments, debits, blocked-for-nonpayment</td><td><span class="std">Finance / billing</span></td></tr>
+        <tr><td class="k">Partners</td><td><span class="std">White-label partners' own end customers and sub-accounts</span></td><td><span class="std">Anything about a partner's own customers — the partner runs their own tier 1</span></td><td><span class="std">Partner manager / head of technical support</span></td></tr>
+      </tbody>
+    </table></div>
+    <p>Note the <b>Integrations</b> row: layer 7 tickets look like platform faults but are almost never resolved by the same people. Decide early who owns them. <span class="std">In most telematics operations relay / endpoint tickets are owned by the Integrations team, not general 2nd line &mdash; route them there, or via your head of technical support if that team isn't yet defined.</span></p>
+
+    <h3 id="c3">C3. Escalation</h3>
+    <ul>
+      <li><b>Escalation is not failure.</b> Escalating early with good notes is better work than sitting on a ticket for a day. Say this out loud in training — new hires routinely over-hold tickets to avoid looking incapable, and that is the single most expensive habit in 1st line.</li>
+      <li><b>What must be in an escalation.</b> A handover that makes the next person start from zero wastes the whole investigation. Required: customer + contract, object/IMEI, exact symptom, timestamps, <b>what Sensors tracing showed</b>, <b>what Audit history showed</b>, what you checked and ruled out, what you think it is, and what the customer has been told and expects.</li>
+      <li><b>Triggers:</b> <span class="std">standard triggers are &mdash; the investigation time limit reached with no progress (see B6); P1/P2 severity; multiple customers affected (an incident); a VIP or strategic account; any data loss or deletion request; and anything touching billing, contracts or admin rights you don't hold. When a trigger fires, escalate to your head of technical support with the full handover above.</span></li>
+      <li><b>Emergency / out-of-hours path:</b> <span class="std">the industry norm is a documented on-call rota with a single emergency contact point. Out of hours, raise P1 incidents immediately to the on-call engineer or your head of technical support; everything else waits for the next business day.</span></li>
+      <li><b>The customer stays informed.</b> Escalating does not end your ownership of the <em>relationship</em> — <span class="std">by default, 1st line remains the customer's single point of contact and owns communication until the ticket is resolved, even after the technical work moves to another team. Confirm this with your head of technical support.</span></li>
+    </ul>
+
+    <h3 id="c4">C4. Special cases</h3>
+    <ul>
+      <li>Multiple customers reporting the same thing → suspected platform incident. <span class="std">Stop debugging it case by case and alert your head of technical support (or the on-call / incident contact) immediately, so a single incident ticket is opened and customers are updated together.</span></li>
+      <li>Customer requests something needing admin-panel access they don't have (new contract, module activation, tariff change) → <span class="std">route to the team that owns the action (Sales for commercial / module changes, 2nd line or admin for rights) through the documented approval path. If no path is defined, your head of technical support authorises or forwards it.</span></li>
+      <li>Data recovery: deleting an object destroys all its data and history, and restoring requires a system administrator. Treat any deletion request as irreversible and confirm before acting. <span class="std">Restoration is only possible if a backup still covers the period, and the window is limited &mdash; never promise recovery. Raise it to your head of technical support at once, because the window is time-critical.</span></li>
+      <li>Feature requests → <span class="std">log as a service / feature request and pass to Product via your head of technical support. Tell the customer honestly that it's been recorded and passed on, with no committed date &mdash; never promise a feature.</span></li>
+      <li>Angry customer demanding a manager → <span class="std">don't refuse. Acknowledge, and escalate the call to your team lead or head of technical support &mdash; a demand for a manager is itself a valid escalation trigger.</span></li>
+    </ul>
+
+    <h4>Module C assignments</h4>
+    <ol>
+      <li><b>Route the ticket.</b> Trainer gives 10 real (anonymized) past requests. Trainee names the owning team and justifies it. Use genuine past tickets — invented ones are always too clean.</li>
+      <li><b>Write an escalation.</b> Take the unresolved case from Module B's broken-sandbox exercise and write the handover. The 2nd-line engineer who receives it grades it: could they start work without asking a single question?</li>
+      <li><b>Shadowing.</b> <span class="std">A common default is 8&ndash;16 hours (2&ndash;4 days) listening to live calls before handling their own, adjusted to how quickly the trainee is ready. Confirm the volume with your head of technical support.</span></li>
+      <li><b>Reverse shadowing.</b> Trainee handles live contacts with a senior listening in. <span class="std">Typically a further 2&ndash;3 days; sign-off when the trainee completes a full Acknowledge &rarr; Diagnose &rarr; Act &rarr; Close cycle unaided on a real contact. Your head of technical support signs off readiness.</span></li>
+    </ol>
+
+    <hr>
+    <h2 id="mod-d">Module D · Industry standard practice</h2>
+    <p><b>Goal.</b> The engineer works to the conventions the support profession already uses, rather than inventing local habits — and understands the one obligation specific to telematics that has no equivalent in ordinary software support.</p>
+    <p>Modules A–C are about handling a case. This module is about the system the cases live in. Most of it is drawn from <b>ITIL 4</b> (the dominant IT service management framework) and <b>KCS</b> (Knowledge-Centered Service, developed by the Consortium for Service Innovation since 1992). Both are worth knowing by name: they are what a support professional joining from another company will already expect.</p>
+
+    <h3 id="d1">D1. Three kinds of ticket, not one</h3>
+    <p>The most common structural mistake in a young support desk is treating everything as "a ticket." ITIL separates three, and they have different owners, different clocks, and different definitions of done:</p>
+    <div class="tw"><table>
+      <thead><tr><th style="width:130px">Type</th><th style="width:180px">Means</th><th>PILOT example</th><th style="width:160px">Done when</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Incident</td><td>Something is broken. Unplanned interruption or degradation.</td><td>Fuel readings wrong on 12 vehicles since Tuesday.</td><td>Service restored — not necessarily explained.</td></tr>
+        <tr><td class="k">Service request</td><td>Something is wanted. Nothing is broken.</td><td>"Activate the Geofences module"; "create a token for our partner"; "add three users."</td><td>Delivered, via a standard, approved path.</td></tr>
+        <tr><td class="k">Problem</td><td>The underlying cause of one or more incidents.</td><td>Six customers this month hit the same Temporary-blocking confusion.</td><td>Cause known and removed, or documented as a known error.</td></tr>
+      </tbody>
+    </table></div>
+    <p><b>Why this matters here.</b> A large share of PILOT 1st-line volume is service requests, not faults — module activation, tariff changes, user creation, tokens. They need an approval path, not a diagnosis (see C2). Mixing them into the incident queue makes the queue look broken and hides the real outages. Equally: if the same symptom arrives three times, that is a <b>problem</b>, and continuing to fix it one ticket at a time is the most expensive thing a support desk can do.</p>
+
+    <h3 id="d2">D2. Priority is calculated, not felt</h3>
+    <p>The industry standard is a <b>priority matrix</b>: priority is derived from <b>impact</b> (how much of the business is affected — how many users, is a critical service down, is there risk to revenue or compliance) crossed with <b>urgency</b> (how fast it must be fixed — driven by deadlines, operational cycles, and commitments). Priority then drives response time, escalation path, and how loudly you communicate.</p>
+    <p>The point of a matrix is to stop the desk from prioritising by <b>who shouts loudest</b>. It also settles the argument new engineers always have: a single-user issue can still be urgent — the classic example is a payroll problem the day before payroll runs.</p>
+    <p><b>A starting matrix for a telematics desk.</b> A draft to argue with, not to adopt. <span class="std">The matrix below is a common industry default; agree the final priorities and response targets with your head of technical support and team leads, and publish them to customers so expectations are shared.</span></p>
+    <div class="mxw"><div class="mx">
+      <div class="hh"></div><div class="hh">Urgency: high</div><div class="hh">Medium</div><div class="hh">Low</div>
+      <div class="rh"><div><b>Impact: high</b>whole contract / many customers</div></div>
+      <div class="c"><div class="p p1">P1</div><div class="x">Nobody at a contract can log in; platform-wide outage; relay to a regulator's system down</div></div>
+      <div class="c"><div class="p p2">P2</div><div class="x">Reports wrong fleet-wide but the fleet still runs</div></div>
+      <div class="c"><div class="p p3">P3</div><div class="x">Cosmetic issue affecting everyone</div></div>
+      <div class="rh"><div><b>Impact: medium</b>a group, or a VIP</div></div>
+      <div class="c"><div class="p p2">P2</div><div class="x">Cold-chain vehicle: temperature alerts not firing, cargo at risk</div></div>
+      <div class="c"><div class="p p3">P3</div><div class="x">One depot's geofence reports wrong</div></div>
+      <div class="c"><div class="p p4">P4</div><div class="x">A group wants a column added</div></div>
+      <div class="rh"><div><b>Impact: low</b>one user / one object</div></div>
+      <div class="c"><div class="p p3">P3</div><div class="x">One vehicle dark during a live theft investigation</div></div>
+      <div class="c"><div class="p p4">P4</div><div class="x">One sensor mis-calibrated</div></div>
+      <div class="c"><div class="p p5">P5</div><div class="x">How-to question</div></div>
+    </div></div>
+    <div class="box good">
+      <p><b>The telematics twist on urgency.</b> In ordinary software, urgency is mostly about deadlines. Here, some data has a <b>physical clock attached</b>: refrigerated cargo spoils, a stolen vehicle moves, a driver-hours violation accrues, a toll or municipal integration has a reporting window. A P4-looking sensor fault on a refrigerated trailer is a P2. Teach engineers to ask "<b>what happens in the physical world while this stays broken?</b>" — that question is the whole difference between telematics support and helpdesk support.</p>
+    </div>
+
+    <h3 id="d3">D3. Capture knowledge while you solve, not afterwards</h3>
+    <p><b>KCS</b> (Knowledge-Centered Service — since May 2026 renamed <b>Knowledge-Centered Success</b>) is the standard model for this. Its central claim is that knowledge should be a <b>by-product of solving the problem</b>, created in the workflow, rather than a documentation project someone does later. The operational half is the <b>Solve loop: Capture → Structure → Reuse → Improve.</b></p>
+    <p>The practices worth importing verbatim:</p>
+    <ul>
+      <li><b>Capture in the customer's words.</b> Not "Sensor field mapping mismatch" — the article should say "fuel gauge shows zero." The next person searching is the customer or a new hire, and neither knows your vocabulary. This is the single highest-leverage habit in KCS.</li>
+      <li><b>Search before you solve; if it isn't there, write it.</b> Every ticket either reuses an article or creates one.</li>
+      <li><b>Content is demand-driven.</b> Write articles for what customers actually ask, not what you think they should know. The ticket queue is the editorial plan.</li>
+      <li><b>Improve on reuse.</b> Whoever finds an article slightly wrong fixes it then and there. Articles are not owned by an author.</li>
+    </ul>
+    <div class="box good">
+      <p><b>PILOT can host the deflection layer itself.</b> The admin panel includes an <b>FAQ</b> feature and a configuration for <b>uploading documents</b>, which then stay available to users for reference on PILOT functions. That is a place to publish your top ten recurring answers where the customer can find them without calling.</p>
+      <p><b>Suggested first ten articles</b>, based on the failure modes in this supplement: Temporary blocking (why my object went quiet); notification time windows; the "For all users" flag; email verification; sensor-template device-type constraint; why yesterday's report is still wrong after a fix (Recalculate); what satellite count means; module vs. missing button; token creation for temporary partner access; who to call when a device never reported after installation.</p>
+    </div>
+
+    <h3 id="d4">D4. Measure the right things</h3>
+    <p>Every support metric distorts behaviour. Adopt them knowing how:</p>
+    <div class="tw"><table>
+      <thead><tr><th style="width:140px">Metric</th><th style="width:200px">What it's for</th><th>How it goes wrong</th></tr></thead>
+      <tbody>
+        <tr><td class="k">FCR</td><td>Rewards actually finishing the job</td><td>Encourages engineers to keep a ticket they should escalate. Pair it with a stated investigation time limit.</td></tr>
+        <tr><td class="k">CSAT</td><td>The only metric the customer actually casts a vote in</td><td>Measures likeability as much as competence; low response rates skew it.</td></tr>
+        <tr><td class="k">AHT</td><td>Capacity planning</td><td><b>Dangerous as a target.</b> Pressure on handle time produces exactly the behaviours Module A trains out: skipping Acknowledge, guessing instead of checking Sensors tracing, closing early. Use it to size the team, not to rank people.</td></tr>
+        <tr><td class="k">Reopen rate</td><td>Catches premature closure</td><td>The honest counterweight to FCR and AHT. If someone's FCR is excellent and reopens are high, they aren't resolving — they're closing.</td></tr>
+        <tr><td class="k">Escalation rate</td><td>Health of the L1/L2 boundary</td><td>A <em>low</em> rate is not automatically good; it often means over-holding. Read it alongside age of escalated tickets.</td></tr>
+      </tbody>
+    </table></div>
+    <p><span class="std">As a default, most telematics desks track FCR, CSAT, reopen rate and escalation rate for <b>coaching and process improvement</b>, and AHT only for capacity planning &mdash; never as an individual target. Which are actually measured here, their targets, and whether they feed coaching or formal review, are questions for your head of technical support; answer trainees plainly, because evasion here damages trust fast.</span></p>
+
+    <h3 id="d5">D5. Driver data is personal data</h3>
+    <div class="box">
+      <p><b>This is the one section with no equivalent in general software support, and the one most likely to be missing from a telematics training plan.</b> A PILOT support engineer handles location histories, driving behaviour scores, dashcam footage and driver identifiers every day. In most modern data-protection regimes these are <b>personal data about a named human being</b>, not neutral vehicle telemetry.</p>
+    </div>
+    <p>The reference position, widely cited across the industry: the European Data Protection Board's <b>Guidelines 01/2020 on connected vehicles</b> treat location, speed, distance and driving-behaviour data as personal data once they can be linked to a natural person. In practice that covers essentially everything a modern tracker collects — GPS traces, harsh-braking events, idling time, login IDs, camera footage.</p>
+    <p><b>This is enforced, not theoretical.</b> In January 2025 the Italian regulator fined a road haulier €50,000 over GPS tracking of 50 tractor-trailers: the tracking stayed active during drivers' breaks and location data was retained for 180 days. Transparency, retention and proportionality each contributed to the penalty independently — getting one right does not excuse the others.</p>
+    <p><b>Which regime applies depends on the customer, not on us.</b> <span class="std">Default working rule: apply the strictest regime that touches the contract, treat all driver location and behaviour data as personal data, and send any doubt to your head of technical support (or the company's data-protection lead). The regimes below are the common ones across PILOT's customer base.</span></p>
+    <ul>
+      <li><b>Ghana:</b> the <b>Data Protection Act, 2012 (Act 843)</b>, enforced by the <b>Data Protection Commission</b>, with mandatory registration of data controllers and processors.</li>
+      <li><b>EU / UK:</b> GDPR, with fines reaching €20m or 4% of global turnover at the top tier.</li>
+      <li><b>Elsewhere:</b> PILOT's own documentation shows integrations for Saudi (WASL), the UAE (Etisalat) and Riyadh Municipality — so the customer base spans several regimes at once. <span class="std">Default position: the fleet operator (the customer) is the <b>data controller</b> and PILOT / your company is the <b>data processor</b> acting on their documented instructions. Confirm this per contract with your head of technical support or data-protection lead.</span></li>
+    </ul>
+
+    <h4>What this actually changes for a 1st-line engineer</h4>
+    <p>Not abstract compliance — five concrete rules:</p>
+    <ol>
+      <li><b>Access is not authorisation.</b> Master status lets you open any customer's driver history. That you <em>can</em> does not mean you <em>may</em>. Open the object on the ticket; nothing else. <span class="std">Default: assume admin-panel access is logged and reviewable, and behave accordingly. Confirm the real logging position with your head of technical support, and tell trainees plainly either way.</span></li>
+      <li><b>A request from a driver is not a normal ticket.</b> Drivers have rights over their own data — access, correction, erasure. If a driver contacts support directly asking what is held about them, that is a data-subject request with a legal clock on it. <span class="std">Route it, unchanged, to your head of technical support or the data-protection lead &mdash; do not fulfil it yourself.</span></li>
+      <li><b>"Where was driver X on Saturday?" puts you inside an employment dispute.</b> The fleet manager may well be entitled to it — but the engineer pulling the report is not the person who should be deciding that. <span class="std">Default: don't fulfil ad-hoc "where was driver X" requests on the spot. Confirm the requester's authority and route through your head of technical support; the person pulling the report is not the person who decides it's lawful.</span></li>
+      <li><b>Deletion is irreversible and may be either an obligation or a breach.</b> Deleting an object destroys all its data and history. Retention has a floor (evidence, contracts) and a ceiling — the 180-day retention was part of the Italian fine. Never action a deletion on a phone call alone. <span class="std">Default: act on a deletion only with written authorisation from the customer's authorised contact, subject to any legal retention floor. Route every deletion request to your head of technical support.</span></li>
+      <li><b>Know that "private mode" is a real category.</b> Industry practice for personal use of company vehicles is a privacy mode suppressing location during non-work time — the Italian case turned partly on tracking continuing through breaks. If a customer asks whether PILOT can do this, it is a real question with legal weight, not a feature whim. <span class="std">Default answer: yes &mdash; suppressing location during personal / non-work time is standard telematics practice and PILOT supports privacy-mode configuration; treat the request as legitimate and route the setup through your head of technical support.</span></li>
+    </ol>
+    <p><b>The line to teach:</b> support engineers are not lawyers, and should never adjudicate. But they must <b>recognise</b> the shape of a data-protection request and route it, rather than helpfully fulfilling it. The failure mode is not malice — it is an engineer being accommodating.</p>
+
+    <h4>Module D assignments</h4>
+    <ol>
+      <li><b>Sort the queue.</b> Trainer gives 12 anonymized past tickets. Trainee labels each Incident / Service request / Problem, then assigns a priority from the D2 matrix and justifies impact and urgency separately. Disagreement here is the exercise — argue it out.</li>
+      <li><b>Find the problem.</b> Given a month of tickets, identify the recurring symptom that should be raised as a problem rather than solved twelve more times.</li>
+      <li><b>Write a KCS article.</b> Take the resolved broken-sandbox case from Module B and write it up <b>titled in the customer's words</b>. Test: search for it using only the phrase a customer would type. If you can't find it, retitle it.</li>
+      <li><b>Physical clock drill.</b> Trainer reads out six faults; trainee answers only "what happens in the physical world while this stays broken?" and re-prioritises accordingly. Include a refrigerated trailer and a stolen-vehicle case.</li>
+      <li><b>The uncomfortable request.</b> Role-play: a fleet manager asks for a weekend location report on one named driver, and is annoyed at hesitation. Trainee must neither refuse flatly nor simply comply — they route it, and keep the relationship intact. <span class="std">Default outcome for the role-play: the trainee routes the request to their head of technical support and keeps the relationship intact, rather than refusing flatly or simply complying. Brief the trainer on the local policy if it differs.</span></li>
+      <li><b>The driver on the phone.</b> Role-play: a driver calls support directly asking what data is held on him and demanding it be deleted. Trainee must recognise the category and route it. Most trainees will try to be helpful. That is the lesson.</li>
+    </ol>
+
+    <hr>
+    <h2 id="docmap">Documentation map</h2>
+    <p>Anyone comparing the internal training plans against the public documentation needs to know how the two relate before drawing conclusions.</p>
+    <div class="box good">
+      <p><b>Treat the PILOT documentation as one reference for the whole platform.</b></p>
+      <p>• The <b>public documentation</b> covers the platform end to end — concepts, interface, objects, sensors, history, reports, notifications, and the administrative panel.<br>
+      • There is also a <b>helpdesk portal</b> (helpdesk.pilot-gps.com), a Jira Service Management customer portal. <span class="std">By default the vendor portal is used by your head of technical support and named platform admins, not by every 1st-line engineer &mdash; raise vendor-side tickets through them.</span></p>
+      <p><b>Consequence:</b> a discrepancy between the training plans and the public documentation is not evidence of an error. It usually means the topic is internal knowledge the docs don't cover, or internal vocabulary the docs word differently.</p>
+    </div>
+
+    <h3>What the documentation covers</h3>
+    <div class="tw"><table>
+      <thead><tr><th style="width:200px">Plan</th><th>Maps to</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Support, 2 weeks</td><td>Public documentation — concepts, interface, objects, sensors, history, reports, tokens, notifications</td></tr>
+        <tr><td class="k">Admin panel, 3 days</td><td>Public documentation, administrative panel — contracts, partners, finances, configurations, modules, rebranding</td></tr>
+        <tr><td class="k">Both</td><td>Internal knowledge with no public page — e.g. Mapping Contract, stock/warehouse account, Prepayment account type, "Address in Online Tree", mileage-by-CAN configuration</td></tr>
+      </tbody>
+    </table></div>
+    <p>That third row is the important one. A significant part of both plans covers admin-panel and commercial concepts that simply are not in the public documentation. Their absence there says nothing about their correctness.</p>
+
+    <h3>Worked example: why "/1000" is right</h3>
+    <p>Day 7 of the support plan teaches setting the formula <code>/1000</code> on a battery voltage sensor. An earlier draft of this supplement claimed this had been superseded by reusable "handlers." It has not.</p>
+    <p>The documentation's own worked example is a battery sensor reporting millivolts, converted to volts by entering <code>/1000</code> in the Conversion formula field. Simple formulas start with an arithmetic sign and the raw value is substituted automatically; complex ones start with <code>=</code> and require the value explicitly as <code>%value%</code>. Handlers are a <b>reuse mechanism</b> for applying the same conversion across many sensors — an addition alongside direct formulas, not a replacement.</p>
+    <p><b>The plan is correct. The lesson is about method:</b> absence of a statement in the public documentation is not evidence that an internal plan is wrong.</p>
+
+    <h3>If you do want to refresh the plans</h3>
+    <p>Not corrections — optional additions, for whoever owns the material to accept or reject:</p>
+    <ul>
+      <li><b>Sensors tracing</b> could be mentioned in Day 4 alongside Current Track and Follow Object, since it lives in the same right-click menu and is the most useful diagnostic view in the product.</li>
+      <li><b>Recalculate</b> has no home in either plan, yet it is the step that makes a sensor fix apply to historical reports.</li>
+      <li>Topics in the documentation but not in either plan, if scope ever allows: Report builder, Control room, sensor handlers, webhook notifications, the Telegram bot, Teltonika FOTA, relay/endpoints, and the mobile apps.</li>
+    </ul>
+    <div class="box">
+      <p><b>Standing rule for this supplement.</b> Where the public documentation and the internal plans disagree, the plans win. They were written by people with access to the build, the admin panel, and the ticket history. This document has access to a website.</p>
+    </div>
+
+    <hr>
+    <h2 id="integration">Integration options</h2>
+    <p><b>Option 1 — Bolt on as Week 3 (simplest).</b> Product training runs as written, then this module runs as a third week. Clean to schedule. Downside: two weeks of pure product knowledge before the trainee hears a customer, which is a long time to stay abstract.</p>
+    <p><b>Option 2 — Weave in (recommended).</b> These skills are habits, and habits need repetition, not a single week.</p>
+    <div class="tw"><table>
+      <thead><tr><th style="width:120px">When</th><th>Add</th></tr></thead>
+      <tbody>
+        <tr><td class="k">Day 1</td><td>A1 (anatomy of a contact) + C2 (who does what). Give them the map on day one.</td></tr>
+        <tr><td class="k">Days 2–10</td><td>20 minutes at the end of each day: one question drill (A2) tied to that day's topic. Cheap, and it compounds.</td></tr>
+        <tr><td class="k">Day 4</td><td><b>B1 — Sensors tracing</b>, taught in the same session as the object right-click menu, where it actually lives.</td></tr>
+        <tr><td class="k">Day 5</td><td>B2 (the layer model) — it lands well here because they've now seen objects, users, and the list. Include the Master trap.</td></tr>
+        <tr><td class="k">Day 7</td><td>Optional additions to the sensors session, if the trainer wants them: the Test button, formula-before-calibration ordering, the two calibration switches, and Recalculate. The Day 7 flow itself is unchanged.</td></tr>
+        <tr><td class="k">Day 9</td><td>Run Day 9 as written, then add the B4 notification tree as the diagnostic counterpart to it.</td></tr>
+        <tr><td class="k">Days 11–12</td><td>Keep the four existing scenarios; add the B4 trees as the method behind them, plus the broken-sandbox exercise.</td></tr>
+        <tr><td class="k">Days 13–14</td><td>A3 role-plays and C3 escalation writing, alongside the final test.</td></tr>
+        <tr><td class="k">Week 3</td><td>Shadowing and reverse shadowing (C4) — the real bridge to taking live contacts.</td></tr>
+      </tbody>
+    </table></div>
+    <p>Shadowing is the part I'd protect if time gets squeezed. Everything else can be compressed; supervised live contact can't be substituted.</p>
+
+    <hr>
+    <h2 id="checklist">Checklist: information needed before delivery</h2>
+    <p>Ordered roughly by how much it blocks:</p>
+    <ol>
+      <li>Ticketing system name, required fields, priority definitions, response targets</li>
+      <li>Team contact map — names, channels, ownership boundaries (C2), <b>including who owns layer 7 / relay tickets</b></li>
+      <li>Escalation triggers and the out-of-hours path</li>
+      <li>Whether 1st line retains customer contact after escalation</li>
+      <li>Approval path for admin actions (new contracts, module activation, tariff changes)</li>
+      <li>Incident procedure — who gets alerted when several customers report the same issue</li>
+      <li>Where known issues / solutions are documented</li>
+      <li>Investigation time limit before escalation</li>
+      <li>Data restoration: who can recover a deleted object, and within what window</li>
+      <li>Shadowing volume and sign-off criteria</li>
+      <li>10 anonymized past tickets for the routing exercise, and access to a breakable test environment with admin-panel visibility</li>
+    </ol>
+
+    <hr>
+    <p style="font-size:12.5px;color:var(--dim)">Sources drawn on in this supplement: PILOT documentation — Roles and access rights; Object menu; How to apply formulas; Sensor handlers; How to create a notification; How to set up notification delivery; Audit and Audit history; Failed Login Attempts; Connection Lost; Raw data; Recalculate; Troubleshooting; Statistics. Industry practice: ITIL 4; KCS (Consortium for Service Innovation); EDPB Guidelines 01/2020 on connected vehicles; Ghana Data Protection Act 2012 (Act 843).</p>
+  </article>
+</div>
+
+<div class="drawer" id="drawer">
+  <div class="drawer-in">
+    <div class="drawer-h">
+      <h3>Standard defaults</h3><span class="n" id="dn"></span><div class="sp"></div>
+      <button id="dclose" aria-label="Close">&times;</button>
+    </div>
+    <div class="drawer-b">
+      <p class="lede">Every company-specific passage in this document, pre-filled with a common telematics-industry default. Confirm each with your team leads before delivery; route anything you can't resolve to your head of technical support. Click one to jump to it.</p>
+      <div id="dlist"></div>
+    </div>
+  </div>
+</div>
+
+<script src="skills-module/script.js"></script>
+<script src="../scripts/shared.js"></script>
+</body>
+</html>

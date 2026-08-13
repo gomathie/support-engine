@@ -1,0 +1,12 @@
+# Secrets — never commit
+.env
+.dev.vars
+
+# Wrangler / Cloudflare
+.wrangler/
+.mf/
+
+# Dependencies & OS
+node_modules/
+.DS_Store
+Thumbs.db
