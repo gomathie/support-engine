@@ -2,23 +2,27 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
+use PHPUnit\Framework\TestCase as PlainTestCase;
 
-class EnvDiagnosticTest extends TestCase
+/**
+ * Temporary. Extends PHPUnit's own TestCase so it does not go through the
+ * project TestCase (and its database guard) while diagnosing.
+ */
+class EnvDiagnosticTest extends PlainTestCase
 {
     public function test_dump_environment(): void
     {
-        fwrite(STDERR, "\n--- environment as the test process sees it ---\n");
-        fwrite(STDERR, 'app.env config      : '.config('app.env')."\n");
-        fwrite(STDERR, 'app()->environment(): '.app()->environment()."\n");
-        fwrite(STDERR, 'runningUnitTests()  : '.var_export(app()->runningUnitTests(), true)."\n");
-        fwrite(STDERR, 'queue.default       : '.config('queue.default')."\n");
-        fwrite(STDERR, 'db host             : '.config('database.connections.pgsql.host')."\n");
-        fwrite(STDERR, 'db name             : '.config('database.connections.pgsql.database')."\n");
-        fwrite(STDERR, 'getenv(APP_ENV)     : '.var_export(getenv('APP_ENV'), true)."\n");
-        fwrite(STDERR, '$_ENV[APP_ENV]      : '.var_export($_ENV['APP_ENV'] ?? null, true)."\n");
-        fwrite(STDERR, 'getenv(QUEUE_CONN)  : '.var_export(getenv('QUEUE_CONNECTION'), true)."\n");
-        fwrite(STDERR, "-----------------------------------------------\n");
+        fwrite(STDERR, "\n--- raw env before Laravel boots ---\n");
+        foreach (['APP_ENV', 'DB_DATABASE', 'QUEUE_CONNECTION'] as $key) {
+            fwrite(STDERR, sprintf(
+                "%-18s getenv=%-20s \$_ENV=%-20s \$_SERVER=%s\n",
+                $key,
+                var_export(getenv($key), true),
+                var_export($_ENV[$key] ?? null, true),
+                var_export($_SERVER[$key] ?? null, true),
+            ));
+        }
+        fwrite(STDERR, "------------------------------------\n");
 
         $this->assertTrue(true);
     }

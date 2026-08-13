@@ -28,22 +28,14 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    environment:
-      APP_NAME: "PILOT Training Academy"
-      APP_ENV: local
-      APP_DEBUG: "true"
-      APP_KEY: "base64:5C97YryzdFbCuj/iKEHj98TzWi6FbNfmYQoHTXoqlMA="
-      APP_URL: "http://localhost:8000"
-      DB_CONNECTION: pgsql
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_DATABASE: pilot_lms
-      DB_USERNAME: pilot
-      DB_PASSWORD: pilot_secret
-      SESSION_DRIVER: database
-      CACHE_STORE: database
-      QUEUE_CONNECTION: database
-      MAIL_MAILER: log
+    # Application config lives in docker/app.env (mounted over .env below), not
+    # here.
+    #
+    # Anything set in this block becomes a $_SERVER variable, and Laravel's env
+    # repository consults $_SERVER before $_ENV. PHPUnit's <env force="true">
+    # writes putenv() and $_ENV but not $_SERVER, so compose variables silently
+    # outrank phpunit.xml — which had the test suite running at APP_ENV=local,
+    # with the queue on `database`, against the development database.
     # No config:cache here.
     #
     # A cached config is frozen at container start, and nothing can override it
@@ -63,6 +55,9 @@ services:
     volumes:
       # Mount source for live edits during dev (optional — comment out for prod-like test)
       - ./platform:/var/www/html
+      # Layered over the mount above: the host .env points at 127.0.0.1, which
+      # is correct on the host and wrong inside the network.
+      - ./docker/app.env:/var/www/html/.env:ro
       # Anonymous volumes to keep container-built layers for vendor/node_modules
       - /var/www/html/vendor
       - /var/www/html/node_modules
