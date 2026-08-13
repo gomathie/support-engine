@@ -50,14 +50,29 @@ function toggleTheme() {
         <!-- ─── HEADER ──────────────────────────────────────── -->
         <header class="sticky top-0 z-20 border-b border-line bg-nav">
             <div class="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-5">
-                <Link :href="route('dashboard')" class="flex shrink-0 items-center gap-2.5 no-underline">
-                    <span
-                        class="brand-gradient flex h-9 w-9 items-center justify-center rounded-lg text-lg font-extrabold text-white"
-                    >
-                        S
-                    </span>
-                    <span class="text-lg leading-tight font-extrabold text-navy">
-                        Support <span class="text-brand">Academy</span>
+                <!--
+                    The PILOT lockup already contains the wordmark, so the
+                    product name sits beside it behind a divider rather than
+                    repeating the brand. Two files rather than a CSS filter:
+                    the light logo is navy-on-transparent and disappears against
+                    a dark header.
+                -->
+                <Link :href="route('dashboard')" class="flex shrink-0 items-center gap-3 no-underline">
+                    <img
+                        src="/images/logo.png"
+                        alt="PILOT"
+                        class="h-7 w-auto dark:hidden"
+                    />
+                    <img
+                        src="/images/logo-white.png"
+                        alt="PILOT"
+                        class="hidden h-7 w-auto dark:block"
+                    />
+
+                    <span class="hidden h-6 w-px bg-line sm:block"></span>
+
+                    <span class="hidden text-base leading-tight font-bold text-navy sm:block">
+                        Support Training Hub
                     </span>
                 </Link>
 
@@ -176,7 +191,7 @@ function toggleTheme() {
         </main>
 
         <footer class="mx-auto w-full max-w-6xl px-5 py-10 text-center text-sm text-ink-dis">
-            Support Academy · internal training for the PILOT platform
+            Support Training Hub · PILOT platform onboarding
         </footer>
     </div>
 </template>

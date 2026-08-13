@@ -43,7 +43,7 @@ class AdminPanelProvider extends PanelProvider
                 'danger' => Color::hex('#dc2626'),
                 'gray' => Color::Slate,
             ])
-            ->brandName('Support Academy')
+            ->brandName('Support Training Hub')
             ->favicon(asset('favicon.ico'))
 
             ->navigationGroups([

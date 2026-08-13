@@ -1,4 +1,4 @@
-# Support Academy
+# Support Training Hub
 
 Internal training platform for new support employees learning the PILOT
 platform. Laravel 13 + Filament 5 admin at `/admin`, Vue 3 + Inertia employee

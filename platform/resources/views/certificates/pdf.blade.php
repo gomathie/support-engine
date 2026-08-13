@@ -112,7 +112,7 @@
     <div class="frame-inner"></div>
 
     <div class="body">
-        <div class="eyebrow">Support Academy</div>
+        <div class="eyebrow">Support Training Hub</div>
 
         <h1 class="title">Certificate of Completion</h1>
         <div class="rule"></div>
