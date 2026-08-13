@@ -5,6 +5,7 @@ use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LessonController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\QuizController;
@@ -90,6 +91,12 @@ Route::middleware(['auth', 'active'])->group(function (): void {
         ->name('support-cases.store');
     Route::put('support-panel/cases/{case}', [SupportPanelController::class, 'update'])
         ->name('support-cases.update');
+
+    // -------------------------------------------------------- notifications
+    Route::post('notifications/read', [NotificationController::class, 'markAllRead'])
+        ->name('notifications.read-all');
+    Route::post('notifications/{notification}/read', [NotificationController::class, 'markRead'])
+        ->name('notifications.read');
 
     // -------------------------------------------------------------- profile
     Route::get('profile', [ProfileController::class, 'edit'])->name('profile.edit');

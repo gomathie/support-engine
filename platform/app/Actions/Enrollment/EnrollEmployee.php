@@ -8,6 +8,7 @@ use App\Models\AssignmentRule;
 use App\Models\Course;
 use App\Models\CourseEnrollment;
 use App\Models\User;
+use App\Notifications\CourseAssigned;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -64,6 +65,11 @@ class EnrollEmployee
             // Create the rollup immediately so the dashboard can show
             // "not started" without a null check on every read.
             $this->recalculate->handle($user, $course);
+
+            // Only on a genuinely new enrollment — restoring a revoked one, or
+            // re-running an assignment rule, must not spam somebody who already
+            // knows about the course.
+            $user->notify(new CourseAssigned($course, $enrollment));
 
             return $enrollment;
         });

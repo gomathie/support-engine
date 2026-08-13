@@ -54,6 +54,25 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
             ],
 
+            // Closures are evaluated lazily by Inertia, so this query only runs
+            // for a full page load — not on every partial reload triggered by
+            // ticking a checkbox.
+            'notifications' => fn () => $user
+                ? $user->unreadNotifications()
+                    ->latest()
+                    ->take(10)
+                    ->get()
+                    ->map(fn ($notification) => [
+                        'id' => $notification->id,
+                        'title' => $notification->data['title'] ?? 'Notification',
+                        'body' => $notification->data['body'] ?? null,
+                        'url' => $notification->data['url'] ?? null,
+                        'type' => $notification->data['type'] ?? null,
+                        'created_at' => $notification->created_at->toIso8601String(),
+                    ])
+                    ->all()
+                : [],
+
             'app' => [
                 'name' => config('app.name'),
             ],

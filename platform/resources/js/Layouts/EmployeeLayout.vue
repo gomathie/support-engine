@@ -11,6 +11,7 @@
 import { computed, ref, watch } from 'vue';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import FlashMessages from '@/Components/FlashMessages.vue';
+import NotificationBell from '@/Components/NotificationBell.vue';
 
 const page = usePage();
 const user = computed(() => page.props.auth.user);
@@ -110,6 +111,8 @@ function toggleTheme() {
                         />
                     </svg>
                 </button>
+
+                <NotificationBell />
 
                 <!-- Account -->
                 <div class="flex items-center gap-2">
