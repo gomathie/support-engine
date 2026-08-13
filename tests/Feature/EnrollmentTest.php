@@ -87,7 +87,11 @@ class EnrollmentTest extends TestCase
         $this->assertEqualsWithDelta(
             now()->addDays(14)->timestamp,
             $enrollment->due_at->timestamp,
-            5,
+
+            // Generous: the due date is set when the enrollment is created and
+            // compared when the assertion runs, and a full suite takes minutes.
+            // The point is "the right number of days out", not the second.
+            120,
         );
     }
 
@@ -224,7 +228,11 @@ class EnrollmentTest extends TestCase
         $this->assertEqualsWithDelta(
             now()->addDays(7)->timestamp,
             $enrollment->due_at->timestamp,
-            5,
+
+            // Generous: the due date is set when the enrollment is created and
+            // compared when the assertion runs, and a full suite takes minutes.
+            // The point is "the right number of days out", not the second.
+            120,
         );
     }
 }
