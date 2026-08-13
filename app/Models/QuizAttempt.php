@@ -18,7 +18,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'status',
     'score',
     'points_earned',
+    'auto_points_earned',
     'points_possible',
+    'manual_points_possible',
+    'reviewed_at',
+    'reviewed_by',
     'passed',
     'passing_score',
     'started_at',
@@ -36,12 +40,34 @@ class QuizAttempt extends Model
             'passed' => 'boolean',
             'started_at' => 'datetime',
             'completed_at' => 'datetime',
+            'reviewed_at' => 'datetime',
         ];
     }
 
     public function scopeCompleted(Builder $query): Builder
     {
         return $query->where('status', AttemptStatus::Completed->value);
+    }
+
+    public function scopeAwaitingReview(Builder $query): Builder
+    {
+        return $query->where('status', AttemptStatus::PendingReview->value);
+    }
+
+    public function reviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    public function awaitsReview(): bool
+    {
+        return $this->status === AttemptStatus::PendingReview;
+    }
+
+    /** Written answers on this attempt that no examiner has marked yet. */
+    public function ungradedAnswers(): HasMany
+    {
+        return $this->answers()->whereNull('graded_at');
     }
 
     public function user(): BelongsTo

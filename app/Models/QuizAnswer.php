@@ -14,6 +14,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'text_answer',
     'is_correct',
     'points_awarded',
+    'graded_at',
+    'graded_by',
+    'grader_feedback',
     'answered_at',
 ])]
 class QuizAnswer extends Model
@@ -26,6 +29,7 @@ class QuizAnswer extends Model
             'selected_option_ids' => 'array',
             'is_correct' => 'boolean',
             'answered_at' => 'datetime',
+            'graded_at' => 'datetime',
         ];
     }
 
@@ -37,5 +41,16 @@ class QuizAnswer extends Model
     public function question(): BelongsTo
     {
         return $this->belongsTo(QuizQuestion::class, 'quiz_question_id');
+    }
+
+    public function grader(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'graded_by');
+    }
+
+    /** Written answers sit unmarked until an examiner reads them. */
+    public function awaitsGrading(): bool
+    {
+        return $this->graded_at === null;
     }
 }
