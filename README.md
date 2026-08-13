@@ -21,10 +21,17 @@ An interactive onboarding platform for new support employees. Trainees work thro
 | Backend | Laravel 13 (PHP 8.3) |
 | Admin | Filament 5 |
 | Frontend | Vue 3 + Inertia 3 |
-| Styling | Tailwind CSS 4 |
+| Styling | Tailwind CSS 4 (Vibrant Indigo + Deep Dark Mode & Glassmorphism) |
 | Database | PostgreSQL 17 |
-| Auth | Laravel Breeze + Spatie Permission (roles: admin, manager, employee) |
+| Auth | Laravel Breeze + Spatie Permission (Roles: Admin, Manager, Employee) |
 | PDF | barryvdh/laravel-dompdf |
+
+## User Roles & Permissions
+
+The application features exactly 3 roles with granular permissions:
+1. **Admin**: Can create users, assign roles, define role permissions, and configure system-wide policies.
+2. **Manager**: Granted content-management rights (by the Admin) to create/edit courses, lessons, and quizzes for training their employees.
+3. **Employee**: Enrolls in courses, ticks off progress, takes quizzes, and views their dashboard.
 
 ## Quick Start (Docker)
 
