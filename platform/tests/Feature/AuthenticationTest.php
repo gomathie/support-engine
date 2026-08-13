@@ -124,9 +124,19 @@ class AuthenticationTest extends TestCase
             'password' => 'wrong',
         ]);
 
+        $getErrorMessage = function ($response) {
+            $errors = $response->getSession()->get('errors');
+            
+            if (is_array($errors)) {
+                return $errors['email'][0] ?? null;
+            }
+            
+            return $errors ? $errors->first('email') : null;
+        };
+
         $this->assertSame(
-            $unknown->getSession()->get('errors')->first('email'),
-            $wrong->getSession()->get('errors')->first('email'),
+            $getErrorMessage($unknown),
+            $getErrorMessage($wrong)
         );
     }
 }
