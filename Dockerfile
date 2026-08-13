@@ -42,6 +42,9 @@ RUN npm run build
 RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
 
+# Ensure OS environment variables are populated in $_ENV so they override .env
+RUN echo "variables_order = \"EGPCS\"" > /usr/local/etc/php/conf.d/99-variables-order.ini
+
 EXPOSE 8000
 
 # Default: run the dev server; docker-compose can override for tests
