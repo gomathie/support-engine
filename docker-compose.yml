@@ -45,7 +45,7 @@ services:
       QUEUE_CONNECTION: database
       MAIL_MAILER: log
     ports:
-      - "8000:8000"
+      - "8080:8000"
     volumes:
       # Mount source for live edits during dev (optional — comment out for prod-like test)
       - ./platform:/var/www/html
