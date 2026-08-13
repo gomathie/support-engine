@@ -55,7 +55,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown));
     >
         <div
             v-if="open"
-            class="fixed inset-0 z-100 bg-navy/50"
+            class="fixed inset-0 z-100 bg-scrim"
             @click.self="emit('close')"
         >
             <div

@@ -29,6 +29,20 @@
     --pilot-navy: #0a2540;
     --pilot-ok: #19a86b;
 
+    /*
+       The hero/logo/thumbnail gradient gets its own pair rather than reusing
+       --pilot-navy. Navy is a *text* colour in dark mode (it flips light so
+       headings stay readable), and a gradient ending on it ran blue →
+       near-white with white text on top: 1.23:1, invisible.
+
+       Both stops are measured against white: 4.93 and 15.54 here.
+    */
+    --pilot-gradient-from: #1463ff;
+    --pilot-gradient-to: #0a2540;
+
+    /* Modal scrim. Always dark, in both themes. */
+    --pilot-scrim: rgb(10 37 64 / 0.55);
+
     --pilot-primary: var(--pilot-brand);
     --pilot-primary-hover: var(--pilot-brand-hover);
     --pilot-primary-bg: var(--pilot-brand-soft);
@@ -72,8 +86,19 @@
     --pilot-brand: #4d8dff;
     --pilot-brand-hover: #7aa9ff;
     --pilot-brand-soft: #10233f;
+    /* A text colour here, not a surface — see the gradient note above. */
     --pilot-navy: #e2e8f0;
     --pilot-ok: #34d399;
+
+    /*
+       Deepened rather than lightened. White text measures 6.65 on the start and
+       11.77 on the end, against 3.20 and 1.23 before — and the end stop sits
+       clear of the #0b1220 page so the panel still reads as raised.
+    */
+    --pilot-gradient-from: #1b4fd8;
+    --pilot-gradient-to: #12376b;
+
+    --pilot-scrim: rgb(2 8 20 / 0.7);
 
     --pilot-primary: var(--pilot-brand);
     --pilot-primary-hover: var(--pilot-brand-hover);
@@ -114,6 +139,7 @@
     --color-brand-soft: var(--pilot-brand-soft);
     --color-navy: var(--pilot-navy);
     --color-ok: var(--pilot-ok);
+    --color-scrim: var(--pilot-scrim);
 
     --color-primary: var(--pilot-primary);
     --color-primary-hover: var(--pilot-primary-hover);
@@ -234,7 +260,24 @@
     /* The gradient the academy uses for its hero banner, logo tile and card
        thumbnails. Defined once so all three stay in step. */
     .brand-gradient {
-        background-image: linear-gradient(to bottom right, var(--color-brand), var(--color-navy));
+        background-image: linear-gradient(
+            to bottom right,
+            var(--pilot-gradient-from),
+            var(--pilot-gradient-to)
+        );
+    }
+
+    /*
+       Everything drawn on the gradient. Fixed white rather than a token,
+       because the panel is dark in both themes — a theme-flipping ink colour
+       would turn the hero text near-white-on-near-white in one of them.
+    */
+    .on-gradient {
+        color: #ffffff;
+    }
+
+    .on-gradient-muted {
+        color: rgb(255 255 255 / 0.75);
     }
 }
 

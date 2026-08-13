@@ -130,9 +130,12 @@ function toggleTheme() {
                         Admin
                     </a>
 
+                    <!-- The gradient rather than bg-navy: navy is a light text
+                         colour in dark mode, which left white initials on a
+                         near-white circle. -->
                     <Link
                         :href="route('profile.edit')"
-                        class="flex h-9 w-9 items-center justify-center rounded-full bg-navy text-sm font-bold text-white no-underline dark:bg-brand"
+                        class="brand-gradient flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold text-white no-underline"
                         :title="user?.name"
                     >
                         {{ user?.initials }}
