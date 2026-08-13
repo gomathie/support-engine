@@ -1,0 +1,21 @@
+{
+    "name": "Support Training Hub",
+    "short_name": "Support Hub",
+    "description": "Internal training for new support employees on the PILOT platform.",
+    "icons": [
+        {
+            "src": "/images/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/images/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#1463ff",
+    "background_color": "#f8fafc",
+    "display": "standalone",
+    "start_url": "/dashboard"
+}

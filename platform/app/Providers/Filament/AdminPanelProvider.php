@@ -51,7 +51,9 @@ class AdminPanelProvider extends PanelProvider
             ->darkModeBrandLogo(asset('images/logo-white.png'))
             ->brandLogoHeight('1.75rem')
 
-            ->favicon(asset('favicon.ico'))
+            // The PNG rather than the .ico — Filament emits a single <link>,
+            // and a 32px PNG is what browsers prefer when given the choice.
+            ->favicon(asset('images/favicon-32.png'))
 
             ->navigationGroups([
                 NavigationGroup::make('Content'),
