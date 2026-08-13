@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             DepartmentSeeder::class,
             UserSeeder::class,
             TrainingContentSeeder::class,
+            PilotExamSeeder::class,
             DiagnosticTreeSeeder::class,
             AssignmentRuleSeeder::class,
         ]);

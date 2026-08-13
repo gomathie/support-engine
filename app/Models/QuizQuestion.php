@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['quiz_id', 'type', 'prompt', 'explanation', 'points', 'position'])]
+#[Fillable(['quiz_id', 'type', 'prompt', 'explanation', 'marking_guidance', 'points', 'position'])]
 class QuizQuestion extends Model
 {
     use HasFactory, SoftDeletes;
@@ -51,6 +51,25 @@ class QuizQuestion extends Model
     public function correctOptions(): Collection
     {
         return $this->options()->where('is_correct', true)->get();
+    }
+
+    public function requiresManualGrading(): bool
+    {
+        return $this->type->requiresManualGrading();
+    }
+
+    /**
+     * A choice question with nothing ticked as correct. Nobody can answer it
+     * right, so it is surfaced in the admin rather than quietly marking every
+     * employee wrong — the imported exam arrives in exactly this state.
+     */
+    public function needsAnswerKey(): bool
+    {
+        if (! $this->type->usesOptions()) {
+            return false;
+        }
+
+        return ! $this->options()->where('is_correct', true)->exists();
     }
 
     /** @return array<int, int> */
