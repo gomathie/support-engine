@@ -69,6 +69,16 @@ The app needs `pdo_pgsql`, which is often not enabled in a stock Windows PHP bui
 .\dev.ps1             # PostgreSQL, migrations, artisan serve, queue, vite
 ```
 
+### If the app serves a blank page
+
+Check for `public/hot`:
+
+```bash
+rm -f public/hot
+```
+
+Vite writes that file while the dev server runs and deletes it on a clean exit. If it is killed abruptly — Ctrl+C in the wrong place, a closed terminal, a crash — the file survives, and `@vite` then points every page at `http://[::1]:5173` instead of the built assets. Nothing is listening there, so you get a blank page with no CSS, no JS, and no error explaining why. `dev.ps1` now clears it on exit, but a bare `npm run dev` does not.
+
 ## Running Tests
 
 ```bash

@@ -82,6 +82,20 @@ try {
         Wait-Process -Id ($jobs | ForEach-Object { $_.Id })
     } finally {
         $jobs | ForEach-Object { if (-not $_.HasExited) { Stop-Process -Id $_.Id -Force } }
+
+        <#
+            Vite writes public/hot while it runs and deletes it on a clean exit.
+            Killed abruptly — Ctrl+C, a closed terminal, a crash — the file is
+            left behind, and @vite then points every page at
+            http://[::1]:5173 instead of the built assets. Nothing is listening
+            there, so the app serves a blank page with no CSS or JS and no error
+            to explain it.
+        #>
+        $hot = Join-Path $PSScriptRoot 'public/hot'
+        if (Test-Path $hot) {
+            Remove-Item $hot -Force
+            Write-Host "Cleaned up public/hot." -ForegroundColor DarkGray
+        }
     }
 } finally {
     Pop-Location
