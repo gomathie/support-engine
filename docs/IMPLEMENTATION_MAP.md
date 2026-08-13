@@ -7,11 +7,11 @@ target Laravel / Inertia+Vue / Filament / PostgreSQL architecture.
 ---
 
 ## 0. Executive summary
-
-The prototype is a **three-page static training hub**, not an LMS. It has no
+Now converting to a training hub.
+The prototype was a **three-page static training hub**, not an LMS. It had no
 users, no authentication, no server, no database, and no notion of a course,
 an enrollment, a quiz score or a certificate. Persistence is per-browser and
-currently **broken** (see §1.4).
+currently **broken** (see §1.4). Now converting to a training hub.
 
 Consequently this work is not a 1:1 port. It splits into two parts:
 
