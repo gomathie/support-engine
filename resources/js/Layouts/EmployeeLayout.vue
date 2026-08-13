@@ -114,13 +114,21 @@ function toggleTheme() {
                         </svg>
                     </button>
 
-                    <Link
+                    <!--
+                        A plain anchor, not an Inertia <Link>. The admin panel
+                        is Filament — Blade and Livewire — not an Inertia page.
+                        An Inertia Link would XHR it, get HTML where it expects
+                        JSON, and render Filament inside Inertia's error modal,
+                        where none of the menus work because they navigate the
+                        iframe rather than the page. This needs a full page load.
+                    -->
+                    <a
                         v-if="user?.is_admin || user?.is_manager"
                         href="/admin"
                         class="hidden rounded-lg px-3 py-1.5 text-sm font-medium text-ink-sec no-underline transition-colors hover:bg-nav-hover hover:text-brand lg:block"
                     >
                         Admin
-                    </Link>
+                    </a>
 
                     <Link
                         :href="route('profile.edit')"
@@ -163,6 +171,15 @@ function toggleTheme() {
                 >
                     {{ link.label }}
                 </Link>
+
+                <!-- Plain anchor: Filament is not an Inertia page. -->
+                <a
+                    v-if="user?.is_admin || user?.is_manager"
+                    href="/admin"
+                    class="block rounded-lg px-3 py-2.5 text-sm font-medium text-ink-sec no-underline"
+                >
+                    Admin panel
+                </a>
 
                 <div class="mt-2 flex items-center gap-2 border-t border-line pt-2">
                     <button
