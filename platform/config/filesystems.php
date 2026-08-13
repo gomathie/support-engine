@@ -38,6 +38,25 @@ return [
             'report' => false,
         ],
 
+        /*
+         | Everything an employee uploads or is issued — lesson resources and
+         | certificate PDFs — lands here. No `url`, no `serve`, no public
+         | visibility: the only way to these bytes is through a controller that
+         | has run a policy first.
+         |
+         | Switching to S3-compatible storage later is a matter of pointing
+         | PRIVATE_DISK at a driver; nothing in the app builds a path by hand,
+         | and each row records the disk it was written to.
+         */
+        'private' => [
+            'driver' => env('PRIVATE_FILESYSTEM_DRIVER', 'local'),
+            'root' => storage_path('app/private'),
+            'serve' => false,
+            'visibility' => 'private',
+            'throw' => false,
+            'report' => false,
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

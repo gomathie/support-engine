@@ -12,6 +12,7 @@
         "inertiajs/inertia-laravel": "^3.3",
         "laravel/framework": "^13.17",
         "laravel/tinker": "^3.0",
+        "mews/purifier": "*",
         "spatie/laravel-permission": "^8.3",
         "tightenco/ziggy": "^2.6"
     },
