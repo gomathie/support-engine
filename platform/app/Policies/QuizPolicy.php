@@ -95,21 +95,21 @@ class QuizPolicy
      */
     public function viewAnswerKey(User $user, Quiz $quiz): bool
     {
-        return false;
+        return $user->hasPermissionTo('quizzes.manage');
     }
 
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('quizzes.manage');
     }
 
     public function update(User $user, Quiz $quiz): bool
     {
-        return false;
+        return $user->hasPermissionTo('quizzes.manage');
     }
 
     public function delete(User $user, Quiz $quiz): bool
     {
-        return false;
+        return $user->hasPermissionTo('quizzes.manage');
     }
 }

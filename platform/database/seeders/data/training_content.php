@@ -17,54 +17,47 @@
 
 return [
     [
-        'title' => 'Before delivery — information to gather',
-        'category' => 'PREP',
-        'summary' => 'The company-specific answers that block Modules C and D until they exist.',
-        'description' => 'Most of these need answers from team leads rather than from the trainer. '
-            .'The Skills Module proposes an industry-standard default for each; confirm them, and '
-            .'escalate anything unresolved to your head of technical support.',
+        'title' => 'Onboarding: IT Support Tools & Policies',
+        'category' => 'ONBOARDING',
+        'summary' => 'Essential introduction to the ticketing system, SLAs, and data security policies.',
+        'description' => 'Before diving into technical troubleshooting, every support agent must understand '
+            .'how we track issues, the service level agreements (SLAs) we are held to, and how to protect '
+            .'customer data. This course covers the foundation of our daily operations.',
         'difficulty' => 'beginner',
         'is_required' => true,
-        'estimated_minutes' => 90,
+        'estimated_minutes' => 120,
         'modules' => [
             [
-                'title' => 'Blocking',
-                'subtitle' => 'Needed before Module C or D can be taught',
-                'description' => 'These are the company-specific gaps. Ordered by how much they block.',
+                'title' => 'Ticketing System Basics',
+                'subtitle' => 'Navigating Zendesk and Jira',
+                'description' => 'Learn how to create, update, and manage tickets efficiently.',
                 'lessons' => [
-                    'Ticketing system: name, required fields, priority definitions, response targets',
-                    'Team contact map — names, channels, ownership boundaries — including who owns layer 7 / relay tickets',
-                    'Escalation triggers and the out-of-hours path',
-                    'Does 1st line retain customer contact after escalation?',
-                    'Approval path for admin actions (new contracts, module activation, tariff changes)',
-                    'Incident procedure — who gets alerted when several customers report the same issue',
-                    'Where known issues / solutions are documented',
-                    'Investigation time limit before escalation',
+                    'Introduction to the ticketing interface',
+                    'Required fields for Sev-1 vs Sev-3 tickets',
+                    'How to properly link Jira issues to customer tickets',
+                    'Writing clear and concise public ticket responses',
                 ],
             ],
             [
-                'title' => 'Data protection',
-                'subtitle' => 'Needed before Module D5 can be taught',
-                'description' => 'Which regime applies depends on where our customers operate — '
-                    .'Ghana (Act 843), EU/UK (GDPR), Gulf states. This needs a real answer, not a placeholder.',
+                'title' => 'Service Level Agreements (SLAs)',
+                'subtitle' => 'Understanding our commitments',
+                'description' => 'How quickly we must respond to and resolve customer issues.',
                 'lessons' => [
-                    'Which data-protection regimes apply to our contracts; controller vs processor in each',
-                    'Is admin-panel access logged and reviewed? (Trainees must be told plainly either way)',
-                    'Where does a data-subject request from a driver get routed?',
-                    'Policy on ad-hoc surveillance-shaped requests ("where was driver X on Saturday?")',
-                    'Retention policy, and who authorises deletion of an object',
-                    'Our answer on private/personal mode for out-of-hours vehicle use',
+                    'Priority definitions: P1, P2, P3, and P4',
+                    'First-response time targets by priority',
+                    'Resolution time targets and escalation paths',
+                    'What to do when an SLA is at risk of breaching',
                 ],
             ],
             [
-                'title' => 'Materials',
-                'subtitle' => 'Practical setup',
-                'description' => 'Without these, the highest-value exercises cannot run at all.',
+                'title' => 'Data Privacy & Security',
+                'subtitle' => 'Protecting customer information',
+                'description' => 'Best practices for handling sensitive PII (Personally Identifiable Information).',
                 'lessons' => [
-                    '10–12 anonymized past tickets (routing + queue-sorting exercises)',
-                    'Breakable test environment with admin-panel visibility',
-                    'Test user with restricted rights (for the Master-trap drill)',
-                    'Trainer briefed on our actual data-protection policy before the D5 role-plays',
+                    'GDPR and CCPA basics for support agents',
+                    'How to verify a caller\'s identity before sharing account details',
+                    'Redacting sensitive data (passwords, credit cards) from tickets',
+                    'Reporting a potential security incident or data breach',
                 ],
             ],
         ],

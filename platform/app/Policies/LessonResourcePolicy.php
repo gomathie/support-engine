@@ -39,11 +39,16 @@ class LessonResourcePolicy
 
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('lessons.manage');
+    }
+
+    public function update(User $user, LessonResource $resource): bool
+    {
+        return $user->hasPermissionTo('lessons.manage');
     }
 
     public function delete(User $user, LessonResource $resource): bool
     {
-        return false;
+        return $user->hasPermissionTo('lessons.manage');
     }
 }

@@ -46,16 +46,16 @@ class LessonPolicy
 
     public function create(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('lessons.manage');
     }
 
     public function update(User $user, Lesson $lesson): bool
     {
-        return false;
+        return $user->hasPermissionTo('lessons.manage');
     }
 
     public function delete(User $user, Lesson $lesson): bool
     {
-        return false;
+        return $user->hasPermissionTo('lessons.manage');
     }
 }

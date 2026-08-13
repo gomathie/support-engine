@@ -48,22 +48,22 @@ class CoursePolicy
 
     public function create(User $user): bool
     {
-        return false; // Admins only, handled by before().
+        return $user->hasPermissionTo('courses.create');
     }
 
     public function update(User $user, Course $course): bool
     {
-        return false;
+        return $user->hasPermissionTo('courses.update');
     }
 
     public function delete(User $user, Course $course): bool
     {
-        return false;
+        return $user->hasPermissionTo('courses.delete');
     }
 
     public function publish(User $user, Course $course): bool
     {
-        return false;
+        return $user->hasPermissionTo('courses.publish');
     }
 
     /**

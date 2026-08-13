@@ -56,7 +56,9 @@ class RoleSeeder extends Seeder
         // and explicitly not reports across the whole company.
         $manager = Role::findOrCreate(RoleEnum::Manager->value, 'web');
         $manager->syncPermissions([
-            'courses.view',
+            'courses.view', 'courses.create', 'courses.update', 'courses.delete', 'courses.publish',
+            'lessons.manage',
+            'quizzes.manage',
             'employees.view',
             'enrollments.view', 'enrollments.create', 'enrollments.delete',
             'reports.view',
