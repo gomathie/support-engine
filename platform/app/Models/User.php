@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Enums\ProgressStatus;
 use App\Enums\Role;
 use Database\Factories\UserFactory;
-use Filament\Auth\MultiFactor\Contracts\HasAppAuthentication;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
