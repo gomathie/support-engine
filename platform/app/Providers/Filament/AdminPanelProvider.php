@@ -23,6 +23,10 @@ class AdminPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
+            // The only panel. Marking it default is what lets
+            // Resource::getUrl() resolve outside a panel request — used by the
+            // tests, and by any link generated from the employee side.
+            ->default()
             ->id('admin')
             ->path('admin')
 
