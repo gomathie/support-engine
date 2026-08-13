@@ -18,7 +18,12 @@ class DatabaseSeeder extends Seeder
             DepartmentSeeder::class,
             UserSeeder::class,
             TrainingContentSeeder::class,
+            // Section A of the examination, with its answer key.
             PilotExamSeeder::class,
+
+            // Sections B and C. Scoped to the last module rather than seeded as
+            // final exams, because a course may only have one of those.
+            WrittenExamSeeder::class,
             DiagnosticTreeSeeder::class,
             AssignmentRuleSeeder::class,
         ]);
