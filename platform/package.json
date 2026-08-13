@@ -20,6 +20,7 @@
         "@inertiajs/vue3": "^3.6.1",
         "@tailwindcss/typography": "^0.5.20",
         "@vitejs/plugin-vue": "^6.0.8",
-        "vue": "^3.5.41"
+        "vue": "^3.5.41",
+        "ziggy-js": "^2.6.3"
     }
 }
