@@ -64,15 +64,17 @@ class CourseEnrollmentsTable
                     })
                     ->alignEnd(),
 
+                // value() applies the model's casts, so this is already a
+                // ProgressStatus rather than the raw column string.
                 TextColumn::make('status')
                     ->label('Status')
-                    ->state(fn (CourseEnrollment $record) => CourseProgress::query()
+                    ->state(fn (CourseEnrollment $record): ProgressStatus => CourseProgress::query()
                         ->where('user_id', $record->user_id)
                         ->where('course_id', $record->course_id)
-                        ->value('status') ?? ProgressStatus::NotStarted->value)
+                        ->value('status') ?? ProgressStatus::NotStarted)
                     ->badge()
-                    ->formatStateUsing(fn ($state) => ProgressStatus::from($state)->label())
-                    ->color(fn ($state) => match (ProgressStatus::from($state)) {
+                    ->formatStateUsing(fn (ProgressStatus $state) => $state->label())
+                    ->color(fn (ProgressStatus $state) => match ($state) {
                         ProgressStatus::Completed => 'success',
                         ProgressStatus::InProgress => 'info',
                         ProgressStatus::Failed, ProgressStatus::Overdue => 'danger',
