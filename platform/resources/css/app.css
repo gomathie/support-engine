@@ -181,6 +181,19 @@
 
 @layer components {
     /*
+       The small uppercase label used above headings and beside figures.
+       Carried over from the prototype, but set in Inter semibold rather than
+       Courier — the monospace treatment was a large part of what made the old
+       screens tiring to read.
+    */
+    .mono-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    /*
        The academy's chip: tiny, uppercase, wide-tracked, on a tinted pill.
        Used for course level, content type, status and the "required" marker.
     */

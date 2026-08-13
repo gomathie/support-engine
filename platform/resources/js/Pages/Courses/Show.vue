@@ -2,11 +2,10 @@
 import { ref } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import EmployeeLayout from '@/Layouts/EmployeeLayout.vue';
-import ProgressGauge from '@/Components/ProgressGauge.vue';
 import ProgressBar from '@/Components/ProgressBar.vue';
 import StatusPill from '@/Components/StatusPill.vue';
 
-defineProps({
+const props = defineProps({
     course: { type: Object, required: true },
     modules: { type: Array, default: () => [] },
     progress: { type: Object, required: true },
@@ -22,179 +21,190 @@ const toggle = (id) => (collapsed.value[id] = !collapsed.value[id]);
     <Head :title="course.title" />
 
     <EmployeeLayout>
-        <div class="mx-auto max-w-[880px] px-5 py-8">
-            <!-- ─── HEADER ──────────────────────────────────── -->
-            <div class="mb-8 flex flex-wrap items-center gap-6">
-                <ProgressGauge :percentage="progress.percentage" />
+        <Link
+            :href="route('courses.index')"
+            class="mb-4 inline-block text-sm font-medium text-ink-sec no-underline hover:text-brand"
+        >
+            ← All courses
+        </Link>
 
-                <div class="min-w-[220px] flex-1">
-                    <p class="mono-label mb-1.5 text-[11px] tracking-[3px] text-primary">
-                        {{ course.category || 'Course' }}
-                    </p>
-                    <h1 class="mb-1.5 text-xl leading-tight font-bold">{{ course.title }}</h1>
-                    <p v-if="course.summary" class="mb-2 text-[13px] text-ink-sec">
-                        {{ course.summary }}
-                    </p>
+        <!-- ─── HEADER ──────────────────────────────────────── -->
+        <section class="brand-gradient mb-8 rounded-2xl p-7 text-white sm:p-9">
+            <div class="mb-3 flex flex-wrap items-center gap-2">
+                <span v-if="course.category" class="chip bg-white/15 text-white">
+                    {{ course.category }}
+                </span>
+                <span v-if="course.is_required" class="chip bg-white/15 text-white">Required</span>
+                <span v-if="course.difficulty" class="chip bg-white/15 text-white">
+                    {{ course.difficulty }}
+                </span>
+            </div>
 
-                    <div class="flex flex-wrap items-center gap-2">
-                        <StatusPill :label="progress.status_label" :tone="progress.status_tone" />
-                        <StatusPill v-if="course.is_required" label="Required" tone="negative" />
-                        <span class="mono-label text-[10px] tracking-[1px] text-ink-dis">
-                            {{ progress.completed_lessons }}/{{ progress.total_lessons }} lessons
-                        </span>
-                        <span
-                            v-if="course.estimated_minutes"
-                            class="mono-label text-[10px] tracking-[1px] text-ink-dis"
-                        >
-                            ~{{ course.estimated_minutes }} min
-                        </span>
-                        <span
-                            v-if="course.instructor"
-                            class="mono-label text-[10px] tracking-[1px] text-ink-dis"
-                        >
-                            {{ course.instructor }}
-                        </span>
-                    </div>
+            <h1 class="mb-2 text-2xl font-extrabold text-white sm:text-3xl">{{ course.title }}</h1>
+
+            <p v-if="course.summary" class="mb-5 max-w-2xl text-sm text-white/80 sm:text-base">
+                {{ course.summary }}
+            </p>
+
+            <div class="max-w-md">
+                <div class="h-2 overflow-hidden rounded-full bg-white/20">
+                    <div
+                        class="h-full rounded-full bg-white transition-[width] duration-500"
+                        :style="{ width: `${progress.percentage}%` }"
+                    ></div>
                 </div>
+                <p class="mt-2 text-sm text-white/80">
+                    {{ progress.completed_lessons }} of {{ progress.total_lessons }} lessons ·
+                    {{ Math.round(progress.percentage) }}%
+                </p>
             </div>
+        </section>
 
-            <div
-                v-if="course.description"
-                class="mb-8 rounded-lg border border-line bg-surface px-4 py-3.5 text-[13px] leading-relaxed text-ink-sec"
-            >
-                {{ course.description }}
-            </div>
+        <div
+            v-if="course.description"
+            class="card mb-8 p-6 text-sm leading-relaxed text-ink-sec"
+        >
+            {{ course.description }}
+        </div>
 
-            <!-- ─── MODULES ─────────────────────────────────── -->
-            <div v-for="module in modules" :key="module.id" class="mb-5">
+        <!-- ─── MODULES ─────────────────────────────────────── -->
+        <div class="mb-8 flex flex-col gap-3">
+            <div v-for="module in modules" :key="module.id" class="card overflow-hidden">
                 <button
                     type="button"
-                    class="mb-2.5 flex w-full cursor-pointer items-center gap-2.5 rounded-md border border-line bg-surface-alt px-3.5 py-2.5 text-left select-none"
+                    class="flex w-full cursor-pointer items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-surface-alt"
                     :aria-expanded="!collapsed[module.id]"
                     @click="toggle(module.id)"
                 >
                     <span
-                        class="rounded-[3px] bg-warning px-2 py-0.5 font-mono text-[11px] font-bold tracking-[1px] text-on-warning"
+                        class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold"
+                        :class="
+                            module.lesson_count > 0 && module.completed_count === module.lesson_count
+                                ? 'bg-ok text-white'
+                                : 'bg-surface-alt text-ink-sec'
+                        "
                     >
-                        {{ module.title }}
+                        <template
+                            v-if="
+                                module.lesson_count > 0 &&
+                                module.completed_count === module.lesson_count
+                            "
+                        >
+                            ✓
+                        </template>
+                        <template v-else>{{ module.completed_count }}</template>
                     </span>
-                    <h2 class="flex-1 text-[15px] font-bold">
-                        {{ module.subtitle || module.title }}
-                    </h2>
-                    <span class="font-mono text-xs text-ink-sec">
+
+                    <span class="min-w-0 flex-1">
+                        <span class="block text-sm font-bold text-navy">{{ module.title }}</span>
+                        <span v-if="module.subtitle" class="block truncate text-sm text-ink-sec">
+                            {{ module.subtitle }}
+                        </span>
+                    </span>
+
+                    <span class="shrink-0 text-xs font-medium text-ink-dis">
                         {{ module.completed_count }}/{{ module.lesson_count }}
                     </span>
-                    <span
-                        class="text-xs text-ink-dis transition-transform duration-150"
+
+                    <svg
+                        class="h-4 w-4 shrink-0 fill-none stroke-current stroke-2 text-ink-dis transition-transform"
                         :class="collapsed[module.id] ? '-rotate-90' : ''"
+                        viewBox="0 0 24 24"
                     >
-                        ▾
-                    </span>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
+                    </svg>
                 </button>
 
-                <div v-show="!collapsed[module.id]">
+                <div v-show="!collapsed[module.id]" class="divide-y divide-line border-t border-line">
                     <p
                         v-if="module.description"
-                        class="mb-2.5 px-1 text-xs leading-relaxed text-ink-sec"
+                        class="px-5 py-3 text-sm leading-relaxed text-ink-sec"
                     >
                         {{ module.description }}
                     </p>
 
-                    <div class="overflow-hidden rounded-lg border border-line bg-surface">
-                        <Link
-                            v-for="lesson in module.lessons"
-                            :key="lesson.id"
-                            :href="route('lessons.show', [course.slug, lesson.slug])"
-                            class="flex items-center gap-3 border-b border-line px-4 py-3 no-underline last:border-b-0 hover:bg-surface-alt"
+                    <Link
+                        v-for="lesson in module.lessons"
+                        :key="lesson.id"
+                        :href="route('lessons.show', [course.slug, lesson.slug])"
+                        class="flex items-center gap-3 px-5 py-3 no-underline transition-colors hover:bg-surface-alt"
+                    >
+                        <span
+                            class="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md border-2"
+                            :class="
+                                lesson.completed ? 'border-ok bg-ok' : 'border-line-strong'
+                            "
                         >
-                            <span
-                                class="relative h-4 w-4 shrink-0 rounded-[3px] border-[1.5px]"
-                                :class="
-                                    lesson.completed
-                                        ? 'border-primary bg-primary'
-                                        : 'border-ink-dis'
-                                "
+                            <svg
+                                v-if="lesson.completed"
+                                class="h-3 w-3 fill-none stroke-white stroke-[3]"
+                                viewBox="0 0 24 24"
                             >
-                                <span
-                                    v-if="lesson.completed"
-                                    class="absolute top-0 left-[4px] h-2 w-1 rotate-45 border-r-2 border-b-2 border-surface"
-                                ></span>
-                            </span>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </span>
 
-                            <span
-                                class="flex-1 text-[13px]"
-                                :class="lesson.completed ? 'text-ink-dis line-through' : 'text-ink'"
-                            >
-                                {{ lesson.title }}
-                            </span>
+                        <span
+                            class="flex-1 text-sm"
+                            :class="lesson.completed ? 'text-ink-dis line-through' : 'text-ink'"
+                        >
+                            {{ lesson.title }}
+                        </span>
 
-                            <span
-                                v-if="lesson.has_quiz"
-                                class="mono-label text-[9px] tracking-[1px] text-warning"
-                            >
-                                Quiz
-                            </span>
-                            <span class="mono-label text-[9px] tracking-[1px] text-ink-dis">
-                                {{ lesson.type_label }}
-                            </span>
-                        </Link>
-                    </div>
+                        <span v-if="lesson.has_quiz" class="chip bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300">
+                            Quiz
+                        </span>
+                        <span class="chip hidden bg-surface-alt text-ink-sec sm:inline-flex">
+                            {{ lesson.type_label }}
+                        </span>
+                    </Link>
                 </div>
             </div>
+        </div>
 
-            <!-- ─── FINAL ASSESSMENT ────────────────────────── -->
-            <div
-                v-if="final_quiz"
-                class="mt-8 rounded-lg border px-5 py-4"
-                :class="
-                    final_quiz.passed
-                        ? 'border-positive bg-positive-bg'
-                        : final_quiz.unlocked
-                          ? 'border-warning-dim bg-warning-bg'
-                          : 'border-line bg-surface'
-                "
+        <!-- ─── FINAL ASSESSMENT ────────────────────────────── -->
+        <div
+            v-if="final_quiz"
+            class="card p-6"
+            :class="final_quiz.passed ? 'border-ok/40' : ''"
+        >
+            <div class="mb-2 flex flex-wrap items-center gap-2">
+                <span class="chip bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300">
+                    Final assessment
+                </span>
+                <StatusPill v-if="final_quiz.passed" label="Passed" tone="positive" />
+            </div>
+
+            <h2 class="mb-1 text-lg font-bold text-navy">{{ final_quiz.title }}</h2>
+
+            <p v-if="final_quiz.description" class="mb-4 text-sm text-ink-sec">
+                {{ final_quiz.description }}
+            </p>
+
+            <div class="mb-5 flex flex-wrap gap-x-6 gap-y-1 text-sm text-ink-sec">
+                <span>Pass mark <strong class="text-navy">{{ final_quiz.passing_score }}%</strong></span>
+                <span v-if="final_quiz.max_attempts">
+                    {{ final_quiz.attempts_used }} of {{ final_quiz.max_attempts }} attempts used
+                </span>
+                <span v-else>{{ final_quiz.attempts_used }} attempts taken</span>
+                <span v-if="final_quiz.best_score > 0">
+                    Best <strong class="text-navy">{{ Math.round(final_quiz.best_score) }}%</strong>
+                </span>
+            </div>
+
+            <Link
+                v-if="final_quiz.unlocked"
+                :href="route('quizzes.show', [course.slug, final_quiz.id])"
+                class="inline-block rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-brand-hover"
             >
-                <div class="mb-1.5 flex items-center gap-2.5">
-                    <span class="mono-label text-[10px] tracking-[2px] text-ink-sec">
-                        Final assessment
-                    </span>
-                    <StatusPill
-                        v-if="final_quiz.passed"
-                        label="Passed"
-                        tone="positive"
-                    />
-                </div>
+                {{ final_quiz.passed ? 'Review results' : 'Take the assessment' }}
+            </Link>
 
-                <h2 class="mb-1 text-base font-bold">{{ final_quiz.title }}</h2>
-                <p v-if="final_quiz.description" class="mb-3 text-xs text-ink-sec">
-                    {{ final_quiz.description }}
-                </p>
-
-                <div class="mono-label mb-3 flex flex-wrap gap-4 text-[10px] tracking-[1px] text-ink-sec">
-                    <span>Pass mark {{ final_quiz.passing_score }}%</span>
-                    <span v-if="final_quiz.max_attempts">
-                        {{ final_quiz.attempts_used }}/{{ final_quiz.max_attempts }} attempts used
-                    </span>
-                    <span v-else>{{ final_quiz.attempts_used }} attempts taken</span>
-                    <span v-if="final_quiz.best_score > 0">
-                        Best {{ Math.round(final_quiz.best_score) }}%
-                    </span>
-                </div>
-
-                <Link
-                    v-if="final_quiz.unlocked"
-                    :href="route('quizzes.show', [course.slug, final_quiz.id])"
-                    class="mono-label inline-block rounded-[5px] border border-primary bg-primary px-4 py-2 text-[11px] font-bold tracking-[1.5px] text-on-accent no-underline"
-                >
-                    {{ final_quiz.passed ? 'Review results' : 'Take the assessment' }}
-                </Link>
-
-                <!-- Locked in the UI *and* by QuizPolicy::attempt — the button
-                     being hidden is the courtesy, the policy is the control. -->
-                <p v-else class="text-xs text-ink-dis italic">
-                    Complete every lesson to unlock the final assessment.
-                </p>
-            </div>
+            <!-- Locked in the UI *and* by QuizPolicy::attempt — the hidden
+                 button is the courtesy, the policy is the control. -->
+            <p v-else class="text-sm text-ink-dis italic">
+                Complete every lesson to unlock the final assessment.
+            </p>
         </div>
     </EmployeeLayout>
 </template>

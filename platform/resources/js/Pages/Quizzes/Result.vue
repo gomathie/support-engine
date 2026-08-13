@@ -1,7 +1,7 @@
 <script setup>
 /**
- * The marked paper. This is the only screen that ever shows which option was
- * correct, and it is rendered from an attempt that has already been graded.
+ * The marked paper. The only screen that ever shows which option was correct,
+ * rendered from an attempt that has already been graded.
  */
 import { Head, Link } from '@inertiajs/vue3';
 import EmployeeLayout from '@/Layouts/EmployeeLayout.vue';
@@ -19,38 +19,34 @@ defineProps({
     <Head :title="`${quiz.title} — results`" />
 
     <EmployeeLayout>
-        <div class="mx-auto max-w-[760px] px-5 py-10">
+        <div class="mx-auto max-w-3xl">
             <Link
                 :href="route('courses.show', course.slug)"
-                class="mono-label mb-4 inline-block text-[10px] tracking-[2px] text-primary no-underline"
+                class="mb-5 inline-block text-sm font-medium text-ink-sec no-underline hover:text-brand"
             >
                 ← {{ course.title }}
             </Link>
 
             <!-- ─── SCORE ───────────────────────────────────── -->
             <div
-                class="mb-8 rounded-2xl border px-6 py-8 text-center"
-                :class="
-                    attempt.passed
-                        ? 'border-positive bg-positive-bg'
-                        : 'border-negative bg-negative-bg'
-                "
+                class="card mb-8 p-9 text-center"
+                :class="attempt.passed ? 'border-ok/40' : 'border-negative/40'"
             >
                 <div
-                    class="font-mono text-5xl font-bold tracking-tight"
-                    :class="attempt.passed ? 'text-positive' : 'text-negative'"
+                    class="text-5xl font-extrabold tracking-tight"
+                    :class="attempt.passed ? 'text-ok' : 'text-negative'"
                 >
                     {{ Math.round(attempt.score) }}%
                 </div>
 
-                <div class="mt-2 mb-3">
+                <div class="mt-3 mb-4">
                     <StatusPill
                         :label="attempt.passed ? 'Passed' : 'Not passed'"
                         :tone="attempt.passed ? 'positive' : 'negative'"
                     />
                 </div>
 
-                <p class="mono-label text-[10px] tracking-[1.5px] text-ink-sec">
+                <p class="text-sm text-ink-sec">
                     {{ attempt.points_earned }} of {{ attempt.points_possible }} points ·
                     attempt {{ attempt.attempt_number }} · pass mark {{ attempt.passing_score }}%
                 </p>
@@ -58,66 +54,67 @@ defineProps({
 
             <!-- ─── FEEDBACK ────────────────────────────────── -->
             <div v-if="quiz.show_feedback && answers.length" class="flex flex-col gap-4">
-                <h2 class="mono-label text-[10px] tracking-[2px] text-ink-sec">Your answers</h2>
+                <h2 class="text-lg font-bold text-navy">Your answers</h2>
 
                 <div
                     v-for="(answer, i) in answers"
                     :key="answer.question_id"
-                    class="rounded-lg border bg-surface px-5 py-4"
-                    :class="answer.is_correct ? 'border-positive' : 'border-negative'"
+                    class="card p-6"
+                    :class="answer.is_correct ? 'border-ok/40' : 'border-negative/40'"
                 >
-                    <div class="mb-3 flex items-start gap-3">
+                    <div class="mb-4 flex items-start gap-3">
                         <span
-                            class="mt-0.5 min-w-4 font-mono text-[11px] font-bold"
-                            :class="answer.is_correct ? 'text-positive' : 'text-negative'"
+                            class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+                            :class="answer.is_correct ? 'bg-ok' : 'bg-negative'"
                         >
-                            {{ i + 1 }}
+                            {{ answer.is_correct ? '✓' : '✕' }}
                         </span>
-                        <p class="flex-1 text-[13px] leading-relaxed text-ink">
+
+                        <p class="flex-1 text-base leading-relaxed font-medium text-navy">
                             {{ answer.prompt }}
                         </p>
+
                         <span
-                            class="mono-label text-[9px] tracking-[1px]"
-                            :class="answer.is_correct ? 'text-positive' : 'text-negative'"
+                            class="shrink-0 text-sm font-semibold"
+                            :class="answer.is_correct ? 'text-ok' : 'text-negative'"
                         >
                             {{ answer.points_awarded }}/{{ answer.points }}
                         </span>
                     </div>
 
                     <!-- Choice questions -->
-                    <ul v-if="answer.options.length" class="flex flex-col gap-1.5 pl-7">
+                    <ul v-if="answer.options.length" class="flex flex-col gap-2 pl-9">
                         <li
                             v-for="(option, j) in answer.options"
                             :key="j"
-                            class="flex items-start gap-2.5 rounded-md border px-3 py-2 text-[13px]"
-                            :class="[
+                            class="flex items-start gap-2.5 rounded-xl border px-4 py-2.5 text-sm"
+                            :class="
                                 option.is_correct
-                                    ? 'border-positive bg-positive-bg'
+                                    ? 'border-ok/40 bg-positive-bg'
                                     : option.selected
-                                      ? 'border-negative bg-negative-bg'
-                                      : 'border-line',
-                            ]"
+                                      ? 'border-negative/40 bg-negative-bg'
+                                      : 'border-line'
+                            "
                         >
-                            <span class="mono-label mt-px text-[9px] tracking-[1px]">
+                            <span class="w-4 shrink-0 font-bold">
                                 <template v-if="option.is_correct && option.selected">✓</template>
                                 <template v-else-if="option.is_correct">·</template>
                                 <template v-else-if="option.selected">✕</template>
-                                <template v-else>&nbsp;</template>
                             </span>
                             <span class="text-ink">{{ option.label }}</span>
                         </li>
                     </ul>
 
                     <!-- Short answer -->
-                    <div v-else class="pl-7 text-[13px]">
+                    <div v-else class="space-y-1 pl-9 text-sm">
                         <p class="text-ink">
-                            <span class="mono-label mr-2 text-[9px] tracking-[1px] text-ink-dis">
+                            <span class="mr-2 text-xs font-semibold text-ink-dis uppercase">
                                 You wrote
                             </span>
                             {{ answer.text_answer || '—' }}
                         </p>
-                        <p v-if="!answer.is_correct" class="mt-1 text-ink-sec">
-                            <span class="mono-label mr-2 text-[9px] tracking-[1px] text-ink-dis">
+                        <p v-if="!answer.is_correct" class="text-ink-sec">
+                            <span class="mr-2 text-xs font-semibold text-ink-dis uppercase">
                                 Accepted
                             </span>
                             {{ answer.accepted_answers.join(' / ') }}
@@ -126,23 +123,23 @@ defineProps({
 
                     <p
                         v-if="answer.explanation"
-                        class="mt-3 border-t border-line pt-2.5 pl-7 text-xs leading-relaxed text-primary"
+                        class="mt-4 rounded-xl bg-brand-soft px-4 py-3 text-sm leading-relaxed text-brand"
                     >
                         {{ answer.explanation }}
                     </p>
                 </div>
             </div>
 
-            <p v-else-if="!quiz.show_feedback" class="text-[13px] text-ink-dis italic">
+            <p v-else-if="!quiz.show_feedback" class="text-sm text-ink-dis italic">
                 Per-question feedback is not enabled for this assessment.
             </p>
 
             <div class="mt-8">
                 <Link
                     :href="route('quizzes.show', [course.slug, quiz.id])"
-                    class="mono-label inline-block rounded-[5px] border border-line px-4 py-2.5 text-[11px] tracking-[1.5px] text-ink-sec no-underline transition-colors hover:border-primary hover:text-primary"
+                    class="inline-block rounded-lg border border-line px-5 py-2.5 text-sm font-semibold text-ink-sec no-underline transition-colors hover:border-brand hover:text-brand"
                 >
-                    Back to quiz
+                    Back to assessment
                 </Link>
             </div>
         </div>

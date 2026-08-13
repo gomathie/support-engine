@@ -21,93 +21,99 @@ const formatDate = (iso) =>
     <Head title="Certificates" />
 
     <EmployeeLayout>
-        <div class="mx-auto max-w-[880px] px-5 py-10">
-            <p class="mono-label mb-1.5 text-[11px] tracking-[3px] text-primary">Record</p>
-            <h1 class="mb-8 text-xl font-bold">Your certificates</h1>
+        <div class="mb-6">
+            <h1 class="mb-1 text-2xl font-extrabold text-navy">Your certificates</h1>
+            <p class="text-sm text-ink-sec">
+                Issued automatically when you finish a course. Each one carries a verification link
+                anyone can check.
+            </p>
+        </div>
 
-            <div v-if="certificates.length" class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                <div
-                    v-for="certificate in certificates"
-                    :key="certificate.id"
-                    class="relative overflow-hidden rounded-2xl border border-line bg-surface p-6"
-                >
-                    <div
-                        class="pointer-events-none absolute -top-16 -right-16 h-40 w-40 rounded-full bg-[radial-gradient(circle,rgba(234,179,8,.12)_0%,transparent_70%)]"
-                    ></div>
-
-                    <div class="relative">
-                        <div class="mono-label mb-2 text-[9px] tracking-[2px] text-ink-dis">
-                            {{ certificate.number }}
-                        </div>
-
-                        <h2 class="mb-1 text-base leading-tight font-bold text-ink">
-                            {{ certificate.course_title }}
-                        </h2>
-
-                        <p class="mb-4 text-xs text-ink-sec">
-                            Awarded to {{ certificate.recipient_name }}
+        <div v-if="certificates.length" class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <div
+                v-for="certificate in certificates"
+                :key="certificate.id"
+                class="card overflow-hidden"
+            >
+                <div class="brand-gradient flex items-center justify-between px-6 py-5">
+                    <div class="min-w-0">
+                        <p class="text-xs font-semibold tracking-wide text-white/70 uppercase">
+                            Certificate
                         </p>
+                        <p class="truncate text-sm font-bold text-white">
+                            {{ certificate.number }}
+                        </p>
+                    </div>
+                    <span class="text-2xl">🎓</span>
+                </div>
 
-                        <dl class="mono-label mb-5 flex flex-wrap gap-4 text-[9px] tracking-[1px] text-ink-dis">
-                            <div>
-                                <dt class="inline">Completed</dt>
-                                <dd class="inline text-ink-sec">
-                                    {{ formatDate(certificate.completed_at) }}
-                                </dd>
-                            </div>
-                            <div v-if="certificate.score !== null">
-                                <dt class="inline">Score</dt>
-                                <dd class="inline text-ink-sec">
-                                    {{ Math.round(certificate.score) }}%
-                                </dd>
-                            </div>
-                        </dl>
+                <div class="p-6">
+                    <h2 class="mb-1 text-base leading-snug font-bold text-navy">
+                        {{ certificate.course_title }}
+                    </h2>
 
-                        <div class="flex flex-wrap gap-2">
-                            <a
-                                v-if="certificate.is_ready"
-                                :href="certificate.download_url"
-                                class="mono-label rounded-[5px] border border-primary bg-primary px-3.5 py-2 text-[10px] font-bold tracking-[1.5px] text-on-accent no-underline"
-                            >
-                                Download PDF
-                            </a>
+                    <p class="mb-5 text-sm text-ink-sec">
+                        Awarded to {{ certificate.recipient_name }}
+                    </p>
 
-                            <!-- The record exists the moment the course is
-                                 completed; the file arrives when the queued
-                                 render finishes. -->
-                            <span
-                                v-else
-                                class="mono-label rounded-[5px] border border-line px-3.5 py-2 text-[10px] tracking-[1.5px] text-ink-dis"
-                            >
-                                Generating…
-                            </span>
-
-                            <a
-                                :href="certificate.verification_url"
-                                target="_blank"
-                                rel="noopener"
-                                class="mono-label rounded-[5px] border border-line px-3.5 py-2 text-[10px] tracking-[1.5px] text-ink-sec no-underline transition-colors hover:border-primary hover:text-primary"
-                            >
-                                Verification link
-                            </a>
+                    <dl class="mb-5 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+                        <div>
+                            <dt class="text-xs text-ink-dis">Completed</dt>
+                            <dd class="font-medium text-ink">
+                                {{ formatDate(certificate.completed_at) }}
+                            </dd>
                         </div>
+                        <div v-if="certificate.score !== null">
+                            <dt class="text-xs text-ink-dis">Score</dt>
+                            <dd class="font-medium text-ok">
+                                {{ Math.round(certificate.score) }}%
+                            </dd>
+                        </div>
+                    </dl>
+
+                    <div class="flex flex-wrap gap-2">
+                        <a
+                            v-if="certificate.is_ready"
+                            :href="certificate.download_url"
+                            class="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white no-underline transition-colors hover:bg-brand-hover"
+                        >
+                            Download PDF
+                        </a>
+
+                        <!-- The record exists the moment the course completes;
+                             the file arrives when the queued render finishes. -->
+                        <span
+                            v-else
+                            class="rounded-lg border border-line px-4 py-2 text-sm text-ink-dis"
+                        >
+                            Generating…
+                        </span>
+
+                        <a
+                            :href="certificate.verification_url"
+                            target="_blank"
+                            rel="noopener"
+                            class="rounded-lg border border-line px-4 py-2 text-sm font-medium text-ink-sec no-underline transition-colors hover:border-brand hover:text-brand"
+                        >
+                            Verification link
+                        </a>
                     </div>
                 </div>
             </div>
-
-            <EmptyState
-                v-else
-                icon="🎓"
-                title="No certificates yet"
-                description="Complete a course — every lesson plus its final assessment — and a certificate is issued automatically."
-            >
-                <Link
-                    :href="route('courses.index')"
-                    class="mono-label rounded-[5px] border border-primary bg-primary px-4 py-2 text-[11px] tracking-[1.5px] text-on-accent no-underline"
-                >
-                    View your courses
-                </Link>
-            </EmptyState>
         </div>
+
+        <EmptyState
+            v-else
+            icon="🎓"
+            title="No certificates yet"
+            description="Finish a course — every lesson plus its final assessment — and a certificate is issued automatically."
+        >
+            <Link
+                :href="route('courses.index')"
+                class="inline-block rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white no-underline hover:bg-brand-hover"
+            >
+                View your courses
+            </Link>
+        </EmptyState>
     </EmployeeLayout>
 </template>

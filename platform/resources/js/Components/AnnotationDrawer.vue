@@ -64,17 +64,15 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown));
                 aria-modal="true"
                 aria-label="Standard defaults"
             >
-                <div
-                    class="flex items-center gap-2.5 border-b border-line bg-surface-alt px-4.5 py-3.5"
-                >
-                    <h3 class="text-[15px] font-bold text-ink">Standard defaults</h3>
-                    <span class="font-mono text-[11px] text-warning">
-                        {{ unresolved.length }} total
+                <div class="flex items-center gap-2.5 border-b border-line bg-surface-alt px-5 py-4">
+                    <h3 class="text-base font-bold text-navy">Standard defaults</h3>
+                    <span class="chip bg-warning-bg text-warning-dim dark:text-warning">
+                        {{ unresolved.length }}
                     </span>
                     <div class="flex-1"></div>
                     <button
                         type="button"
-                        class="cursor-pointer rounded border border-line px-2.5 py-1 text-base leading-none text-ink-dis transition-colors hover:border-ink-dis hover:text-ink"
+                        class="cursor-pointer rounded-lg px-2.5 py-1 text-lg leading-none text-ink-dis transition-colors hover:bg-surface hover:text-ink"
                         aria-label="Close"
                         @click="emit('close')"
                     >
@@ -82,8 +80,8 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown));
                     </button>
                 </div>
 
-                <div class="overflow-auto px-4.5 pt-3.5 pb-6">
-                    <p class="mb-3.5 text-[13px] text-ink-dis">
+                <div class="overflow-auto px-5 pt-4 pb-6">
+                    <p class="mb-4 text-sm leading-relaxed text-ink-sec">
                         Industry-standard answers proposed by the trainer. Confirm each one
                         locally, and escalate anything unresolved.
                     </p>
@@ -92,19 +90,19 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown));
                         v-for="annotation in unresolved"
                         :key="annotation.id"
                         type="button"
-                        class="block w-full cursor-pointer border-b border-line px-0.5 py-2.5 text-left text-[13px] leading-snug text-ink-sec transition-colors hover:bg-surface-alt focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
+                        class="block w-full cursor-pointer rounded-lg border-b border-line px-2 py-3 text-left text-sm leading-snug text-ink transition-colors hover:bg-surface-alt focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand"
                         @click="jumpTo(annotation.anchor)"
                     >
                         <span
                             v-if="annotation.section_label"
-                            class="mono-label mb-0.5 block text-[9.5px] tracking-[1px] text-ink-dis"
+                            class="mb-1 block text-xs font-semibold tracking-wide text-ink-dis uppercase"
                         >
                             {{ annotation.section_label }}
                         </span>
                         {{ annotation.body }}
                     </button>
 
-                    <p v-if="!unresolved.length" class="text-[13px] text-ink-dis italic">
+                    <p v-if="!unresolved.length" class="text-sm text-ink-dis italic">
                         Nothing outstanding in this lesson.
                     </p>
                 </div>

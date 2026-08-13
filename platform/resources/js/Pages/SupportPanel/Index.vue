@@ -1,16 +1,12 @@
 <script setup>
 /**
- * The Support Panel.
+ * The Support Panel: a diagnostic decision tree on the left, a case note that
+ * writes itself on the right.
  *
- * Layout is the prototype's: symptom list and decision tree on the left, sticky
- * case note on the right, collapsing to one column under 900px. The tri-state
- * per step (untouched / ruled out / cause found), the reveal-on-found fix text,
- * the priority matrix and the clipboard copy with its execCommand fallback are
- * all preserved.
- *
- * The case itself is now a row. The prototype wrote `S` to an API that did not
- * exist, so every case evaporated on reload; here each change is persisted and
- * the note is rebuilt server-side by BuildCaseNote.
+ * The tri-state per step (untouched / ruled out / cause found), the
+ * reveal-on-found fix text, the priority matrix and the clipboard copy with its
+ * execCommand fallback are all carried over from the prototype. The case itself
+ * is now a persisted row rather than an object that evaporated on reload.
  */
 import { computed, ref, watch } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
@@ -38,8 +34,8 @@ const customerTold = ref(props.case?.customer_told ?? '');
 
 const stamp = ref('');
 
-const activeTree = computed(() =>
-    props.trees.find((tree) => tree.id === selectedTreeId.value) ?? null,
+const activeTree = computed(
+    () => props.trees.find((tree) => tree.id === selectedTreeId.value) ?? null,
 );
 
 const note = computed(() => props.case?.note ?? 'No symptom selected yet.');
@@ -62,12 +58,8 @@ const persist = debounce(() => {
         {
             preserveScroll: true,
             preserveState: false,
-            onSuccess: () => {
-                stamp.value = 'saved ' + new Date().toLocaleTimeString();
-            },
-            onError: () => {
-                stamp.value = 'not saved';
-            },
+            onSuccess: () => (stamp.value = `Saved ${new Date().toLocaleTimeString()}`),
+            onError: () => (stamp.value = 'Not saved'),
         },
     );
 }, 600);
@@ -114,19 +106,19 @@ function newCase() {
 async function copyNote() {
     try {
         await navigator.clipboard.writeText(note.value);
-        stamp.value = 'copied to clipboard';
+        stamp.value = 'Copied to clipboard';
     } catch {
-        // The prototype's fallback, kept for browsers and contexts where the
-        // async clipboard API is unavailable (notably non-HTTPS origins).
+        // Fallback for browsers and contexts where the async clipboard API is
+        // unavailable, notably non-HTTPS origins.
         const ta = document.createElement('textarea');
         ta.value = note.value;
         document.body.appendChild(ta);
         ta.select();
         try {
             document.execCommand('copy');
-            stamp.value = 'copied to clipboard';
+            stamp.value = 'Copied to clipboard';
         } catch {
-            stamp.value = 'select the text above to copy';
+            stamp.value = 'Select the text above to copy';
         }
         ta.remove();
     }
@@ -136,113 +128,116 @@ const priorityColour = (code) =>
     ({
         P1: 'text-negative',
         P2: 'text-warning-dim dark:text-warning',
-        P3: 'text-[#D9C86A]',
-        P4: 'text-primary',
+        P3: 'text-amber-500',
+        P4: 'text-brand',
         P5: 'text-ink-dis',
     })[code] ?? 'text-ink';
+
+const layers = [
+    { n: 1, name: 'Access & rights', look: "Failed Login Attempts, Blocked Users, Disabled Users → then the user's rights" },
+    { n: 2, name: 'Contract & modules', look: 'Is the module on the contract? A missing button is usually this, not a bug' },
+    { n: 3, name: 'Interface & filters', look: 'List filters, group selection, columns, date range' },
+    { n: 4, name: 'Object config', look: 'Object card, tariff, device ID/type, temporary blocking' },
+    { n: 5, name: 'Sensor config', look: 'Field mapping → conversion formula → calibration table, in that order' },
+    { n: 6, name: 'Device & data', look: 'Sensors tracing, satellite count, Connection Lost, Devices offline' },
+    { n: 7, name: 'Relay', look: 'Statistics: Queue, Err, Send, Ack' },
+];
 
 const tabs = [
     { id: 'diagnose', label: 'Diagnose' },
     { id: 'classify', label: 'Classify' },
 ];
+
+const fieldClass =
+    'w-full rounded-lg border border-line bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-dis focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none';
 </script>
 
 <template>
     <Head title="Support Panel" />
 
     <EmployeeLayout>
-        <!-- ─── SUB BAR ─────────────────────────────────────── -->
-        <div class="sticky top-[54px] z-20 border-b border-line bg-nav backdrop-blur-[6px]">
-            <div class="mx-auto flex max-w-[1180px] flex-wrap items-center gap-4.5 px-4.5 py-3">
-                <div class="mono-label text-[11px] tracking-[2.5px] whitespace-nowrap text-primary">
-                    PILOT <b class="tracking-[1px] text-ink">SUPPORT PANEL</b>
-                </div>
-
-                <div class="flex flex-1 flex-wrap gap-1" role="tablist">
-                    <button
-                        v-for="tab in tabs"
-                        :key="tab.id"
-                        type="button"
-                        role="tab"
-                        :aria-selected="activeTab === tab.id"
-                        class="mono-label cursor-pointer rounded border px-3 py-1.5 text-[11px] tracking-[1.5px] transition-all duration-250"
-                        :class="
-                            activeTab === tab.id
-                                ? 'border-warning bg-warning font-bold text-on-warning'
-                                : 'border-line bg-transparent text-ink-sec hover:text-ink'
-                        "
-                        @click="activeTab = tab.id"
-                    >
-                        {{ tab.label }}
-                    </button>
-                </div>
-            </div>
+        <div class="mb-6">
+            <h1 class="mb-1 text-2xl font-extrabold text-navy">Support panel</h1>
+            <p class="text-sm text-ink-sec">
+                Work the layers top down. Rule each check out as you go — the case note writes
+                itself.
+            </p>
         </div>
 
-        <div
-            class="mx-auto grid max-w-[1180px] grid-cols-1 items-start gap-5.5 px-4.5 py-5.5 lg:grid-cols-[1fr_340px]"
-        >
-            <main>
+        <!-- ─── TABS ────────────────────────────────────────── -->
+        <div class="mb-6 flex gap-1 border-b border-line" role="tablist">
+            <button
+                v-for="tab in tabs"
+                :key="tab.id"
+                type="button"
+                role="tab"
+                :aria-selected="activeTab === tab.id"
+                class="-mb-px cursor-pointer border-b-2 px-4 py-2.5 text-sm font-semibold transition-colors"
+                :class="
+                    activeTab === tab.id
+                        ? 'border-brand text-brand'
+                        : 'border-transparent text-ink-sec hover:text-ink'
+                "
+                @click="activeTab = tab.id"
+            >
+                {{ tab.label }}
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_340px]">
+            <main class="min-w-0">
                 <!-- ═══ DIAGNOSE ════════════════════════════════ -->
                 <section v-show="activeTab === 'diagnose'">
-                    <p class="mono-label mb-1 text-[10px] tracking-[2px] text-ink-dis">Module B</p>
-                    <h1 class="mb-1.5 text-[19px] font-bold">Work the layers, top down</h1>
-                    <p class="mb-4.5 max-w-[62ch] text-[13px] leading-relaxed text-ink-sec">
-                        Pick what the customer said. Rule each check out as you go — the case note
-                        on the right writes itself. Faults live near the top of this list far more
-                        often than the bottom, so resist jumping to the device.
-                    </p>
+                    <h2 class="mb-3 text-lg font-bold text-navy">What did the customer say?</h2>
 
-                    <!-- Symptom picker -->
-                    <div class="mb-5 flex flex-col gap-1.75">
+                    <div class="mb-6 flex flex-col gap-2">
                         <button
                             v-for="tree in trees"
                             :key="tree.id"
                             type="button"
                             :aria-pressed="selectedTreeId === tree.id"
-                            class="flex w-full cursor-pointer items-center gap-2.75 rounded-[7px] border px-3.25 py-2.75 text-left transition-all duration-250"
+                            class="flex w-full cursor-pointer items-center gap-3 rounded-xl border px-4 py-3.5 text-left transition-colors"
                             :class="
                                 selectedTreeId === tree.id
-                                    ? 'border-warning bg-surface-alt'
-                                    : 'border-line bg-surface hover:border-ink-dis'
+                                    ? 'border-brand bg-brand-soft'
+                                    : 'border-line bg-surface hover:border-line-strong hover:bg-surface-alt'
                             "
                             @click="selectSymptom(tree)"
                         >
-                            <span class="flex-1 text-[13.5px] text-ink">“{{ tree.question }}”</span>
-                            <span class="font-mono text-[10px] whitespace-nowrap text-ink-dis">
-                                layer {{ tree.layer_label }}
+                            <span class="flex-1 text-sm text-ink">“{{ tree.question }}”</span>
+                            <span class="chip bg-surface-alt text-ink-sec">
+                                Layer {{ tree.layer_label }}
                             </span>
                         </button>
                     </div>
 
                     <!-- Decision tree -->
-                    <div
-                        v-if="activeTree"
-                        class="mb-3.5 overflow-hidden rounded-lg border border-line bg-surface"
-                    >
+                    <div v-if="activeTree" class="card mb-6 divide-y divide-line overflow-hidden">
                         <div
                             v-for="(step, i) in activeTree.steps"
                             :key="step.id"
-                            class="flex items-start gap-2.75 border-b border-line px-3.25 py-2.75 last:border-b-0"
+                            class="flex items-start gap-3 px-5 py-4 transition-colors"
                             :class="{
                                 'bg-negative-bg': stepState(step.id) === 'out',
                                 'bg-positive-bg': stepState(step.id) === 'found',
                             }"
                         >
-                            <div
-                                class="min-w-4 pt-0.5 font-mono text-[11px] font-bold"
+                            <span
+                                class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold"
                                 :class="
-                                    stepState(step.id) === 'out'
-                                        ? 'text-ink-dis'
-                                        : 'text-warning-dim dark:text-warning'
+                                    stepState(step.id) === 'found'
+                                        ? 'bg-ok text-white'
+                                        : stepState(step.id) === 'out'
+                                          ? 'bg-surface-alt text-ink-dis'
+                                          : 'bg-brand-soft text-brand'
                                 "
                             >
                                 {{ i + 1 }}
-                            </div>
+                            </span>
 
                             <div class="min-w-0 flex-1">
-                                <div
-                                    class="text-[13px] leading-relaxed"
+                                <p
+                                    class="text-sm leading-relaxed"
                                     :class="
                                         stepState(step.id) === 'out'
                                             ? 'text-ink-dis line-through'
@@ -250,30 +245,28 @@ const tabs = [
                                     "
                                 >
                                     {{ step.prompt }}
-                                    <span
-                                        class="mono-label ml-1.5 inline-block rounded-[3px] border border-line px-1.25 py-px align-[1px] text-[9px] tracking-[1px] text-ink-dis"
-                                    >
+                                    <span class="chip ml-1.5 bg-surface-alt text-ink-sec">
                                         L{{ step.layer }}
                                     </span>
-                                </div>
+                                </p>
 
                                 <!-- Revealed only once the step is marked as the
                                      cause, exactly as the prototype did. -->
-                                <div
+                                <p
                                     v-if="step.fix && stepState(step.id) === 'found'"
-                                    class="mt-1.75 text-xs leading-relaxed text-primary"
+                                    class="mt-2 rounded-lg bg-surface px-3 py-2 text-sm leading-relaxed text-ink-sec"
                                 >
                                     {{ step.fix }}
-                                </div>
+                                </p>
 
-                                <div class="flex gap-1.25 pt-1.5">
+                                <div class="mt-2.5 flex gap-2">
                                     <button
                                         type="button"
-                                        class="mono-label cursor-pointer rounded border px-1.75 py-1 text-[10px] leading-none whitespace-nowrap transition-all duration-250"
+                                        class="cursor-pointer rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors"
                                         :class="
                                             stepState(step.id) === 'out'
                                                 ? 'border-negative bg-negative text-white'
-                                                : 'border-line bg-transparent text-ink-dis hover:border-ink-dis hover:text-ink'
+                                                : 'border-line bg-surface text-ink-sec hover:border-negative hover:text-negative'
                                         "
                                         @click="markStep(step.id, 'out')"
                                     >
@@ -283,11 +276,11 @@ const tabs = [
                                     <button
                                         v-if="step.fix"
                                         type="button"
-                                        class="mono-label cursor-pointer rounded border px-1.75 py-1 text-[10px] leading-none whitespace-nowrap transition-all duration-250"
+                                        class="cursor-pointer rounded-lg border px-2.5 py-1 text-xs font-semibold transition-colors"
                                         :class="
                                             stepState(step.id) === 'found'
-                                                ? 'border-positive bg-positive text-white dark:text-[#020617]'
-                                                : 'border-line bg-transparent text-ink-dis hover:border-ink-dis hover:text-ink'
+                                                ? 'border-ok bg-ok text-white'
+                                                : 'border-line bg-surface text-ink-sec hover:border-ok hover:text-ok'
                                         "
                                         @click="markStep(step.id, 'found')"
                                     >
@@ -299,40 +292,36 @@ const tabs = [
                     </div>
 
                     <!-- Layer model reference -->
-                    <h2 class="mt-6.5 mb-2.5 text-sm font-bold">The layer model</h2>
-                    <div class="overflow-x-auto">
-                        <table class="w-full border-collapse text-[12.5px]">
-                            <thead>
-                                <tr>
-                                    <th class="w-9.5 border border-line bg-surface-alt px-2.5 py-2 text-left text-[11px]">#</th>
-                                    <th class="w-37.5 border border-line bg-surface-alt px-2.5 py-2 text-left text-[11px]">Layer</th>
-                                    <th class="border border-line bg-surface-alt px-2.5 py-2 text-left text-[11px]">First place to look</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="layer in [
-                                    { n: 1, name: 'Access &amp; rights', look: 'Failed Login Attempts, Blocked Users, Disabled Users → then the user\'s rights' },
-                                    { n: 2, name: 'Contract &amp; modules', look: 'Is the module on the contract? A missing button is usually this, not a bug' },
-                                    { n: 3, name: 'Interface &amp; filters', look: 'List filters, group selection, columns, date range' },
-                                    { n: 4, name: 'Object config', look: 'Object card, tariff, device ID/type, temporary blocking' },
-                                    { n: 5, name: 'Sensor config', look: 'Field mapping → conversion formula → calibration table, in that order' },
-                                    { n: 6, name: 'Device &amp; data', look: 'Sensors tracing, satellite count, Connection Lost, Devices offline' },
-                                    { n: 7, name: 'Relay', look: 'Statistics: Queue, Err, Send, Ack' },
-                                ]" :key="layer.n">
-                                    <td class="border border-line px-2.5 py-2 font-mono text-[11px] whitespace-nowrap text-warning-dim dark:text-warning">
-                                        {{ layer.n }}
-                                    </td>
-                                    <td class="border border-line px-2.5 py-2 align-top">
-                                        <b class="text-ink" v-html="layer.name"></b>
-                                    </td>
-                                    <td class="border border-line px-2.5 py-2 align-top leading-relaxed text-ink-sec">
-                                        {{ layer.look }}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <h2 class="mb-3 text-lg font-bold text-navy">The layer model</h2>
+
+                    <div class="card overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full border-collapse text-sm">
+                                <thead>
+                                    <tr class="bg-surface-alt text-left">
+                                        <th class="w-10 px-4 py-3 font-semibold text-navy">#</th>
+                                        <th class="w-44 px-4 py-3 font-semibold text-navy">Layer</th>
+                                        <th class="px-4 py-3 font-semibold text-navy">
+                                            First place to look
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-line">
+                                    <tr v-for="layer in layers" :key="layer.n">
+                                        <td class="px-4 py-3 font-bold text-brand">{{ layer.n }}</td>
+                                        <td class="px-4 py-3 font-medium text-navy">
+                                            {{ layer.name }}
+                                        </td>
+                                        <td class="px-4 py-3 leading-relaxed text-ink-sec">
+                                            {{ layer.look }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                    <p class="mt-2 mb-4.5 text-xs text-ink-dis italic">
+
+                    <p class="mt-3 text-sm text-ink-dis italic">
                         Affects everything → 1–2. One object → 4–6. One screen → 3. Fine here,
                         missing downstream → 7.
                     </p>
@@ -340,33 +329,33 @@ const tabs = [
 
                 <!-- ═══ CLASSIFY ════════════════════════════════ -->
                 <section v-show="activeTab === 'classify'">
-                    <p class="mono-label mb-1 text-[10px] tracking-[2px] text-ink-dis">Module D</p>
-                    <h1 class="mb-1.5 text-[19px] font-bold">Classify before you queue</h1>
-                    <p class="mb-4.5 max-w-[62ch] text-[13px] leading-relaxed text-ink-sec">
-                        Priority is impact × urgency — not who shouts loudest. Tap a cell to set it
-                        on the case note.
+                    <h2 class="mb-1 text-lg font-bold text-navy">Priority is impact × urgency</h2>
+                    <p class="mb-5 text-sm text-ink-sec">
+                        Not who shouts loudest. Tap a cell to set it on the case note.
                     </p>
 
                     <div class="overflow-x-auto">
-                        <div class="grid min-w-[520px] grid-cols-[auto_repeat(3,1fr)] gap-1.25">
+                        <div class="grid min-w-[560px] grid-cols-[130px_repeat(3,1fr)] gap-2">
                             <div></div>
                             <div
                                 v-for="(header, i) in [
-                                    'Urgency: high<br>now / blocking',
-                                    'Urgency: medium<br>today / workaround',
-                                    'Urgency: low<br>next week',
+                                    ['Urgency: high', 'now / blocking'],
+                                    ['Urgency: medium', 'today / workaround'],
+                                    ['Urgency: low', 'next week'],
                                 ]"
                                 :key="i"
-                                class="mono-label flex items-center justify-center p-1.25 text-center text-[10px] tracking-[1px] text-ink-dis"
-                                v-html="header"
-                            ></div>
+                                class="px-2 pb-1 text-center"
+                            >
+                                <span class="block text-xs font-semibold text-navy">
+                                    {{ header[0] }}
+                                </span>
+                                <span class="block text-xs text-ink-dis">{{ header[1] }}</span>
+                            </div>
 
                             <template v-for="row in priority_matrix" :key="row.row">
-                                <div
-                                    class="mono-label flex max-w-[118px] items-center p-1.25 text-[10px] leading-snug tracking-[1px] text-ink-dis"
-                                >
-                                    <span>
-                                        <b class="block text-ink">{{ row.row }}</b>
+                                <div class="flex flex-col justify-center py-2 pr-2">
+                                    <span class="text-xs font-semibold text-navy">{{ row.row }}</span>
+                                    <span class="text-xs leading-snug text-ink-dis">
                                         {{ row.sub }}
                                     </span>
                                 </div>
@@ -379,36 +368,39 @@ const tabs = [
                                         priority?.code === cell.priority &&
                                         priority?.reason.startsWith(row.row)
                                     "
-                                    class="cursor-pointer rounded-md border px-1.75 py-2.25 text-center transition-all duration-250"
+                                    class="cursor-pointer rounded-xl border px-3 py-3 text-center transition-colors"
                                     :class="
                                         priority?.code === cell.priority &&
                                         priority?.reason.startsWith(row.row)
-                                            ? 'border-warning bg-surface-alt'
-                                            : 'border-line bg-surface hover:border-ink-dis'
+                                            ? 'border-brand bg-brand-soft'
+                                            : 'border-line bg-surface hover:border-line-strong hover:bg-surface-alt'
                                     "
                                     @click="selectPriority(cell.priority, row.row, i)"
                                 >
-                                    <div
-                                        class="font-mono text-sm font-bold"
+                                    <span
+                                        class="block text-base font-extrabold"
                                         :class="priorityColour(cell.priority)"
                                     >
                                         {{ cell.priority }}
-                                    </div>
-                                    <div class="mt-0.75 text-[10.5px] leading-snug text-ink-dis">
+                                    </span>
+                                    <span class="mt-1 block text-xs leading-snug text-ink-dis">
                                         {{ cell.example }}
-                                    </div>
+                                    </span>
                                 </button>
                             </template>
                         </div>
                     </div>
 
-                    <div class="mt-4 rounded-lg border border-line bg-surface px-4 py-3.5">
-                        <h3 class="mb-1.75 text-[13px] font-bold">The telematics twist</h3>
-                        <p class="text-[12.5px] leading-relaxed text-ink-sec">
-                            Some of this data has a <b class="text-ink">physical clock</b> attached.
-                            Refrigerated cargo spoils. A stolen vehicle moves. Ask:
-                            <b class="text-ink">what happens in the real world while this stays
-                            broken?</b> A sensor fault that looks like P4 on a reefer trailer is a P2.
+                    <div class="card mt-6 p-5">
+                        <h3 class="mb-2 text-base font-bold text-navy">The telematics twist</h3>
+                        <p class="text-sm leading-relaxed text-ink-sec">
+                            Some of this data has a
+                            <strong class="text-navy">physical clock</strong> attached. Refrigerated
+                            cargo spoils. A stolen vehicle moves. Ask:
+                            <strong class="text-navy">
+                                what happens in the real world while this stays broken?
+                            </strong>
+                            A sensor fault that looks like P4 on a reefer trailer is a P2.
                         </p>
                     </div>
                 </section>
@@ -416,36 +408,32 @@ const tabs = [
 
             <!-- ═══ CASE NOTE ═══════════════════════════════════ -->
             <aside>
-                <div
-                    class="overflow-hidden rounded-lg border border-line bg-surface lg:sticky lg:top-[120px]"
-                >
-                    <div class="flex items-center gap-2 border-b border-line bg-surface-alt px-3.25 py-2.25">
-                        <span class="h-1.5 w-1.5 rounded-full bg-primary"></span>
-                        <span class="mono-label flex-1 text-[10px] tracking-[2px] text-ink-sec">
-                            Case note
-                        </span>
+                <div class="card overflow-hidden lg:sticky lg:top-24">
+                    <div class="flex items-center gap-2 border-b border-line bg-surface-alt px-5 py-3.5">
+                        <span class="h-2 w-2 rounded-full bg-brand"></span>
+                        <span class="flex-1 text-sm font-bold text-navy">Case note</span>
                     </div>
 
-                    <div class="px-3.25 py-3">
-                        <div class="mb-2.75 flex flex-col gap-1.75">
+                    <div class="p-5">
+                        <div class="mb-3 flex flex-col gap-2">
                             <input
                                 v-model="customer"
                                 placeholder="Customer / contract"
                                 autocomplete="off"
                                 aria-label="Customer or contract"
-                                class="w-full rounded-[5px] border border-line bg-canvas px-2.25 py-1.75 font-mono text-[11.5px] text-ink placeholder:text-ink-dis focus:border-primary focus:outline-none"
+                                :class="fieldClass"
                             />
                             <input
                                 v-model="objectRef"
                                 placeholder="Object name / IMEI"
                                 autocomplete="off"
                                 aria-label="Object name or IMEI"
-                                class="w-full rounded-[5px] border border-line bg-canvas px-2.25 py-1.75 font-mono text-[11.5px] text-ink placeholder:text-ink-dis focus:border-primary focus:outline-none"
+                                :class="fieldClass"
                             />
                         </div>
 
                         <pre
-                            class="mb-2.5 max-h-[290px] overflow-auto rounded-[5px] border border-line bg-canvas p-2.5 font-mono text-[11px] leading-relaxed whitespace-pre-wrap text-ink-sec"
+                            class="mb-3 max-h-72 overflow-auto rounded-lg border border-line bg-surface-alt p-3.5 font-mono text-xs leading-relaxed whitespace-pre-wrap text-ink-sec"
                             >{{ note }}</pre
                         >
 
@@ -454,29 +442,28 @@ const tabs = [
                             rows="2"
                             placeholder="What the customer has been told"
                             aria-label="What the customer has been told"
-                            class="mb-2.5 w-full resize-y rounded-[5px] border border-line bg-canvas px-2.25 py-1.75 font-mono text-[11px] text-ink placeholder:text-ink-dis focus:border-primary focus:outline-none"
+                            :class="fieldClass"
+                            class="mb-3 resize-y"
                         ></textarea>
 
-                        <div class="flex gap-1.5">
+                        <div class="flex gap-2">
                             <button
                                 type="button"
-                                class="mono-label flex-1 cursor-pointer rounded-[5px] border border-primary bg-primary py-1.75 text-[10.5px] font-bold tracking-[1px] text-on-accent"
+                                class="flex-1 cursor-pointer rounded-lg bg-brand py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-hover"
                                 @click="copyNote"
                             >
                                 Copy
                             </button>
                             <button
                                 type="button"
-                                class="mono-label flex-1 cursor-pointer rounded-[5px] border border-line bg-transparent py-1.75 text-[10.5px] tracking-[1px] text-ink-sec transition-colors hover:border-ink-dis hover:text-ink"
+                                class="flex-1 cursor-pointer rounded-lg border border-line py-2.5 text-sm font-semibold text-ink-sec transition-colors hover:border-brand hover:text-brand"
                                 @click="newCase"
                             >
                                 New case
                             </button>
                         </div>
 
-                        <div class="mt-1.75 min-h-3 text-center font-mono text-[9.5px] text-ink-dis">
-                            {{ stamp }}
-                        </div>
+                        <p class="mt-2.5 min-h-4 text-center text-xs text-ink-dis">{{ stamp }}</p>
                     </div>
                 </div>
             </aside>

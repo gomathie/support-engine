@@ -1,11 +1,10 @@
 <script setup>
 /**
- * The lesson viewer. Carries the skills module's layout — sticky TOC on the
- * left, "paper" article on the right, annotation drawer — and branches on the
- * lesson's content type.
+ * The lesson viewer: a table of contents on the left, the lesson "paper" on
+ * the right, and a branch per content type.
  *
- * Adding a content type means adding a branch here and a case to the
- * LessonType enum. Nothing else changes.
+ * Adding a content type means adding a branch here and a case to the LessonType
+ * enum. Nothing else changes.
  */
 import { computed, ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
@@ -29,22 +28,22 @@ const tocOpen = ref(false);
 const saving = ref(false);
 
 const unresolvedCount = computed(() => props.annotations.filter((a) => !a.is_resolved).length);
-
 const primaryResource = computed(() => props.resources[0] ?? null);
 
 function toggleComplete() {
     saving.value = true;
 
-    const method = props.state.completed ? 'delete' : 'post';
-
-    router.visit(route(props.state.completed ? 'lessons.uncomplete' : 'lessons.complete', [
-        props.course.slug,
-        props.lesson.slug,
-    ]), {
-        method,
-        preserveScroll: true,
-        onFinish: () => (saving.value = false),
-    });
+    router.visit(
+        route(props.state.completed ? 'lessons.uncomplete' : 'lessons.complete', [
+            props.course.slug,
+            props.lesson.slug,
+        ]),
+        {
+            method: props.state.completed ? 'delete' : 'post',
+            preserveScroll: true,
+            onFinish: () => (saving.value = false),
+        },
+    );
 }
 </script>
 
@@ -52,89 +51,77 @@ function toggleComplete() {
     <Head :title="lesson.title" />
 
     <EmployeeLayout>
-        <!-- ─── SUB-MASTHEAD ────────────────────────────────── -->
-        <div class="sticky top-[54px] z-30 border-b border-line bg-nav backdrop-blur-[6px]">
-            <div class="mx-auto flex max-w-[1220px] items-center gap-4 px-5.5 py-2.5">
-                <Link
-                    :href="route('courses.show', course.slug)"
-                    class="mono-label text-[11px] tracking-[2.5px] whitespace-nowrap text-primary no-underline"
-                >
-                    {{ course.title }}
-                </Link>
+        <!-- ─── BREADCRUMB ──────────────────────────────────── -->
+        <div class="mb-5 flex flex-wrap items-center gap-3">
+            <Link
+                :href="route('courses.show', course.slug)"
+                class="text-sm font-medium text-ink-sec no-underline hover:text-brand"
+            >
+                ← {{ course.title }}
+            </Link>
 
-                <div class="flex-1"></div>
+            <div class="flex-1"></div>
 
-                <span
-                    v-if="navigation.position"
-                    class="mono-label hidden text-[10px] tracking-[1px] text-ink-dis sm:block"
-                >
-                    {{ navigation.position }} / {{ navigation.total }}
-                </span>
+            <span v-if="navigation.position" class="text-sm text-ink-dis">
+                Lesson {{ navigation.position }} of {{ navigation.total }}
+            </span>
 
-                <button
-                    v-if="unresolvedCount"
-                    type="button"
-                    class="mono-label cursor-pointer rounded border border-warning-dim px-2.5 py-1.5 text-[11px] tracking-[1px] whitespace-nowrap text-warning transition-colors hover:bg-warning hover:text-on-warning"
-                    @click="drawerOpen = true"
-                >
-                    {{ unresolvedCount }} standard defaults
-                </button>
+            <button
+                v-if="unresolvedCount"
+                type="button"
+                class="chip cursor-pointer bg-warning-bg text-warning-dim dark:text-warning"
+                @click="drawerOpen = true"
+            >
+                {{ unresolvedCount }} standard defaults
+            </button>
 
-                <button
-                    type="button"
-                    class="mono-label cursor-pointer rounded border border-line px-2.5 py-1.5 text-[11px] text-ink-dis lg:hidden"
-                    @click="tocOpen = !tocOpen"
-                >
-                    Contents
-                </button>
-            </div>
+            <button
+                type="button"
+                class="rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-ink-sec lg:hidden"
+                @click="tocOpen = !tocOpen"
+            >
+                Contents
+            </button>
         </div>
 
-        <div
-            class="mx-auto grid max-w-[1220px] grid-cols-1 items-start gap-7.5 px-5.5 pt-6.5 pb-17 lg:grid-cols-[225px_1fr]"
-        >
+        <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-[220px_1fr]">
             <!-- ─── TOC ─────────────────────────────────────── -->
             <div :class="tocOpen ? 'block' : 'hidden lg:block'">
-                <div
-                    class="rounded-lg border border-line bg-surface p-3.5 lg:border-0 lg:bg-transparent lg:p-0"
-                >
+                <div class="card p-4 lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
                     <LessonToc content-selector="#lesson-body" />
                 </div>
             </div>
 
             <!-- ─── ARTICLE ─────────────────────────────────── -->
-            <article
-                class="min-w-0 rounded-[10px] border border-line bg-surface px-5 py-6.5 sm:px-13 sm:py-11"
-            >
-                <p class="mono-label mb-2 text-[10px] tracking-[3px] text-ink-dis">
+            <article class="card min-w-0 p-6 sm:p-9">
+                <p v-if="lesson.module_title" class="mb-2 text-sm font-medium text-brand">
                     {{ lesson.module_title }}
                 </p>
 
-                <h1 class="mb-2 text-[34px] leading-[1.15] font-bold tracking-[-.4px] text-primary">
+                <h1 class="mb-3 text-2xl leading-tight font-extrabold text-navy sm:text-3xl">
                     {{ lesson.title }}
                 </h1>
 
-                <p
-                    v-if="lesson.description"
-                    class="mb-3.5 border-b-[3px] border-primary pb-4 text-[17px] text-ink-sec"
-                >
+                <p v-if="lesson.description" class="mb-4 text-base text-ink-sec">
                     {{ lesson.description }}
                 </p>
 
-                <div class="mono-label mb-6 flex flex-wrap items-center gap-3 text-[10px] tracking-[1px] text-ink-dis">
+                <div class="mb-7 flex flex-wrap items-center gap-2 border-b border-line pb-5">
                     <StatusPill
                         :label="state.completed ? 'Completed' : 'Not completed'"
                         :tone="state.completed ? 'positive' : 'neutral'"
                     />
-                    <span>{{ lesson.type_label }}</span>
-                    <span v-if="lesson.estimated_minutes">~{{ lesson.estimated_minutes }} min</span>
+                    <span class="chip bg-surface-alt text-ink-sec">{{ lesson.type_label }}</span>
+                    <span v-if="lesson.estimated_minutes" class="chip bg-surface-alt text-ink-sec">
+                        ~{{ lesson.estimated_minutes }} min
+                    </span>
                 </div>
 
                 <!-- ═══ CONTENT BY TYPE ═════════════════════════ -->
 
-                <!-- Rich text. v-html is safe here: the server ran the body
-                     through HTMLPurifier's `lesson` allowlist before sending it,
-                     which strips script, iframe, style and every event handler. -->
+                <!-- v-html is safe here: the server ran the body through
+                     HTMLPurifier's `lesson` allowlist, which strips script,
+                     iframe, style and every event handler. -->
                 <div
                     v-if="lesson.type === 'rich_text' && lesson.content"
                     id="lesson-body"
@@ -142,12 +129,10 @@ function toggleComplete() {
                     v-html="lesson.content"
                 ></div>
 
-                <!-- PDF: streamed inline through the policy-checked route, never
-                     a public storage URL. -->
                 <div v-else-if="lesson.type === 'pdf' && primaryResource" id="lesson-body">
                     <iframe
                         :src="primaryResource.stream_url"
-                        class="h-[70vh] w-full rounded-md border border-line"
+                        class="h-[70vh] w-full rounded-xl border border-line"
                         :title="primaryResource.name"
                     ></iframe>
                 </div>
@@ -156,22 +141,23 @@ function toggleComplete() {
                     <img
                         :src="primaryResource.stream_url"
                         :alt="primaryResource.description || lesson.title"
-                        class="max-w-full rounded-md border border-line"
+                        class="max-w-full rounded-xl border border-line"
                     />
                 </div>
 
-                <div v-else-if="lesson.type === 'external_link' && lesson.external_url" id="lesson-body">
+                <div
+                    v-else-if="lesson.type === 'external_link' && lesson.external_url"
+                    id="lesson-body"
+                >
                     <a
                         :href="lesson.external_url"
                         target="_blank"
                         rel="noopener noreferrer"
-                        class="mono-label inline-block rounded-[5px] border border-primary bg-primary px-4 py-2.5 text-[11px] tracking-[1.5px] text-on-accent no-underline"
+                        class="inline-block rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white no-underline hover:bg-brand-hover"
                     >
                         Open external resource ↗
                     </a>
-                    <p class="mt-2 font-mono text-[11px] break-all text-ink-dis">
-                        {{ lesson.external_url }}
-                    </p>
+                    <p class="mt-2 text-sm break-all text-ink-dis">{{ lesson.external_url }}</p>
                 </div>
 
                 <div v-else id="lesson-body">
@@ -180,41 +166,36 @@ function toggleComplete() {
                         class="lesson-prose prose max-w-none"
                         v-html="lesson.content"
                     ></div>
-                    <p v-else class="text-[13px] text-ink-dis italic">
+                    <p v-else class="text-sm text-ink-dis italic">
                         This lesson has no inline content — see the resources below.
                     </p>
                 </div>
 
                 <!-- ═══ RESOURCES ═══════════════════════════════ -->
-                <div v-if="resources.length" class="mt-8 border-t border-line pt-5">
-                    <h2 class="mono-label mb-3 text-[10px] tracking-[2px] text-ink-sec">
-                        Resources
-                    </h2>
+                <div v-if="resources.length" class="mt-9 border-t border-line pt-6">
+                    <h2 class="mb-3 text-base font-bold text-navy">Resources</h2>
 
                     <ul class="flex flex-col gap-2">
                         <li
                             v-for="resource in resources"
                             :key="resource.id"
-                            class="flex items-center gap-3 rounded-md border border-line px-3 py-2.5"
+                            class="flex items-center gap-3 rounded-xl border border-line px-4 py-3"
                         >
                             <div class="min-w-0 flex-1">
-                                <div class="truncate text-[13px] text-ink">{{ resource.name }}</div>
-                                <div
-                                    v-if="resource.description"
-                                    class="truncate text-[11px] text-ink-sec"
-                                >
+                                <div class="truncate text-sm font-medium text-ink">
+                                    {{ resource.name }}
+                                </div>
+                                <div v-if="resource.description" class="truncate text-xs text-ink-sec">
                                     {{ resource.description }}
                                 </div>
                             </div>
 
-                            <span class="mono-label text-[9px] tracking-[1px] text-ink-dis">
-                                {{ resource.size }}
-                            </span>
+                            <span class="shrink-0 text-xs text-ink-dis">{{ resource.size }}</span>
 
                             <a
                                 v-if="resource.is_downloadable"
                                 :href="resource.download_url"
-                                class="mono-label rounded border border-line px-2.5 py-1.5 text-[10px] tracking-[1px] text-ink-sec no-underline transition-colors hover:border-primary hover:text-primary"
+                                class="shrink-0 rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-ink-sec no-underline transition-colors hover:border-brand hover:text-brand"
                             >
                                 Download
                             </a>
@@ -225,21 +206,21 @@ function toggleComplete() {
                 <!-- ═══ ATTACHED QUIZ ═══════════════════════════ -->
                 <div
                     v-if="quiz"
-                    class="mt-8 rounded-lg border px-4 py-3.5"
-                    :class="quiz.passed ? 'border-positive bg-positive-bg' : 'border-warning-dim bg-warning-bg'"
+                    class="mt-9 rounded-xl border p-5"
+                    :class="quiz.passed ? 'border-ok/40 bg-positive-bg' : 'border-line bg-surface-alt'"
                 >
-                    <div class="mb-1.5 flex items-center gap-2.5">
-                        <span class="mono-label text-[10px] tracking-[2px] text-ink-sec">
+                    <div class="mb-2 flex flex-wrap items-center gap-2">
+                        <span class="chip bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300">
                             Knowledge check
                         </span>
                         <StatusPill v-if="quiz.passed" label="Passed" tone="positive" />
                     </div>
 
-                    <h3 class="mb-2 text-sm font-bold">{{ quiz.title }}</h3>
+                    <h3 class="mb-3 text-base font-bold text-navy">{{ quiz.title }}</h3>
 
                     <Link
                         :href="route('quizzes.show', [course.slug, quiz.id])"
-                        class="mono-label inline-block rounded-[5px] border border-primary bg-primary px-3.5 py-2 text-[11px] font-bold tracking-[1.5px] text-on-accent no-underline"
+                        class="inline-block rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white no-underline hover:bg-brand-hover"
                     >
                         {{ quiz.passed ? 'Review' : 'Take quiz' }}
                     </Link>
@@ -248,26 +229,26 @@ function toggleComplete() {
                 <!-- ═══ COMPLETE ════════════════════════════════ -->
                 <div
                     v-if="state.can_complete && lesson.completion_requirement === 'acknowledge'"
-                    class="mt-8 flex items-center gap-3 border-t border-line pt-5"
+                    class="mt-9 border-t border-line pt-6"
                 >
                     <button
                         type="button"
                         :disabled="saving"
-                        class="mono-label cursor-pointer rounded-[5px] border px-4 py-2.5 text-[11px] font-bold tracking-[1.5px] transition-colors disabled:opacity-60"
+                        class="cursor-pointer rounded-lg px-5 py-2.5 text-sm font-semibold transition-colors disabled:opacity-60"
                         :class="
                             state.completed
-                                ? 'border-line bg-transparent text-ink-sec hover:border-ink-dis'
-                                : 'border-primary bg-primary text-on-accent'
+                                ? 'border border-line bg-transparent text-ink-sec hover:border-ink-dis'
+                                : 'bg-ok text-white hover:opacity-90'
                         "
                         @click="toggleComplete"
                     >
-                        {{ state.completed ? 'Mark as not complete' : 'Mark complete' }}
+                        {{ state.completed ? 'Mark as not complete' : '✓ Mark complete' }}
                     </button>
                 </div>
 
                 <p
                     v-else-if="lesson.completion_requirement === 'quiz'"
-                    class="mt-8 border-t border-line pt-5 text-xs text-ink-dis italic"
+                    class="mt-9 border-t border-line pt-6 text-sm text-ink-dis italic"
                 >
                     This lesson is completed by passing its quiz.
                 </p>
@@ -275,23 +256,31 @@ function toggleComplete() {
         </div>
 
         <!-- ─── PREV / NEXT ─────────────────────────────────── -->
-        <div class="mx-auto flex max-w-[1220px] flex-wrap gap-3 px-5.5 pb-15">
+        <div class="mt-8 flex flex-wrap gap-3">
             <Link
                 v-if="navigation.previous"
                 :href="navigation.previous.url"
-                class="flex-1 rounded-lg border border-line bg-surface px-4 py-3 no-underline transition-colors hover:border-primary"
+                class="card card-interactive flex-1 p-4 no-underline"
             >
-                <span class="mono-label block text-[9px] tracking-[2px] text-ink-dis">Previous</span>
-                <span class="text-[13px] text-ink">{{ navigation.previous.title }}</span>
+                <span class="block text-xs font-semibold tracking-wide text-ink-dis uppercase">
+                    Previous
+                </span>
+                <span class="mt-0.5 block text-sm font-medium text-ink">
+                    {{ navigation.previous.title }}
+                </span>
             </Link>
 
             <Link
                 v-if="navigation.next"
                 :href="navigation.next.url"
-                class="flex-1 rounded-lg border border-line bg-surface px-4 py-3 text-right no-underline transition-colors hover:border-primary"
+                class="card card-interactive flex-1 p-4 text-right no-underline"
             >
-                <span class="mono-label block text-[9px] tracking-[2px] text-ink-dis">Next</span>
-                <span class="text-[13px] text-ink">{{ navigation.next.title }}</span>
+                <span class="block text-xs font-semibold tracking-wide text-ink-dis uppercase">
+                    Next
+                </span>
+                <span class="mt-0.5 block text-sm font-medium text-ink">
+                    {{ navigation.next.title }}
+                </span>
             </Link>
         </div>
 

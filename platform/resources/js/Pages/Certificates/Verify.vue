@@ -3,8 +3,8 @@
  * Public certificate check. No layout, no navigation, no login — somebody
  * outside the company follows this link and needs one answer.
  *
- * Shows only what makes the certificate checkable. No score, no email address,
- * no employee number.
+ * Shows only what makes a certificate checkable: who, what, when. No score, no
+ * email address, no employee number.
  */
 import { Head } from '@inertiajs/vue3';
 
@@ -17,68 +17,77 @@ defineProps({
 <template>
     <Head title="Verify certificate" />
 
-    <div class="flex min-h-screen items-center justify-center bg-canvas px-6 py-12">
-        <div class="w-full max-w-[480px]">
-            <div class="mb-8 flex flex-col items-center text-center">
-                <img
-                    src="/images/logo.png"
-                    alt="PILOT"
-                    class="mb-4 h-8 w-auto brightness-0 invert-[0.2] dark:brightness-100 dark:invert-0"
-                />
-                <span class="mono-label text-[11px] tracking-[2.5px] text-primary">
-                    PILOT <b class="tracking-[1px] text-ink">Training Hub</b>
+    <div class="flex min-h-screen items-center justify-center bg-canvas px-5 py-12">
+        <div class="w-full max-w-lg">
+            <div class="mb-8 flex items-center justify-center gap-2.5">
+                <span
+                    class="brand-gradient flex h-9 w-9 items-center justify-center rounded-lg text-lg font-extrabold text-white"
+                >
+                    P
+                </span>
+                <span class="text-lg font-extrabold text-navy">
+                    Pilot <span class="text-brand">Academy</span>
                 </span>
             </div>
 
-            <div
-                class="rounded-2xl border p-8 text-center"
-                :class="valid ? 'border-positive bg-surface' : 'border-negative bg-surface'"
-            >
+            <div class="card p-9 text-center" :class="valid ? 'border-ok/40' : 'border-negative/40'">
                 <template v-if="valid">
-                    <div class="mb-4 text-4xl">✓</div>
+                    <div
+                        class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-ok text-2xl text-white"
+                    >
+                        ✓
+                    </div>
 
-                    <p class="mono-label mb-4 text-[10px] tracking-[2px] text-positive">
+                    <p class="mb-5 text-xs font-semibold tracking-wide text-ok uppercase">
                         Valid certificate
                     </p>
 
-                    <h1 class="mb-1 text-lg font-bold text-ink">
+                    <h1 class="mb-1 text-xl font-extrabold text-navy">
                         {{ certificate.recipient_name }}
                     </h1>
 
-                    <p class="mb-6 text-[13px] text-ink-sec">
+                    <p class="mb-7 text-sm text-ink-sec">
                         successfully completed
-                        <span class="font-bold text-ink">{{ certificate.course_title }}</span>
+                        <span class="font-bold text-navy">{{ certificate.course_title }}</span>
                     </p>
 
-                    <dl class="mono-label flex flex-col gap-1.5 text-[10px] tracking-[1px] text-ink-dis">
-                        <div>
-                            <dt class="inline">Certificate</dt>
-                            <dd class="ml-2 inline text-ink-sec">{{ certificate.number }}</dd>
+                    <dl class="flex flex-col gap-2 border-t border-line pt-5 text-sm">
+                        <div class="flex justify-between">
+                            <dt class="text-ink-dis">Certificate</dt>
+                            <dd class="font-medium text-ink">{{ certificate.number }}</dd>
                         </div>
-                        <div>
-                            <dt class="inline">Completed</dt>
-                            <dd class="ml-2 inline text-ink-sec">{{ certificate.completed_at }}</dd>
+                        <div class="flex justify-between">
+                            <dt class="text-ink-dis">Completed</dt>
+                            <dd class="font-medium text-ink">{{ certificate.completed_at }}</dd>
                         </div>
-                        <div>
-                            <dt class="inline">Issued</dt>
-                            <dd class="ml-2 inline text-ink-sec">{{ certificate.issued_at }}</dd>
+                        <div class="flex justify-between">
+                            <dt class="text-ink-dis">Issued</dt>
+                            <dd class="font-medium text-ink">{{ certificate.issued_at }}</dd>
                         </div>
                     </dl>
                 </template>
 
                 <template v-else>
-                    <div class="mb-4 text-4xl">✕</div>
+                    <div
+                        class="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-negative text-2xl text-white"
+                    >
+                        ✕
+                    </div>
 
-                    <p class="mono-label mb-3 text-[10px] tracking-[2px] text-negative">
+                    <p class="mb-3 text-xs font-semibold tracking-wide text-negative uppercase">
                         Not found
                     </p>
 
-                    <p class="text-[13px] leading-relaxed text-ink-sec">
+                    <p class="text-sm leading-relaxed text-ink-sec">
                         No certificate matches this verification link. Check the link is complete,
                         or ask the holder for a current one.
                     </p>
                 </template>
             </div>
+
+            <p class="mt-6 text-center text-sm text-ink-dis">
+                Pilot Academy · internal support training
+            </p>
         </div>
     </div>
 </template>

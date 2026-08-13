@@ -21,85 +21,94 @@ function start() {
     <Head :title="quiz.title" />
 
     <EmployeeLayout>
-        <div class="mx-auto max-w-[720px] px-5 py-10">
+        <div class="mx-auto max-w-3xl">
             <Link
                 :href="route('courses.show', course.slug)"
-                class="mono-label mb-4 inline-block text-[10px] tracking-[2px] text-primary no-underline"
+                class="mb-5 inline-block text-sm font-medium text-ink-sec no-underline hover:text-brand"
             >
                 ← {{ course.title }}
             </Link>
 
-            <h1 class="mb-2 text-xl font-bold">{{ quiz.title }}</h1>
-            <p v-if="quiz.description" class="mb-6 text-[13px] leading-relaxed text-ink-sec">
+            <span class="chip mb-3 bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300">
+                Assessment
+            </span>
+
+            <h1 class="mb-2 text-2xl font-extrabold text-navy">{{ quiz.title }}</h1>
+
+            <p v-if="quiz.description" class="mb-7 text-base leading-relaxed text-ink-sec">
                 {{ quiz.description }}
             </p>
 
             <!-- ─── RULES ───────────────────────────────────── -->
-            <div class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <div class="rounded-lg border border-line bg-surface px-3 py-2.5 text-center">
-                    <div class="font-mono text-lg font-bold text-ink">{{ quiz.question_count }}</div>
-                    <div class="mono-label text-[9px] tracking-[1px] text-ink-sec">Questions</div>
+            <div class="mb-7 grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <div class="card px-4 py-3.5 text-center">
+                    <div class="text-xl font-extrabold text-navy">{{ quiz.question_count }}</div>
+                    <div class="mt-1 text-xs text-ink-sec">Questions</div>
                 </div>
-                <div class="rounded-lg border border-line bg-surface px-3 py-2.5 text-center">
-                    <div class="font-mono text-lg font-bold text-ink">{{ quiz.passing_score }}%</div>
-                    <div class="mono-label text-[9px] tracking-[1px] text-ink-sec">To pass</div>
+                <div class="card px-4 py-3.5 text-center">
+                    <div class="text-xl font-extrabold text-navy">{{ quiz.passing_score }}%</div>
+                    <div class="mt-1 text-xs text-ink-sec">To pass</div>
                 </div>
-                <div class="rounded-lg border border-line bg-surface px-3 py-2.5 text-center">
-                    <div class="font-mono text-lg font-bold text-ink">
+                <div class="card px-4 py-3.5 text-center">
+                    <div class="text-xl font-extrabold text-navy">
                         {{ state.attempts_remaining ?? '∞' }}
                     </div>
-                    <div class="mono-label text-[9px] tracking-[1px] text-ink-sec">Attempts left</div>
+                    <div class="mt-1 text-xs text-ink-sec">Attempts left</div>
                 </div>
-                <div class="rounded-lg border border-line bg-surface px-3 py-2.5 text-center">
-                    <div class="font-mono text-lg font-bold text-ink">
-                        {{ quiz.time_limit_minutes ? quiz.time_limit_minutes + 'm' : '—' }}
+                <div class="card px-4 py-3.5 text-center">
+                    <div class="text-xl font-extrabold text-navy">
+                        {{ quiz.time_limit_minutes ? `${quiz.time_limit_minutes}m` : '—' }}
                     </div>
-                    <div class="mono-label text-[9px] tracking-[1px] text-ink-sec">Time limit</div>
+                    <div class="mt-1 text-xs text-ink-sec">Time limit</div>
                 </div>
             </div>
 
             <div
                 v-if="state.passed"
-                class="mb-6 rounded-lg border border-positive bg-positive-bg px-4 py-3 text-[13px] text-positive"
+                class="mb-7 rounded-xl border border-ok/40 bg-positive-bg px-5 py-4 text-sm font-medium text-ok"
             >
-                You have already passed this assessment.
+                ✓ You have already passed this assessment.
             </div>
 
             <button
                 v-if="state.can_attempt"
                 type="button"
-                class="mono-label mb-8 w-full cursor-pointer rounded-[5px] border border-primary bg-primary py-3 text-[11px] font-bold tracking-[1.5px] text-on-accent transition-colors hover:bg-primary-hover"
+                class="mb-9 w-full cursor-pointer rounded-lg bg-brand py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-hover"
                 @click="start"
             >
-                {{ state.resume_attempt_id ? 'Resume attempt' : state.attempts_used ? 'Retake' : 'Begin' }}
+                {{
+                    state.resume_attempt_id
+                        ? 'Resume attempt'
+                        : state.attempts_used
+                          ? 'Retake assessment'
+                          : 'Begin assessment'
+                }}
             </button>
 
-            <p v-else class="mb-8 text-[13px] text-ink-dis italic">
+            <p v-else class="mb-9 text-sm text-ink-dis italic">
                 No attempts remaining. Speak to your trainer if you need another.
             </p>
 
             <!-- ─── HISTORY ─────────────────────────────────── -->
-            <div v-if="history.length">
-                <h2 class="mono-label mb-3 text-[10px] tracking-[2px] text-ink-sec">
-                    Your attempts
-                </h2>
+            <section v-if="history.length">
+                <h2 class="mb-3 text-lg font-bold text-navy">Your attempts</h2>
 
-                <div class="overflow-hidden rounded-lg border border-line bg-surface">
+                <div class="card divide-y divide-line overflow-hidden">
                     <Link
                         v-for="attempt in history"
                         :key="attempt.id"
                         :href="route('attempts.show', attempt.id)"
-                        class="flex items-center gap-3 border-b border-line px-4 py-3 no-underline last:border-b-0 hover:bg-surface-alt"
+                        class="flex items-center gap-3 px-5 py-3.5 no-underline transition-colors hover:bg-surface-alt"
                     >
-                        <span class="mono-label text-[10px] tracking-[1px] text-ink-dis">
+                        <span class="text-sm font-medium text-ink-dis">
                             #{{ attempt.attempt_number }}
                         </span>
-                        <span class="flex-1 text-xs text-ink-sec">
+                        <span class="flex-1 text-sm text-ink-sec">
                             {{ formatDate(attempt.completed_at) }}
                         </span>
                         <span
-                            class="font-mono text-sm font-bold"
-                            :class="attempt.passed ? 'text-positive' : 'text-negative'"
+                            class="text-sm font-bold"
+                            :class="attempt.passed ? 'text-ok' : 'text-negative'"
                         >
                             {{ Math.round(attempt.score) }}%
                         </span>
@@ -109,7 +118,7 @@ function start() {
                         />
                     </Link>
                 </div>
-            </div>
+            </section>
         </div>
     </EmployeeLayout>
 </template>

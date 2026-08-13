@@ -56,19 +56,19 @@ function jump(id) {
 </script>
 
 <template>
-    <nav v-if="headings.length" class="sticky top-[128px] max-h-[calc(100vh-96px)] overflow-auto pr-1.5">
-        <p class="mono-label mb-1.5 text-[9.5px] tracking-[1.6px] text-ink-dis">Contents</p>
+    <nav v-if="headings.length" class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-auto pr-1.5">
+        <p class="mb-2 text-xs font-semibold tracking-wide text-ink-dis uppercase">Contents</p>
 
         <button
             v-for="heading in headings"
             :key="heading.id"
             type="button"
-            class="block w-full cursor-pointer border-l-2 py-0.5 pr-0 pl-2.5 text-left text-[12.5px] leading-snug transition-colors"
+            class="block w-full cursor-pointer border-l-2 py-1 pr-0 pl-3 text-left text-sm leading-snug transition-colors"
             :class="[
                 activeId === heading.id
-                    ? 'border-primary font-semibold text-primary'
-                    : 'border-line text-ink-dis hover:border-primary hover:text-primary',
-                heading.level === 3 ? 'pl-5' : '',
+                    ? 'border-brand font-semibold text-brand'
+                    : 'border-line text-ink-sec hover:border-brand hover:text-brand',
+                heading.level === 3 ? 'pl-6' : '',
             ]"
             @click="jump(heading.id)"
         >

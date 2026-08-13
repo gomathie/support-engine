@@ -27,9 +27,13 @@ const answeredCount = computed(
         ).length,
 );
 
+const answeredPercent = computed(() =>
+    props.questions.length ? (answeredCount.value / props.questions.length) * 100 : 0,
+);
+
 // ─── COUNTDOWN ────────────────────────────────────────────
-// A convenience, not a control. The server re-checks the deadline when the
-// attempt is submitted, so closing the tab to stop the clock achieves nothing.
+// A convenience, not a control. The server re-checks the deadline on
+// submission, so closing the tab to stop the clock achieves nothing.
 const remaining = ref(null);
 let ticker = null;
 
@@ -75,54 +79,67 @@ function submit() {
     <Head :title="quiz.title" />
 
     <EmployeeLayout>
-        <div class="sticky top-[54px] z-30 border-b border-line bg-nav backdrop-blur-[6px]">
-            <div class="mx-auto flex max-w-[760px] items-center gap-4 px-5 py-2.5">
-                <span class="mono-label text-[11px] tracking-[2.5px] text-primary">
-                    {{ quiz.title }}
-                </span>
-                <div class="flex-1"></div>
-                <span class="mono-label text-[10px] tracking-[1px] text-ink-sec">
-                    {{ answeredCount }}/{{ questions.length }} answered
-                </span>
-                <span
-                    v-if="clock"
-                    class="font-mono text-sm font-bold"
-                    :class="remaining < 60 ? 'text-negative' : 'text-warning'"
-                >
-                    {{ clock }}
-                </span>
+        <div class="mx-auto max-w-3xl">
+            <!-- Progress bar sticks under the site header while scrolling. -->
+            <div class="sticky top-16 z-10 -mx-5 mb-6 border-b border-line bg-canvas px-5 py-3">
+                <div class="mb-2 flex items-center gap-3">
+                    <span class="flex-1 truncate text-sm font-bold text-navy">
+                        {{ quiz.title }}
+                    </span>
+                    <span class="text-sm text-ink-sec">
+                        {{ answeredCount }}/{{ questions.length }} answered
+                    </span>
+                    <span
+                        v-if="clock"
+                        class="rounded-lg px-2.5 py-1 text-sm font-bold tabular-nums"
+                        :class="
+                            remaining < 60
+                                ? 'bg-negative-bg text-negative'
+                                : 'bg-warning-bg text-warning-dim dark:text-warning'
+                        "
+                    >
+                        {{ clock }}
+                    </span>
+                </div>
+
+                <div class="h-1.5 overflow-hidden rounded-full bg-surface-alt">
+                    <div
+                        class="h-full rounded-full bg-brand transition-[width] duration-300"
+                        :style="{ width: `${answeredPercent}%` }"
+                    ></div>
+                </div>
             </div>
-        </div>
 
-        <form class="mx-auto max-w-[760px] px-5 py-8" @submit.prevent="submit">
-            <div class="flex flex-col gap-4">
-                <QuizQuestion
-                    v-for="(question, i) in questions"
-                    :key="question.id"
-                    v-model="answers[question.id]"
-                    :question="question"
-                    :index="i"
-                />
-            </div>
+            <form @submit.prevent="submit">
+                <div class="flex flex-col gap-4">
+                    <QuizQuestion
+                        v-for="(question, i) in questions"
+                        :key="question.id"
+                        v-model="answers[question.id]"
+                        :question="question"
+                        :index="i"
+                    />
+                </div>
 
-            <p v-if="form.errors.quiz" class="mt-4 text-xs text-negative">{{ form.errors.quiz }}</p>
+                <p v-if="form.errors.quiz" class="mt-4 text-sm text-negative">
+                    {{ form.errors.quiz }}
+                </p>
 
-            <div class="mt-8 flex items-center gap-4">
                 <button
                     type="submit"
                     :disabled="form.processing"
-                    class="mono-label flex-1 cursor-pointer rounded-[5px] border border-primary bg-primary py-3 text-[11px] font-bold tracking-[1.5px] text-on-accent transition-colors hover:bg-primary-hover disabled:opacity-60"
+                    class="mt-8 w-full cursor-pointer rounded-lg bg-brand py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-hover disabled:opacity-60"
                 >
                     {{ form.processing ? 'Submitting…' : 'Submit answers' }}
                 </button>
-            </div>
 
-            <p
-                v-if="answeredCount < questions.length"
-                class="mt-3 text-center text-xs text-ink-dis italic"
-            >
-                {{ questions.length - answeredCount }} unanswered — these will score zero.
-            </p>
-        </form>
+                <p
+                    v-if="answeredCount < questions.length"
+                    class="mt-3 text-center text-sm text-ink-dis italic"
+                >
+                    {{ questions.length - answeredCount }} unanswered — these will score zero.
+                </p>
+            </form>
+        </div>
     </EmployeeLayout>
 </template>
