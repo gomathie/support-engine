@@ -28,16 +28,23 @@ A training platform for support staff. Trainees work through structured curricul
 | Frontend | Vue 3 + Inertia 3 |
 | Styling | Tailwind CSS 4 — academy palette (`#1463ff` brand, `#0a2540` navy, `#19a86b` green) |
 | Database | PostgreSQL 17 |
-| Auth | Laravel session auth + Spatie Permission (Admin, Manager, Employee) |
+| Auth | Laravel session auth + Spatie Permission (Admin, Trainer, Trainee) |
 | PDF | barryvdh/laravel-dompdf |
 
 ## User Roles
 
-1. **Admin** — creates users, assigns roles, authors all content, sees every department.
-2. **Manager** — sees only the departments they run; assigns training and reads their reports.
-3. **Employee** — enrols in courses, ticks off progress, takes assessments, earns certificates.
+1. **Admin** — creates users, assigns roles, authors content, decides who trains whom, sees everything.
+2. **Trainer** — authors content and **marks the work of their own assigned cohort**.
+3. **Trainee** — takes courses, sits assessments, submits practical tasks, earns levels and certificates.
 
-Authorization is enforced server-side by policies, not by hiding links. Managers are scoped in SQL as well as per-record, so they cannot learn the shape of departments they do not run.
+The roles describe what somebody does on the training portal, not where they sit on an org chart — a Trainer is not necessarily anybody's line manager.
+
+Authorization is enforced server-side by policies, not by hiding links. Two boundaries are worth knowing:
+
+- **Reading and marking are separate rights.** A Trainer with `transcripts.view-all` may read any trainee's record, but may only *mark* the trainees assigned to them. These used to be one department-shaped rule and are now two, because they answer different questions.
+- **Nobody marks their own paper.** `grade`, `override` and `submit` are excluded from the administrator bypass in the attempt and submission policies, so the rule holds for everyone including an Admin.
+
+Every Trainer capability is a named permission on the role rather than an implied tier, so "can build quizzes" is separable from "can assign trainees" — which is what prevents accidental privilege creep. Grants are per **role**, not per person: `spatie/laravel-permission` has no per-user deny, so revoking a permission from one Trainer would take it from all of them.
 
 ## Quick Start (Docker)
 
@@ -61,10 +68,12 @@ Container config lives in [`docker/app.env`](docker/app.env), mounted over `.env
 | Role | Email | Password |
 | --- | --- | --- |
 | Admin | `admin@pilot.test` | `password` |
-| Manager | `manager@pilot.test` | `password` |
-| Employee | `employee@pilot.test` | `password` |
+| Trainer | `manager@pilot.test` | `password` |
+| Trainee | `employee@pilot.test` | `password` |
 
-Sign in at `/login` — there is one login page for everyone, and admins and managers are redirected into `/admin` automatically.
+> The two addresses still read `manager@` and `employee@`. The roles were renamed in place so existing assignments survived; the seeded email addresses were left alone so the known logins kept working. Cosmetic, but worth not being confused by.
+
+Sign in at `/login` — there is one login page for everyone, and admins and trainers are redirected into `/admin` automatically.
 
 ## Local Development (without Docker)
 
@@ -104,7 +113,7 @@ support-engine/
 ├── app/
 │   ├── Actions/           ← Business logic (RecalculateCourseProgress, GradeQuizAttempt, …)
 │   ├── Console/Commands/  ← training:send-reminders, training:sync-assignments
-│   ├── Enums/             ← Role, CourseStatus, LessonType, ProgressStatus, …
+│   ├── Enums/             ← Role, CourseStatus, LessonType, RubricCriterion, …
 │   ├── Filament/          ← Admin resources, relation managers, widgets, reports
 │   ├── Http/              ← Controllers, form requests, middleware
 │   ├── Jobs/              ← RenderCertificatePdf
@@ -112,7 +121,7 @@ support-engine/
 │   ├── Notifications/     ← CourseAssigned, TrainingDue
 │   └── Policies/          ← Authorization
 ├── database/
-│   ├── migrations/        ← 24 migrations
+│   ├── migrations/        ← 32 migrations
 │   └── seeders/           ← Roles, users, curriculum, diagnostic trees, assignment rules
 ├── resources/
 │   ├── css/app.css        ← Tailwind theme + design tokens
@@ -135,6 +144,14 @@ Business logic lives in `app/Actions`, never in Vue components:
 | `Progress\CompleteLesson` | Ticking a lesson off, and undoing it |
 | `Quiz\StartQuizAttempt` | Starts or resumes an attempt, enforces the attempt limit |
 | `Quiz\GradeQuizAttempt` | Scores server-side; the browser only ever submits option ids |
+| `Quiz\GradeWrittenAnswer` | One examiner marking one written answer |
+| `Quiz\FinaliseQuizAttempt` | Turns a fully-marked attempt into a score and a verdict |
+| `Quiz\OverrideAttemptResult` | Overturns a pass or fail, with a reason on the record |
+| `Practical\SubmitPracticalTask` | Draft, save, hand in |
+| `Practical\GradePracticalSubmission` | Marking against the four-criterion rubric |
+| `Practical\FinalisePracticalSubmission` | Reconciles one or two independent gradings into an outcome |
+| `Competency\AwardCompetencyLevel` | Decides whether a level has been earned, and records it |
+| `Cohorts\AssignTrainee` | The single place a trainee's trainer changes |
 | `Enrollment\EnrollEmployee` | Assignment, restoring revoked enrollments, due dates |
 | `Enrollment\SyncAssignmentRules` | Turns assignment rules into enrollments |
 | `Certificates\IssueCertificate` | Idempotent issuance; queues the PDF render |
@@ -150,6 +167,11 @@ Business logic lives in `app/Actions`, never in Vue components:
 - **`lessons.course_id` is denormalised** from the module. `Lesson::saving()` keeps it in sync; do not set it by hand.
 - **Assignment rules are rows, not code.** "Operations gets Fleet Safety Training" is a record in `assignment_rules`, evaluated live, so moving somebody between departments changes what they are assigned.
 - **Filament's published assets are committed** (`public/css|js|fonts/filament`). The Dockerfile does not run `filament:assets`, so deleting them leaves the admin panel unstyled in a fresh build.
+- **A video URL is never stored or rendered.** `Support\Video\VideoEmbed` parses the pasted URL to a provider and an id, and the embed URL is rebuilt from a fixed template — an iframe `src` must never be author-controlled text. Uploaded video is served from the private disk through a policy-checked route that answers `Range` requests with 206, because a 200 makes the scrubber useless on a large file.
+- **A pass/fail override is stored, not written into `passed` and forgotten.** Re-marking a written answer re-runs finalisation, and a human decision to uphold an appeal must survive it. The score is never rewritten either — *"scored 30% but passed on appeal"* is the truth.
+- **The practical rubric threshold is not a total.** Passing needs 3+ on Correctness, 2+ on every other criterion, *and* 10+ overall. `4/4/2/0` sums to 10 and still fails.
+- **Two markers who disagree are not averaged.** A split verdict leaves the submission unsettled and flagged, because the disagreement is the signal that calibration exists to surface.
+- **A level is held per competency area, not globally**, and a (level, area) pair with no configured requirements is never awarded — an unconfigured level is not an automatic pass.
 
 ### Scheduled work
 
@@ -164,16 +186,33 @@ Both are idempotent and `training:send-reminders` takes `--dry-run`, so they are
 
 ## How Progress Tracking Works
 
-1. Employee signs in and sees assigned courses, plus a **next lesson** call to action.
+1. A trainee signs in and sees assigned courses, plus a **next lesson** call to action.
 2. Each course contains modules, and each module holds lessons.
-3. The employee studies the material and **ticks the checkbox** on each completed lesson.
+3. They study the material and tick off each completed lesson.
 4. That posts to `/courses/{course}/lessons/{lesson}/complete`, creating a `LessonProgress` row.
-5. `RecalculateCourseProgress` recomputes the rollup — counters, percentage, status — and issues a certificate if the course is now complete.
-6. Managers and admins monitor it through the Filament report, filterable by department, course, status and date, with CSV export.
+5. `RecalculateCourseProgress` recomputes the rollup — counters, percentage, status — and, if the course is now complete, issues a certificate and evaluates any competency level it may have earned.
+6. Trainers and admins monitor it through the Filament report, filterable by department, course, status and date, with CSV export.
+
+`course_progress` is the single authority on "how far along is this person". Nothing in Vue is allowed to disagree with it.
+
+## How Assessment Works
+
+Separate from the above, and deliberately so — completion says a lesson was read, assessment says the job can be done.
+
+1. The trainee sits the course's **final exam**. Multiple-choice questions are marked instantly; written answers park the attempt at `pending_review`.
+2. Their **trainer** — the one person assigned to them — marks the written answers, with the marking guidance on screen beside the answer.
+3. Where the course has a **practical task**, they do the work, write it up, attach evidence, and hand it in. It is marked against the four-criterion rubric (Correctness · Method · Verification · Communication, 0–4 each). A score of 2 or below needs a written reason.
+4. On a task flagged for calibration, **two trainers mark independently**. If they disagree on the verdict the submission does not settle — it is flagged for them to reconcile rather than averaged.
+5. Passing the exam completes the course, which issues a certificate and runs `AwardCompetencyLevel`. A **level in an area** is granted once *every* course that (level, area) pair requires is complete, and never before the rung below it in the same area.
+6. An Admin or the assigned Trainer can **override** a pass or fail, with a mandatory reason. The score is left as it was, the override survives any later re-marking, and any level that attempt was the evidence for is revoked.
+
+Every step of that leaves an audit row: `grade_override_logs` for overturned results, `trainer_assignment_logs` for cohort changes.
 
 ## Documentation
 
 - [PILOT GPS Platform Docs](https://docs.pilot-gps.com/)
+- [Competency Implementation Plan](docs/COMPETENCY_IMPLEMENTATION_PLAN.md) — the phased plan for moving from checkbox completion to assessed competency
+- [Competency Delivery Log](docs/COMPETENCY_DELIVERY_LOG.md) — what has actually shipped against that plan, and the decisions behind it
 - [Implementation Map](docs/IMPLEMENTATION_MAP.md) — prototype audit and architecture mapping
 - [1st-Line Support Training Plan](<docs/PILOT%20System%20Training%20Plan%20for%201st-Line%20Support%20(2%20Weeks).md>)
 - [Admin Panel Training Plan](docs/Training%20Plan%20for%203%20Days_%20PILOT%20Administrative%20Panel.md)

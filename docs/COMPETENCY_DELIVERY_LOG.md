@@ -24,7 +24,9 @@ Status is what is **merged and tested**, not what is designed.
 | PA-14 | Practical task submission + rubric UI | **Done** | Both sides: trainee submission and trainer marking |
 | PA-15 | Pilot rollout | Not started | |
 | PA-16 | Verify Section A answer key | **Blocked** | The source document contains no answer key — see §6 risk (g) |
-| PA-17–19 | Phase 3 | Not started | |
+| PA-17 | Bloom-balance the question bank | Not started | Igor; needs the audit first |
+| PA-18 | Spaced-repetition refreshers | Not started | Blocks KPI 6 |
+| PA-19 | Admin heatmaps & KPI dashboard | **Done** | 5 of 9 metrics reporting; see below |
 
 ---
 
@@ -312,6 +314,49 @@ gated on `trainees.reassign`. §6 asks for an immutable log of reassignments, an
 a screen that could edit it would not be one. It carries a "trainer (either
 side)" filter, because the question when reviewing a handover is everything that
 moved *to or from* one person.
+
+## PA-19 — Success metrics
+
+The nine KPIs from §7, on an admin-only screen under Reporting. **Completion
+rate is deliberately absent** — it is what the previous model already optimised
+for, and a dashboard that led with it would undo the point of the exercise. A
+test asserts it stays absent.
+
+### Five report, four cannot
+
+| Reporting now | Blocked, and on what |
+| --- | --- |
+| 1 First-time pass rate | 2 Lessons re-aligned — needs audit dispositions as data (PA-5) |
+| 5 Practical task quality | 3 Retire ratio — same audit data |
+| 7 Trainer workload *(proxy)* | 4 Video engagement — no playback tracking exists |
+| 8 Time-to-competency | 6 90-day retention — needs refreshers (PA-18) |
+| 9 Item difficulty | |
+
+The four that cannot be computed are shown **with the reason attached**, not
+hidden. A dashboard that silently displays five of nine looks complete when it is
+not — and the missing four are precisely the ones blocked on content work, which
+is the thing most at risk of being forgotten. A test names them, so a later
+change that quietly starts faking one fails.
+
+"Cannot be measured" and "measurable but nothing has happened yet" are separate
+states, because they call for different actions.
+
+### Two judgements worth keeping
+
+- **KPI 1's target is a band, and both ends are findings.** A 100% first-time
+  pass rate is reported as *above* target with "the exam is likely too easy, not
+  the training excellent" — not as success. Reporting it green would be the
+  opposite of what §7 asks for. Only first sittings count, or a determined
+  retaker would flatter the number.
+- **KPI 7 is labelled a proxy.** The plan asks for median hours per week spent
+  grading. Nothing times how long marking takes, and deriving an hours figure
+  from a count would be inventing the number its own target is checked against.
+  The screen reports queue size instead and says so plainly.
+
+KPI 9 lists the flagged questions underneath with a reading for each: a question
+almost nobody passes is usually a defective question or an untaught topic, not a
+weak cohort. Questions with fewer than five answers are excluded — that is not
+evidence of anything.
 
 ### RBAC note — "revocable per person" was wrong
 
