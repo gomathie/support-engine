@@ -33,8 +33,8 @@ return [
             'docs' => 'Before you start → Glossary · About the platform',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>Four words do most of the work in PILOT. Almost every ticket you take will be
-about one of them, and customers use them loosely — so it is worth being precise from day one.</p></div>
+<p><strong>Four words do most of the work in PILOT. Almost every ticket you take will be
+about one of them, and customers use them loosely — so it is worth being precise from day one.</strong></p>
 
 <h2 id="object">Object</h2>
 
@@ -60,11 +60,11 @@ which sensor, because the fault is usually in one sensor's configuration rather 
 <blockquote><p>A contract is <strong>the main element in the system that brings together all
 monitored objects, users, and available features for a client or company</strong>.</p></blockquote>
 
-<div class="note"><p>This is the one new starters most often get wrong. A contract is not a piece of
+<blockquote><p>This is the one new starters most often get wrong. A contract is not a piece of
 paperwork — it is the container. Objects live in a contract, users are granted access within a
 contract, and the modules a customer can use are activated on a contract. If somebody cannot see an
 object, the first question is almost always <em>which contract is it in, and does this user have
-access to that contract?</em></p></div>
+access to that contract?</em></p></blockquote>
 
 <h2 id="account">Account</h2>
 
@@ -84,10 +84,10 @@ workspace</em>. One person may hold access within several contracts.</p>
 <li>An <strong>account</strong> is a person, granted access within a contract.</li>
 </ul>
 
-<div class="hint"><p><strong>On a call:</strong> when a customer describes a problem, work out which of
+<blockquote><p><strong>On a call:</strong> when a customer describes a problem, work out which of
 these four they are actually talking about before you start looking. "I can't see my truck" could be
 an object problem, a contract problem or an access problem, and they are investigated in different
-places.</p></div>
+places.</p></blockquote>
 HTML,
         ],
 
@@ -96,23 +96,22 @@ HTML,
             'docs' => 'About the platform · Before you start → Roles and access rights',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>PILOT has two front doors. Knowing which one a customer is standing at saves half
-the confusion on a support call.</p></div>
+<p><strong>PILOT has two front doors. Knowing which one a customer is standing at saves half
+the confusion on a support call.</strong></p>
 
 <h2 id="two-tiers">Two interfaces, two audiences</h2>
 
 <p>The platform separates access into two tiers:</p>
 
-<dl>
-<dt><strong>The user dashboard</strong> (personal account)</dt>
-<dd>The day-to-day interface. Personnel observe vehicles, equipment, people and other monitored
-resources — <em>without administrative privileges</em>. This is where a fleet manager watches their
-trucks and runs reports.</dd>
+<ul>
+<li><strong>The user dashboard</strong> (personal account) — the day-to-day interface. Personnel
+observe vehicles, equipment, people and other monitored resources, <em>without administrative
+privileges</em>. This is where a fleet manager watches their trucks and runs reports.</li>
 
-<dt><strong>The admin panel</strong></dt>
-<dd>Configuration access. Administrators manage accounts, users, system assets and the overall
-platform structure. This is where contracts are created, modules activated and tariffs set.</dd>
-</dl>
+<li><strong>The admin panel</strong> — configuration access. Administrators manage accounts, users,
+system assets and the overall platform structure. This is where contracts are created, modules
+activated and tariffs set.</li>
+</ul>
 
 <h2 id="roles">Who holds what</h2>
 
@@ -136,8 +135,8 @@ vehicles they work with.</li>
 the partner's own permissions.</li>
 </ul>
 
-<div class="note"><p><strong>Master</strong> is a status rather than a role. It is assigned when logging
-in <em>through the admin panel</em>, and carries unlimited rights in the system.</p></div>
+<blockquote><p><strong>Master</strong> is a status rather than a role. It is assigned when logging
+in <em>through the admin panel</em>, and carries unlimited rights in the system.</p></blockquote>
 
 <h2 id="why-it-matters">Why this matters on a call</h2>
 
@@ -146,8 +145,8 @@ in <em>through the admin panel</em>, and carries unlimited rights in the system.
 in before you start diagnosing a permissions problem, or you will spend ten minutes looking in the
 wrong place.</p>
 
-<div class="hint"><p><strong>The question to ask:</strong> "What is the address in your browser's bar?"
-It settles it faster than "are you an administrator?", because everybody thinks they are.</p></div>
+<blockquote><p><strong>The question to ask:</strong> "What is the address in your browser's bar?"
+It settles it faster than "are you an administrator?", because everybody thinks they are.</p></blockquote>
 HTML,
         ],
 
@@ -170,7 +169,7 @@ HTML,
                 .'retired from the lesson.',
 
             'body' => <<<'HTML'
-<div class="note"><p><strong>This lesson is not written yet.</strong></p></div>
+<blockquote><p><strong>This lesson is not written yet.</strong></p></blockquote>
 
 <p>The term <em>Mapping Contract</em> comes from the original training plan, but it does not appear
 in the PILOT 7.10 documentation — not in the glossary, not in <em>About the platform</em>, and not

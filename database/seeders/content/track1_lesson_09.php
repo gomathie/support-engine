@@ -1,0 +1,200 @@
+<?php
+
+/**
+ * Lesson 9 — Contract settings and notifications.
+ *
+ * Content drawn from docs.pilot-gps.com 7.10:
+ *   · Account settings                 /account_settings_1.html
+ *   · Privacy (Email setup)            /privacy.html#Email_setup
+ *   · Privacy (Notification settings)  /privacy.html#Notification_settings
+ *   · Privacy (Two-factor auth)        /privacy.html#Two-factor_authentication_
+ *   · Privacy (IP filtering)           /privacy.html#IP-based_protection_(IP_filtering)
+ */
+
+return [
+    'module_subtitle' => 'Contract settings and notifications',
+
+    'lessons' => [
+
+        // ─────────────────────────────────────────────────────────
+        'Add a test email in contract settings and send confirmation' => [
+            'docs' => 'Account settings → Privacy → Email setup',
+            'estimated_minutes' => 15,
+            'body' => <<<'HTML'
+<div class="lede"><p>Email delivery is the primary channel for scheduled operational reports, security alerts, and system notifications. In PILOT, an email address cannot receive automated data until it has been explicitly confirmed.</p></div>
+
+<h2 id="why-confirmation">Why email confirmation is enforced</h2>
+
+<p>To prevent spam penalties, protect customer privacy, and ensure notifications reach genuine inboxes, PILOT enforces a verification handshake. Unconfirmed email addresses remain inactive in the notification dispatcher.</p>
+
+<h2 id="email-statuses">Email status badges</h2>
+
+<p>In the <strong>User email addresses</strong> list, status badges indicate delivery readiness:</p>
+
+<ul>
+<li><strong style="color:#16a34a;">Green check badge</strong> — <strong>Confirmed</strong>. The mailbox owner clicked the verification link. Notifications and scheduled reports are actively sent.</li>
+<li><strong style="color:#dc2626;">Red badge</strong> — <strong>Not confirmed</strong>. The address is on file, but automated dispatches are withheld.</li>
+</ul>
+
+<h2 id="step-by-step-email">Adding and confirming an email address</h2>
+
+<ol>
+<li>Click the <strong>Account settings</strong> gear icon on the top panel.</li>
+<li>Switch to the <strong>Privacy</strong> section.</li>
+<li>Find the <strong>User email addresses</strong> block and click the <strong>Add email</strong> button (plus icon).</li>
+<li>Enter a valid email address you have access to.</li>
+<li>Click <strong>Save</strong>. The address appears with a red unconfirmed badge.</li>
+<li>Click the <strong>Send confirmation email</strong> icon (envelope with arrow) next to the address.</li>
+<li>Open your email inbox, find the PILOT verification message, and click the confirmation link.</li>
+<li>Return to PILOT and click the <strong>Refresh email list</strong> icon. The badge turns green.</li>
+</ol>
+
+<div class="note"><p><strong>First-line diagnostic rule:</strong> When a customer reports "I set up automated daily reports but nobody is receiving them!", the very first check is Account Settings → Privacy. In 90% of cases, the email address was entered but never confirmed.</p></div>
+HTML,
+        ],
+
+        // ─────────────────────────────────────────────────────────
+        'Activate "Speed Limit Exceeded" email notifications' => [
+            'docs' => 'Account settings → Privacy → Notification settings',
+            'estimated_minutes' => 15,
+            'body' => <<<'HTML'
+<div class="lede"><p>Fleet safety and fuel efficiency depend on rapid enforcement of driving policies. The notifications engine monitors incoming GPS speed in real time and sends instant alerts when thresholds are violated.</p></div>
+
+<h2 id="how-notifications-work">The notification processing chain</h2>
+
+<p>PILOT evaluates telemetry events against active alert rules. When an event fires (e.g. speed exceeds 100 km/h for 10 seconds), the engine dispatches notifications across selected delivery channels:</p>
+
+<ul>
+<li><strong>Email</strong> — detailed summary containing vehicle callsign, driver name, location address, peak speed, and time.</li>
+<li><strong>Browser Pop-up</strong> — immediate audio and visual banner in the active PILOT web tab.</li>
+<li><strong>SMS / Mobile Push</strong> — operational dispatch for on-duty field supervisors.</li>
+</ul>
+
+<h2 id="activating-speed-alerts">Activating Speed Limit notifications</h2>
+
+<ol>
+<li>Open <strong>Account settings</strong> → <strong>Privacy</strong> tab.</li>
+<li>Scroll to the <strong>Notification settings</strong> section.</li>
+<li>Locate the <strong>Speed limit exceeded</strong> notification row.</li>
+<li>Check the box to enable the rule.</li>
+<li>Under delivery methods, check <strong>Email</strong> and select your confirmed email address.</li>
+<li>Optionally check <strong>Web notification</strong> for live on-screen pop-ups.</li>
+<li>Click <strong>Save</strong>.</li>
+</ol>
+
+<p>When any vehicle in the account exceeds the configured speed threshold, an instant alert is generated and dispatched within seconds.</p>
+HTML,
+        ],
+
+        // ─────────────────────────────────────────────────────────
+        'Enable and configure 2FA for the test user (if available)' => [
+            'docs' => 'Account settings → Privacy → Two-factor authentication',
+            'estimated_minutes' => 15,
+            'body' => <<<'HTML'
+<div class="lede"><p>Telematics platforms hold sensitive fleet location data and remote engine immobilization controls. Two-Factor Authentication (2FA) adds a critical security layer against credential theft.</p></div>
+
+<h2 id="supported-2fa-methods">Two 2FA methods in PILOT</h2>
+
+<dl>
+<dt><strong>TOTP Authentication (Authenticator App)</strong></dt>
+<dd>Industry-standard Time-based One-Time Password using mobile apps like Google Authenticator, Microsoft Authenticator, or Twilio Authy. Generates a 6-digit code refreshing every 30 seconds. Works offline without cellular SMS reception.</dd>
+
+<dt><strong>Email Authentication</strong></dt>
+<dd>Sends a temporary 6-digit one-time code to the user’s confirmed email address upon login. Useful for users who do not carry smartphone authenticator apps.</dd>
+</dl>
+
+<h2 id="enabling-totp">Step-by-step: Enabling TOTP 2FA</h2>
+
+<ol>
+<li>Go to <strong>Account settings</strong> → <strong>Privacy</strong>.</li>
+<li>In the <strong>Two-Factor Authentication</strong> section, click <strong>Enable</strong> next to TOTP.</li>
+<li>PILOT displays a unique QR code on screen.</li>
+<li>Open Google Authenticator or Microsoft Authenticator on your mobile phone and tap <em>Scan QR Code</em>.</li>
+<li>Scan the screen; your app generates a rotating 6-digit code.</li>
+<li>Type the current 6-digit code into the verification box in PILOT.</li>
+<li>Click <strong>Confirm</strong>. TOTP is now active.</li>
+<li>On next login, after typing username and password, PILOT prompts for the authenticator code.</li>
+</ol>
+
+<div class="hint"><p><strong>Code expiration note:</strong> The 6-digit TOTP code expires every 30 seconds. If an end user reports "My 2FA code is rejected", advise them to wait for the next 30-second cycle and enter the fresh code immediately.</p></div>
+HTML,
+        ],
+    ],
+
+    'quiz' => [
+        'title' => 'Lesson 9 — knowledge check',
+        'description' => 'Four questions on email verification, alert channels, speed notifications, and 2FA security.',
+        'passing_score' => 70,
+        'max_attempts' => 3,
+        'time_limit_minutes' => null,
+
+        'questions' => [
+            [
+                'prompt' => 'A customer added an email address for scheduled reports, but reports are not arriving. The email has a red badge next to it. What is the problem?',
+                'type' => 'single_choice',
+                'points' => 1,
+                'explanation' => 'PILOT requires email addresses to be confirmed via verification link before automated messages or reports will be dispatched.',
+                'options' => [
+                    ['text' => 'The email address has not been confirmed via the verification link sent to the inbox', 'correct' => true],
+                    ['text' => 'Red badges indicate that the recipient inbox is full', 'correct' => false],
+                    ['text' => 'The email address domain must end in .pilot-gps.com', 'correct' => false],
+                    ['text' => 'Reports can only be delivered via physical postal mail', 'correct' => false],
+                ],
+            ],
+            [
+                'prompt' => 'Which delivery channels can be selected for Speed Limit Exceeded notifications in PILOT?',
+                'type' => 'single_choice',
+                'points' => 1,
+                'explanation' => 'PILOT allows notifications to be delivered via Email (to confirmed addresses), Web pop-up banners, and SMS/mobile channels.',
+                'options' => [
+                    ['text' => 'Email, browser web pop-ups, and SMS/mobile', 'correct' => true],
+                    ['text' => 'Only fax machine transmission', 'correct' => false],
+                    ['text' => 'Vehicle horn honking', 'correct' => false],
+                    ['text' => 'Automated phone calls from the PILOT CEO', 'correct' => false],
+                ],
+            ],
+            [
+                'prompt' => 'How often does a standard TOTP 6-digit code refresh in an authenticator app?',
+                'type' => 'single_choice',
+                'points' => 1,
+                'explanation' => 'TOTP standard codes refresh every 30 seconds. If a code changes mid-entry, entering the new code resolves validation errors.',
+                'options' => [
+                    ['text' => 'Every 30 seconds', 'correct' => true],
+                    ['text' => 'Once every 24 hours', 'correct' => false],
+                    ['text' => 'Every 5 minutes', 'correct' => false],
+                    ['text' => 'Only when the user reboots their phone', 'correct' => false],
+                ],
+            ],
+            [
+                'prompt' => 'Where in the PILOT interface can a user enable IP filtering and 2-factor authentication?',
+                'type' => 'single_choice',
+                'points' => 1,
+                'explanation' => 'Security settings — including Password changes, IP filtering, 2FA, and notification preferences — are located in Account Settings → Privacy.',
+                'options' => [
+                    ['text' => 'In Account settings under the Privacy tab', 'correct' => true],
+                    ['text' => 'In the Map Tools layer selector', 'correct' => false],
+                    ['text' => 'On the History track playback toolbar', 'correct' => false],
+                    ['text' => 'In the driver profile photo gallery', 'correct' => false],
+                ],
+            ],
+        ],
+    ],
+
+    'practical_task' => [
+        'title' => 'Configure email confirmation, speed notifications, and security',
+        'lesson_title' => 'Add a test email in contract settings and send confirmation',
+        'brief' => 'Open Account Settings → Privacy. Add an email address, verify confirmation, '
+            .'activate Speed Limit Exceeded notifications, and review 2FA configuration.',
+        'submission_instructions' => '1. Open Account settings and navigate to the Privacy tab.\n'
+            .'2. Add your email address and click Send confirmation email.\n'
+            .'3. Scroll down to Notification settings and enable Speed limit exceeded notifications with Email delivery.\n'
+            .'4. Review the Two-Factor Authentication options (TOTP and Email).\n'
+            .'5. Take a screenshot showing your confirmed email and active notification settings in the Privacy tab.',
+        'requires_screenshot' => true,
+        'estimated_minutes' => 20,
+        'required_evidence' => [
+            ['key' => 'account_id', 'label' => 'Your Account ID', 'hint' => 'The login you used to access PILOT'],
+            ['key' => 'verified_email', 'label' => 'Configured Email', 'hint' => 'The email address added in Privacy settings'],
+        ],
+    ],
+];

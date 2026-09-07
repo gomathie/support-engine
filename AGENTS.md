@@ -74,6 +74,13 @@ Either wait for the run, or only add files nothing references yet.
 **Blade resolves component tags at compile time.** An unknown
 `<x-some::component>` breaks the whole template, not just the branch it sits in.
 
+**Lesson content must survive the rich editor.** Filament's editor is TipTap-based
+and silently drops nodes it has no extension for. Its toolbar covers headings,
+lists, blockquotes, tables, links and inline marks — **not `div`, `dl/dt/dd`,
+`span` or `figure`**. Content using those looks right until a trainer presses
+save, then loses structure with no warning. `LessonContentEditableTest` asserts
+no seeded body contains them; keep it that way when writing new lessons.
+
 **Bash eats backslashes.** Writing PHP namespaces through `echo`/`sed`/heredocs
 in Git Bash has corrupted files repeatedly. Use the Write/Edit tools for PHP.
 
@@ -112,6 +119,23 @@ commit unless asked.**
 | PA-1/2 server + queue | **Not started** — Nazih |
 
 ---
+
+## 4a. Writing lesson content
+
+Content lives in `database/seeders/content/`, one file per lesson, applied by
+`LessonContentSeeder`. `track1_lesson_01.php` is the worked example and its
+header carries the rules. Three that matter:
+
+- **Write only what the documentation says.** Definitions are quoted verbatim
+  from docs.pilot-gps.com so trainees learn the platform's own wording. If a
+  topic is not in the docs, set `needs_input` and leave the gap visible — see the
+  "Mapping Contract" entry. An invented PILOT fact is worse than an obvious hole,
+  because a trainee will carry it onto a call.
+- **Use only markup the rich editor round-trips** (see §3).
+- **The seeder never overwrites existing content.** Once a lesson has a body it
+  belongs to whoever has been maintaining it. `LESSON_CONTENT_OVERWRITE=1`
+  reapplies the source files, and is for revising them during development — not
+  something to run against a live database without saying so.
 
 ## 5. Open questions — do not invent answers to these
 
@@ -227,3 +251,32 @@ trainer sets.* Most of it already existed. One piece did not.
   lessons — the old model in new clothes. Not blocked, because a policy briefing
   is a legitimate case, but shown as *"Reading only"* so it is a decision rather
   than an oversight.
+
+### 2026-09-07 — Lesson 1 written, and verifiable evidence (Claude)
+
+**Lesson 1 of the 1st-line track now has real content**, drawn from
+docs.pilot-gps.com 7.10 with the glossary definitions quoted verbatim, plus a
+four-question knowledge check at 70%. This is the pattern for the remaining ~100
+lessons — see §4a.
+
+**"Mapping Contract" was left unwritten on purpose.** The term is in the original
+training plan but appears nowhere in the 7.10 documentation. The lesson says so
+rather than carrying an invented definition. Needs Igor.
+
+**Practical tasks can now demand verifiable evidence.** Trainees work in a live
+PILOT account, so a task saying "create an object" leaves a real object with a
+real agent ID. A task declares the identifiers it wants (`required_evidence`,
+each {key, label, hint}) and whether a screenshot is mandatory; a submission
+missing either cannot be handed in, enforced in the action so it holds for any
+caller. The marking screen shows them under *"Check these in PILOT"*. This closes
+a genuine weakness: Verification is one of four scored criteria and trainers were
+marking it against prose.
+
+Two bugs found by asking whether content was really editable:
+
+- **The content seeder overwrote trainer edits.** It rewrote bodies on every run,
+  and the quiz path deleted and recreated options — so an edited question would
+  not even have merged. Now skips anything that already has content.
+- **The seeded markup could not survive the rich editor.** Callout `div`s and a
+  definition list would have been stripped on a trainer's first save. Rewritten
+  to blockquotes and lists, with a test to stop it recurring.

@@ -7,6 +7,7 @@ use App\Enums\LessonType;
 use App\Enums\QuestionType;
 use App\Models\CourseModule;
 use App\Models\Lesson;
+use App\Models\PracticalTask;
 use App\Models\Quiz;
 use App\Models\QuizOption;
 use App\Models\QuizQuestion;
@@ -46,6 +47,17 @@ class LessonContentSeeder extends Seeder
     {
         return [
             'track1_lesson_01.php',
+            'track1_lesson_02.php',
+            'track1_lesson_03.php',
+            'track1_lesson_04.php',
+            'track1_lesson_05.php',
+            'track1_lesson_06.php',
+            'track1_lesson_07.php',
+            'track1_lesson_08.php',
+            'track1_lesson_09.php',
+            'track1_lesson_10.php',
+            'track1_lesson_11.php',
+            'track1_lesson_12.php',
         ];
     }
 
@@ -79,12 +91,30 @@ class LessonContentSeeder extends Seeder
 
         $written = 0;
         $open = 0;
+        $kept = 0;
 
         foreach ($content['lessons'] as $title => $lesson) {
             $existing = $module->lessons()->where('title', $title)->first();
 
             if (! $existing) {
                 $this->command?->warn("No lesson titled \"{$title}\" in {$module->title}.");
+
+                continue;
+            }
+
+            /*
+             * Never overwrite a lesson somebody has edited.
+             *
+             * Trainers author in the admin panel — that is the point of the
+             * content being editable. A seeder that reapplies its own version
+             * on every run would silently destroy their work, and they would
+             * have no way of knowing it had happened.
+             *
+             * Set LESSON_CONTENT_OVERWRITE=1 to reapply deliberately, which is
+             * for revising the source files during development.
+             */
+            if (filled($existing->content) && ! $this->overwriting()) {
+                $kept++;
 
                 continue;
             }
@@ -105,11 +135,25 @@ class LessonContentSeeder extends Seeder
         }
 
         $this->seedQuiz($module, $content['quiz'] ?? null);
+        $this->seedPracticalTask($module, $content['practical_task'] ?? $content['practical_tasks'] ?? null);
 
         $this->command?->info(
             $module->title.': '.$written.' written'
             .($open > 0 ? ', '.$open.' awaiting subject-matter input' : '')
+            .($kept > 0 ? ', '.$kept.' left alone (already has content)' : '')
         );
+
+        if ($kept > 0 && ! $this->overwriting()) {
+            $this->command?->comment(
+                '  Existing content was not replaced. Use LESSON_CONTENT_OVERWRITE=1 to reapply.'
+            );
+        }
+    }
+
+    /** Reapplying the source files is deliberate, never the default. */
+    private function overwriting(): bool
+    {
+        return filter_var(env('LESSON_CONTENT_OVERWRITE', false), FILTER_VALIDATE_BOOL);
     }
 
     /**
@@ -124,6 +168,23 @@ class LessonContentSeeder extends Seeder
     private function seedQuiz(CourseModule $module, ?array $quiz): void
     {
         if (! $quiz) {
+            return;
+        }
+
+        /*
+         * Same rule as the lesson bodies: once a knowledge check exists, it
+         * belongs to whoever has been maintaining it. Rewriting the questions
+         * would discard a trainer's corrections — and the options are deleted
+         * and recreated below, so it would not even be a merge.
+         */
+        $already = Quiz::query()
+            ->where('course_module_id', $module->getKey())
+            ->where('title', $quiz['title'])
+            ->exists();
+
+        if ($already && ! $this->overwriting()) {
+            $this->command?->comment('  Knowledge check already exists — left alone.');
+
             return;
         }
 
@@ -174,6 +235,61 @@ class LessonContentSeeder extends Seeder
                 'is_correct' => $option['correct'],
                 'position' => $index + 1,
             ]);
+        }
+    }
+
+    /**
+     * Practical task(s) attached to the module or its lessons.
+     *
+     * @param  array<string, mixed>|array<int, array<string, mixed>>|null  $taskData
+     */
+    private function seedPracticalTask(CourseModule $module, ?array $taskData): void
+    {
+        if (! $taskData) {
+            return;
+        }
+
+        $tasks = isset($taskData['title']) ? [$taskData] : $taskData;
+
+        foreach ($tasks as $position => $data) {
+            if (! isset($data['title'])) {
+                continue;
+            }
+
+            $already = PracticalTask::query()
+                ->where('course_id', $module->course_id)
+                ->where('title', $data['title'])
+                ->exists();
+
+            if ($already && ! $this->overwriting()) {
+                $this->command?->comment("  Practical task \"{$data['title']}\" already exists — left alone.");
+
+                continue;
+            }
+
+            $lessonId = null;
+            if (isset($data['lesson_title'])) {
+                $lessonId = $module->lessons()->where('title', $data['lesson_title'])->value('id');
+            }
+
+            PracticalTask::query()->updateOrCreate(
+                [
+                    'course_id' => $module->course_id,
+                    'title' => $data['title'],
+                ],
+                [
+                    'lesson_id' => $lessonId,
+                    'brief' => $data['brief'] ?? '',
+                    'submission_instructions' => $data['submission_instructions'] ?? null,
+                    'expected_evidence' => $data['expected_evidence'] ?? null,
+                    'required_evidence' => $data['required_evidence'] ?? [],
+                    'requires_screenshot' => $data['requires_screenshot'] ?? true,
+                    'estimated_minutes' => $data['estimated_minutes'] ?? 15,
+                    'position' => $position + 1,
+                    'is_published' => true,
+                    'requires_second_marker' => $data['requires_second_marker'] ?? false,
+                ]
+            );
         }
     }
 }
