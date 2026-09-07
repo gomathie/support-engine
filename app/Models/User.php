@@ -185,6 +185,43 @@ class User extends Authenticatable implements FilamentUser
             && $this->trainees()->whereKey($trainee->getKey())->exists();
     }
 
+    // ---------------------------------------------------------- competency
+
+    /** Every rung this person has been awarded, revoked ones included. */
+    public function competencyLevels(): HasMany
+    {
+        return $this->hasMany(TraineeLevel::class);
+    }
+
+    /**
+     * The highest rung held in one area, or null.
+     *
+     * This is the answer to "who is Level 1 in Sensors" from the person's side;
+     * the reverse lookup goes through TraineeLevel directly.
+     */
+    public function levelIn(CompetencyArea|int $area): ?Level
+    {
+        $areaId = $area instanceof CompetencyArea ? $area->getKey() : $area;
+
+        return Level::query()
+            ->join('trainee_levels', 'trainee_levels.level_id', '=', 'levels.id')
+            ->where('trainee_levels.user_id', $this->getKey())
+            ->where('trainee_levels.competency_area_id', $areaId)
+            ->whereNull('trainee_levels.revoked_at')
+            ->orderByDesc('levels.position')
+            ->select('levels.*')
+            ->first();
+    }
+
+    public function holdsLevel(Level|int $level, CompetencyArea|int $area): bool
+    {
+        return $this->competencyLevels()
+            ->active()
+            ->where('level_id', $level instanceof Level ? $level->getKey() : $level)
+            ->where('competency_area_id', $area instanceof CompetencyArea ? $area->getKey() : $area)
+            ->exists();
+    }
+
     public function enrollments(): HasMany
     {
         return $this->hasMany(CourseEnrollment::class);

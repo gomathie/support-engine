@@ -25,6 +25,10 @@ class DatabaseSeeder extends Seeder
             // final exams, because a course may only have one of those.
             WrittenExamSeeder::class,
             DiagnosticTreeSeeder::class,
+
+            // After the content: the ladder points at courses by title.
+            CompetencySeeder::class,
+
             AssignmentRuleSeeder::class,
         ]);
     }

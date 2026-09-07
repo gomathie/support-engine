@@ -7,12 +7,14 @@ namespace App\Enums;
  * matching branch in resources/js/Pages/Lessons/Show.vue — no migration, because
  * lessons.type is a plain string column.
  *
- * Deliberately excludes video: the platform is text, document and quiz based,
- * and there is no streaming infrastructure behind it.
+ * Video was excluded under the original brief. The competency plan reverses
+ * that: §4.1 makes short video the default delivery format for re-aligned
+ * content. VideoEmbed (PA-9) covers hosted video; native upload follows in PA-10.
  */
 enum LessonType: string
 {
     case RichText = 'rich_text';
+    case VideoEmbed = 'video_embed';
     case Pdf = 'pdf';
     case Image = 'image';
     case Document = 'document';
@@ -23,6 +25,7 @@ enum LessonType: string
     {
         return match ($this) {
             self::RichText => 'Rich text',
+            self::VideoEmbed => 'Video',
             self::Pdf => 'PDF',
             self::Image => 'Image',
             self::Document => 'Document',
@@ -37,10 +40,17 @@ enum LessonType: string
         return in_array($this, [self::Pdf, self::Image, self::Document, self::Download], true);
     }
 
+    /** Types whose payload is a video reference on the lesson itself. */
+    public function isVideo(): bool
+    {
+        return $this === self::VideoEmbed;
+    }
+
     public function icon(): string
     {
         return match ($this) {
             self::RichText => 'heroicon-o-document-text',
+            self::VideoEmbed => 'heroicon-o-play-circle',
             self::Pdf => 'heroicon-o-document',
             self::Image => 'heroicon-o-photo',
             self::Document => 'heroicon-o-paper-clip',

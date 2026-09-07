@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\CompletionRequirement;
 use App\Enums\LessonType;
+use App\Support\Video\VideoEmbed;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,6 +24,10 @@ use Illuminate\Support\Str;
     'type',
     'content',
     'external_url',
+    'video_provider',
+    'video_id',
+    'video_duration_seconds',
+    'video_transcript',
     'estimated_minutes',
     'completion_requirement',
     'position',
@@ -111,6 +116,43 @@ class Lesson extends Model
     public function requiresQuiz(): bool
     {
         return $this->completion_requirement === CompletionRequirement::Quiz;
+    }
+
+    /**
+     * The parsed video reference, or null.
+     *
+     * Reads from the stored provider and id rather than any URL, so the embed
+     * URL the view renders is always rebuilt from a fixed template.
+     */
+    public function videoEmbed(): ?VideoEmbed
+    {
+        if (! $this->video_provider || ! $this->video_id) {
+            return null;
+        }
+
+        return VideoEmbed::parse($this->video_id, $this->video_provider);
+    }
+
+    /** "6:30" — how the duration reads next to the title. */
+    public function videoDurationForHumans(): ?string
+    {
+        $seconds = (int) $this->video_duration_seconds;
+
+        if ($seconds <= 0) {
+            return null;
+        }
+
+        return intdiv($seconds, 60).':'.str_pad((string) ($seconds % 60), 2, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * §4.1 sets a 5–7 minute ceiling: attention falls sharply past about six
+     * minutes. Not enforced — a legitimate 9-minute walkthrough exists — but
+     * flagged to the author and reportable in the content audit.
+     */
+    public function videoExceedsRecommendedLength(): bool
+    {
+        return (int) $this->video_duration_seconds > 7 * 60;
     }
 
     public function completedBy(User $user): bool

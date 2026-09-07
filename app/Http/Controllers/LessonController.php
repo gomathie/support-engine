@@ -53,6 +53,16 @@ class LessonController extends Controller
                 'content' => $lesson->content ? $this->sanitize($lesson->content) : null,
 
                 'external_url' => $lesson->external_url,
+
+                // Rebuilt from the stored provider and id, never from a stored
+                // URL — the iframe src must not be author-controlled text.
+                'video' => $lesson->videoEmbed()?->toArray(),
+                'video_duration' => $lesson->videoDurationForHumans(),
+
+                // Plain text. Rendered with interpolation rather than v-html,
+                // so it needs no sanitising pass.
+                'video_transcript' => $lesson->video_transcript,
+
                 'estimated_minutes' => $lesson->estimated_minutes,
                 'completion_requirement' => $lesson->completion_requirement->value,
                 'module_title' => $lesson->module?->title,

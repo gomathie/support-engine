@@ -5,6 +5,9 @@ namespace App\Filament\Resources\Lessons\Schemas;
 use App\Enums\CompletionRequirement;
 use App\Enums\LessonType;
 use App\Models\CourseModule;
+use App\Models\Lesson;
+use App\Support\Video\VideoEmbed;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -102,6 +105,78 @@ class LessonForm
                             ->label('Estimated duration (minutes)')
                             ->numeric()
                             ->minValue(0),
+                    ]),
+
+                /*
+                 * Video (PA-9).
+                 *
+                 * The author pastes whatever URL the browser gave them. It is
+                 * parsed here into a provider and an id, and only those are
+                 * stored — the embed URL is rebuilt from a fixed template at
+                 * render time, so a pasted string never reaches an iframe src.
+                 *
+                 * Gated on videos.manage, which is grantable per Trainer.
+                 */
+                Section::make('Video')
+                    ->visible(fn ($get) => $get('type') === LessonType::VideoEmbed->value
+                        && (Filament::auth()->user()?->can('videos.manage') ?? false))
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('video_url')
+                            ->label('Video URL')
+                            ->placeholder('https://www.youtube.com/watch?v=… or https://vimeo.com/…')
+                            ->columnSpanFull()
+                            ->required()
+                            ->live(onBlur: true)
+
+                            // Not a column. The provider and id below are.
+                            ->dehydrated(false)
+
+                            ->afterStateHydrated(function ($state, $set, ?Lesson $record): void {
+                                $set('video_url', $record?->videoEmbed()?->canonicalUrl());
+                            })
+                            ->afterStateUpdated(function ($state, $set): void {
+                                $embed = VideoEmbed::parse($state);
+
+                                $set('video_provider', $embed?->provider);
+                                $set('video_id', $embed?->id);
+                            })
+                            ->rule(fn () => function (string $attribute, $value, callable $fail): void {
+                                if (filled($value) && VideoEmbed::parse($value) === null) {
+                                    $fail('That is not a YouTube or Vimeo URL we recognise. Paste the address from the browser bar.');
+                                }
+                            })
+                            ->helperText('YouTube or Vimeo. Embedded privately — youtube-nocookie, no suggested videos at the end.'),
+
+                        // Written by the parser above, shown so the author can
+                        // see what was actually understood.
+                        TextInput::make('video_provider')
+                            ->label('Provider')
+                            ->readOnly()
+                            ->dehydrated()
+                            ->placeholder('detected from the URL'),
+
+                        TextInput::make('video_id')
+                            ->label('Video ID')
+                            ->readOnly()
+                            ->dehydrated()
+                            ->placeholder('detected from the URL'),
+
+                        TextInput::make('video_duration_seconds')
+                            ->label('Duration (seconds)')
+                            ->numeric()
+                            ->minValue(0)
+                            ->live(onBlur: true)
+                            ->helperText(fn ($state) => (int) $state > 420
+                                ? 'Over the 5–7 minute ceiling. Consider splitting it — one objective per video.'
+                                : 'Neither provider reports this without an API key, so enter it by hand.')
+                            ->hintColor(fn ($state) => (int) $state > 420 ? 'warning' : null),
+
+                        Textarea::make('video_transcript')
+                            ->label('Transcript')
+                            ->rows(8)
+                            ->columnSpanFull()
+                            ->helperText('Adults scan before they watch, and auto-captioning mangles PILOT terminology. Searchable alongside the video.'),
                     ]),
             ]);
     }

@@ -77,6 +77,26 @@ class CourseForm
                             ->columnSpanFull(),
                     ]),
 
+                Section::make('Competency')
+                    ->description('Where this course sits on the ladder. Optional — plenty of courses are standalone and award nothing. This is a structural claim about what completing it earns, unlike Difficulty, which only describes the material.')
+                    ->columns(2)
+                    ->schema([
+                        Select::make('level_id')
+                            ->label('Level')
+                            ->relationship('level', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->placeholder('Awards no level'),
+
+                        Select::make('competency_area_id')
+                            ->label('Competency area')
+                            ->relationship('competencyArea', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->placeholder('No area'),
+                    ])
+                    ->collapsed(fn ($record) => $record?->level_id === null),
+
                 Section::make('Delivery')
                     ->columns(3)
                     ->schema([

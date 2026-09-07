@@ -5,17 +5,23 @@ namespace App\Filament\Resources\Users\Tables;
 use App\Actions\Enrollment\SyncAssignmentRules;
 use App\Enums\ProgressStatus;
 use App\Enums\Role;
+use App\Models\CompetencyArea;
 use App\Models\Department;
+use App\Models\Level;
+use App\Models\TraineeLevel;
 use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class UsersTable
 {
@@ -79,6 +85,26 @@ class UsersTable
                     })
                     ->alignEnd(),
 
+                // The competency ladder, per area. Read as "Basic · Sensors" —
+                // one badge per rung held, because a single overall level would
+                // hide the gap a trainer needs to see.
+                TextColumn::make('competency')
+                    ->label('Competency')
+                    ->state(fn (User $record) => $record->competencyLevels()
+                        ->active()
+                        ->with(['level', 'competencyArea'])
+                        ->get()
+                        ->sortByDesc(fn (TraineeLevel $award) => $award->level?->position)
+                        ->map(fn (TraineeLevel $award) => trim(
+                            ($award->level?->name ?? '?').' · '.($award->competencyArea?->name ?? '?')
+                        ))
+                        ->values()
+                        ->all())
+                    ->badge()
+                    ->color('success')
+                    ->placeholder('none yet')
+                    ->wrap(),
+
                 TextColumn::make('certificates_count')
                     ->label('Certs')
                     ->counts('certificates')
@@ -107,6 +133,48 @@ class UsersTable
                     ->multiple(),
 
                 TernaryFilter::make('is_active')->label('Active'),
+
+                /*
+                 * "Who is Level 1 in Sensors" — the question the whole
+                 * competency model exists to answer. Two independent selects
+                 * rather than one combined list, so "everybody at Basic,
+                 * anywhere" and "everybody in Sensors, any rung" both work.
+                 */
+                Filter::make('competency')
+                    ->schema([
+                        Select::make('level_id')
+                            ->label('Holds level')
+                            ->options(fn () => Level::query()->orderBy('position')->pluck('name', 'id')->all())
+                            ->placeholder('Any'),
+
+                        Select::make('competency_area_id')
+                            ->label('In area')
+                            ->options(fn () => CompetencyArea::query()->orderBy('position')->pluck('name', 'id')->all())
+                            ->placeholder('Any'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        if (blank($data['level_id'] ?? null) && blank($data['competency_area_id'] ?? null)) {
+                            return $query;
+                        }
+
+                        return $query->whereHas('competencyLevels', fn (Builder $q) => $q
+                            ->whereNull('revoked_at')
+                            ->when($data['level_id'] ?? null, fn (Builder $q, $id) => $q->where('level_id', $id))
+                            ->when($data['competency_area_id'] ?? null, fn (Builder $q, $id) => $q->where('competency_area_id', $id)));
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $parts = [];
+
+                        if (filled($data['level_id'] ?? null)) {
+                            $parts[] = 'Level: '.Level::query()->find($data['level_id'])?->name;
+                        }
+
+                        if (filled($data['competency_area_id'] ?? null)) {
+                            $parts[] = 'Area: '.CompetencyArea::query()->find($data['competency_area_id'])?->name;
+                        }
+
+                        return $parts;
+                    }),
             ])
             ->recordActions([
                 // Re-evaluates every assignment rule for this person. The case

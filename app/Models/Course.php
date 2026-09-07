@@ -18,6 +18,8 @@ use Illuminate\Support\Str;
     'title',
     'slug',
     'category',
+    'level_id',
+    'competency_area_id',
     'summary',
     'description',
     'thumbnail_path',
@@ -52,6 +54,43 @@ class Course extends Model
             // switch. Keep them consistent without making the author set both.
             if ($course->status === CourseStatus::Published && $course->published_at === null) {
                 $course->published_at = now();
+            }
+        });
+
+        /*
+         * Keep the course's own level/area in step with the requirement rows the
+         * award engine actually reads.
+         *
+         * Without this, an author could retag a course in the course form and
+         * the ladder would carry on awarding the old level from a stale
+         * requirement row. Requirements for *other* pairs are left alone — a
+         * course may legitimately count towards more than one, and those are
+         * managed on the level itself.
+         */
+        static::saved(function (self $course): void {
+            if (! $course->wasChanged(['level_id', 'competency_area_id'])) {
+                return;
+            }
+
+            $previousPair = [
+                $course->getOriginal('level_id'),
+                $course->getOriginal('competency_area_id'),
+            ];
+
+            if ($previousPair[0] && $previousPair[1]) {
+                LevelRequirement::query()
+                    ->where('course_id', $course->getKey())
+                    ->where('level_id', $previousPair[0])
+                    ->where('competency_area_id', $previousPair[1])
+                    ->delete();
+            }
+
+            if ($course->level_id && $course->competency_area_id) {
+                LevelRequirement::query()->firstOrCreate([
+                    'course_id' => $course->getKey(),
+                    'level_id' => $course->level_id,
+                    'competency_area_id' => $course->competency_area_id,
+                ]);
             }
         });
     }
@@ -108,6 +147,29 @@ class Course extends Model
     public function instructor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'instructor_id');
+    }
+
+    /**
+     * The rung this course counts towards. Nullable — plenty of courses are
+     * standalone and award nothing.
+     *
+     * Not the same as `difficulty`, which is a descriptive label on the course
+     * itself. This is a structural claim about what completing it earns.
+     */
+    public function level(): BelongsTo
+    {
+        return $this->belongsTo(Level::class);
+    }
+
+    public function competencyArea(): BelongsTo
+    {
+        return $this->belongsTo(CompetencyArea::class);
+    }
+
+    /** Every (level, area) pair that counts this course towards an award. */
+    public function levelRequirements(): HasMany
+    {
+        return $this->hasMany(LevelRequirement::class);
     }
 
     public function creator(): BelongsTo

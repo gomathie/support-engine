@@ -3,6 +3,7 @@
 namespace App\Actions\Progress;
 
 use App\Actions\Certificates\IssueCertificate;
+use App\Actions\Competency\AwardCompetencyLevel;
 use App\Enums\ProgressStatus;
 use App\Models\Course;
 use App\Models\CourseProgress;
@@ -21,6 +22,7 @@ class RecalculateCourseProgress
 {
     public function __construct(
         private readonly IssueCertificate $issueCertificate,
+        private readonly AwardCompetencyLevel $awardCompetencyLevel,
     ) {}
 
     public function handle(User $user, Course $course): CourseProgress
@@ -98,6 +100,12 @@ class RecalculateCourseProgress
             // a passing quiz, an admin backfill — issues one.
             if ($progress->status === ProgressStatus::Completed) {
                 $this->issueCertificate->handle($user, $course, $progress);
+
+                // A course rarely earns a level on its own — the action checks
+                // whether this completion was the one a rung was still waiting
+                // for. Idempotent, so running it on every completion is cheaper
+                // than tracking which course is the last of a set.
+                $this->awardCompetencyLevel->forCourse($user, $course);
             }
 
             return $progress;

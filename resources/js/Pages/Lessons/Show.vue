@@ -27,6 +27,10 @@ const drawerOpen = ref(false);
 const tocOpen = ref(false);
 const saving = ref(false);
 
+// Collapsed by default: the video is the lesson, the transcript is the
+// reference you open when you want to find one line again.
+const transcriptOpen = ref(false);
+
 const unresolvedCount = computed(() => props.annotations.filter((a) => !a.is_resolved).length);
 const primaryResource = computed(() => props.resources[0] ?? null);
 
@@ -128,6 +132,45 @@ function toggleComplete() {
                     class="lesson-prose prose max-w-none"
                     v-html="lesson.content"
                 ></div>
+
+                <!-- The src comes from the server, rebuilt from a stored
+                     provider and id against a fixed template — never from a
+                     URL an author pasted. See App\Support\Video\VideoEmbed. -->
+                <div v-else-if="lesson.type === 'video_embed' && lesson.video" id="lesson-body">
+                    <div class="relative w-full overflow-hidden rounded-xl border border-line bg-black pt-[56.25%]">
+                        <iframe
+                            :src="lesson.video.embed_url"
+                            :title="lesson.title"
+                            class="absolute inset-0 h-full w-full"
+                            frameborder="0"
+                            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                            allowfullscreen
+                        ></iframe>
+                    </div>
+
+                    <p class="mt-2 flex flex-wrap items-center gap-2 text-xs text-ink-dis">
+                        <span>{{ lesson.video.provider_label }}</span>
+                        <span v-if="lesson.video_duration">· {{ lesson.video_duration }}</span>
+                    </p>
+
+                    <!-- Adults scan before they watch, so the transcript is a
+                         first-class part of the lesson rather than a download. -->
+                    <div v-if="lesson.video_transcript" class="mt-6">
+                        <button
+                            type="button"
+                            class="flex w-full items-center justify-between rounded-lg border border-line bg-surface-alt px-4 py-3 text-left text-sm font-semibold text-ink-pri"
+                            @click="transcriptOpen = !transcriptOpen"
+                        >
+                            <span>Transcript</span>
+                            <span class="text-ink-dis">{{ transcriptOpen ? '−' : '+' }}</span>
+                        </button>
+
+                        <div
+                            v-show="transcriptOpen"
+                            class="mt-2 max-h-96 overflow-y-auto rounded-lg border border-line p-4 text-sm leading-relaxed whitespace-pre-wrap text-ink-sec"
+                        >{{ lesson.video_transcript }}</div>
+                    </div>
+                </div>
 
                 <div v-else-if="lesson.type === 'pdf' && primaryResource" id="lesson-body">
                     <iframe

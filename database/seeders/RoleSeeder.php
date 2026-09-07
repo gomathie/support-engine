@@ -54,6 +54,7 @@ class RoleSeeder extends Seeder
             'transcripts.view-all',
             'enrollments.view', 'enrollments.create', 'enrollments.delete',
             'grades.override',
+            'competency.view',
             'reports.view',
             'certificates.view',
         ]);
@@ -92,6 +93,12 @@ class RoleSeeder extends Seeder
 
             // Assessment
             'grades.override',
+
+            // The competency ladder itself — rungs, areas and what each demands.
+            // Admin only: a Trainer who could edit the requirements could lower
+            // the bar for their own cohort.
+            'competency.manage',
+            'competency.view',
 
             // Reporting
             'reports.view', 'reports.view-all-departments', 'reports.export',
