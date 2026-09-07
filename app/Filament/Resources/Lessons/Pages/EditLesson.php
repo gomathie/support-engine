@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\Lessons\Pages;
+namespace App\Filament\Resources\CourseModules\Pages;
 
-use App\Filament\Resources\Lessons\LessonResource;
+use App\Filament\Resources\CourseModules\CourseModuleResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditLesson extends EditRecord
+class EditCourseModule extends EditRecord
 {
-    protected static string $resource = LessonResource::class;
+    protected static string $resource = CourseModuleResource::class;
 
     protected function getHeaderActions(): array
     {

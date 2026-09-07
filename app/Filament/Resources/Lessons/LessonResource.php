@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\Lessons;
+namespace App\Filament\Resources\CourseModules;
 
-use App\Filament\Resources\Lessons\Pages\CreateLesson;
-use App\Filament\Resources\Lessons\Pages\EditLesson;
-use App\Filament\Resources\Lessons\Pages\ListLessons;
-use App\Filament\Resources\Lessons\Schemas\LessonForm;
-use App\Filament\Resources\Lessons\Tables\LessonsTable;
-use App\Models\Lesson;
+use App\Filament\Resources\CourseModules\Pages\CreateCourseModule;
+use App\Filament\Resources\CourseModules\Pages\EditCourseModule;
+use App\Filament\Resources\CourseModules\Pages\ListCourseModules;
+use App\Filament\Resources\CourseModules\Schemas\CourseModuleForm;
+use App\Filament\Resources\CourseModules\Tables\CourseModulesTable;
+use App\Models\CourseModule;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -17,53 +17,39 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
-class LessonResource extends Resource
+class CourseModuleResource extends Resource
 {
-    protected static ?string $model = Lesson::class;
+    protected static ?string $model = CourseModule::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSquares2x2;
 
     protected static string|UnitEnum|null $navigationGroup = 'Content';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {
-        return LessonForm::configure($schema);
+        return CourseModuleForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return LessonsTable::configure($table);
+        return CourseModulesTable::configure($table);
     }
 
     public static function getRelations(): array
     {
         return [
-            RelationManagers\ResourcesRelationManager::class,
-        ];
-    }
-
-    /** @return array<int, string> */
-    public static function getGloballySearchableAttributes(): array
-    {
-        return ['title', 'description'];
-    }
-
-    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
-    {
-        return [
-            'Course' => $record->course?->title ?? '—',
-            'Module' => $record->module?->title ?? '—',
+            RelationManagers\LessonsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ListLessons::route('/'),
-            'create' => CreateLesson::route('/create'),
-            'edit' => EditLesson::route('/{record}/edit'),
+            'index' => ListCourseModules::route('/'),
+            'create' => CreateCourseModule::route('/create'),
+            'edit' => EditCourseModule::route('/{record}/edit'),
         ];
     }
 
