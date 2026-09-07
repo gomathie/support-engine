@@ -57,6 +57,15 @@ class LessonController extends Controller
                 // Rebuilt from the stored provider and id, never from a stored
                 // URL — the iframe src must not be author-controlled text.
                 'video' => $lesson->videoEmbed()?->toArray(),
+
+                // A route, not a file path or a storage URL. The bytes are on
+                // the private disk and only this route reaches them, after the
+                // same policy that let the lesson render at all.
+                'video_src' => $lesson->hasUploadedVideo()
+                    ? route('lessons.video', [$course->slug, $lesson->slug])
+                    : null,
+                'video_mime' => $lesson->hasUploadedVideo() ? $lesson->video_mime_type : null,
+
                 'video_duration' => $lesson->videoDurationForHumans(),
 
                 // Plain text. Rendered with interpolation rather than v-html,

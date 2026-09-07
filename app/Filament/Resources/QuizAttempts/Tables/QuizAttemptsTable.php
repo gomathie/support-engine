@@ -3,17 +3,20 @@
 namespace App\Filament\Resources\QuizAttempts\Tables;
 
 use App\Actions\Quiz\GradeWrittenAnswer;
+use App\Actions\Quiz\OverrideAttemptResult;
 use App\Enums\AttemptStatus;
 use App\Models\Course;
 use App\Models\Department;
 use App\Models\QuizAttempt;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Text;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
@@ -70,10 +73,28 @@ class QuizAttemptsTable
                     ->alignEnd()
                     ->sortable(),
 
+                // An overturned result must never read as a plain mark. The
+                // score column above still shows what the paper scored, so
+                // without this the two would silently disagree.
+                TextColumn::make('override')
+                    ->label('Override')
+                    ->state(fn (QuizAttempt $record) => $record->wasOverridden()
+                        ? ($record->override_passed ? 'Passed on override' : 'Failed on override')
+                        : null)
+                    ->badge()
+                    ->color(fn (QuizAttempt $record) => $record->override_passed ? 'warning' : 'danger')
+                    ->tooltip(fn (QuizAttempt $record) => $record->override_reason)
+                    ->placeholder('—'),
+
                 TextColumn::make('completed_at')
                     ->label('Submitted')
                     ->since()
                     ->sortable(),
+
+                TextColumn::make('overriddenBy.name')
+                    ->label('Overridden by')
+                    ->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('reviewer.name')
                     ->label('Marked by')
@@ -100,9 +121,17 @@ class QuizAttemptsTable
                         $data['value'] ?? null,
                         fn ($q, $id) => $q->whereHas('user', fn ($u) => $u->where('department_id', $id)),
                     )),
+
+                // Every overturned result in one list — the review an auditor
+                // or a calibration meeting actually asks for.
+                Filter::make('overridden')
+                    ->label('Overridden results only')
+                    ->query(fn ($query) => $query->whereNotNull('override_passed'))
+                    ->toggle(),
             ])
             ->recordActions([
                 static::gradeAction(),
+                static::overrideAction(),
             ])
             ->defaultSort('completed_at', 'asc')
             ->emptyStateHeading('Nothing to mark')
@@ -227,6 +256,71 @@ class QuizAttemptsTable
                         ? $record->ungradedAnswers()->count().' still outstanding on this attempt.'
                         : 'Attempt finalised at '.round((float) $record->score).'% — '
                           .($record->passed ? 'passed' : 'not passed').'.')
+                    ->send();
+            });
+    }
+
+    /**
+     * Overturn a marked result, with a reason (PA-12).
+     *
+     * Promotion is automatic; this is the exception path, so it is deliberately
+     * not the obvious button on the row — a secondary action, a confirmation,
+     * and a reason that will not accept a shrug.
+     */
+    private static function overrideAction(): Action
+    {
+        return Action::make('override')
+            ->label(fn (QuizAttempt $record) => $record->wasOverridden() ? 'Overridden' : 'Override result')
+            ->icon('heroicon-o-scale')
+            ->color(fn (QuizAttempt $record) => $record->wasOverridden() ? 'warning' : 'gray')
+            ->link()
+
+            // Marked papers only: there is nothing to overturn until the
+            // examiner has finished, and the policy carries the real boundary.
+            ->visible(fn (QuizAttempt $record) => ! $record->awaitsReview()
+                && $record->passed !== null
+                && auth()->user()?->can('override', $record))
+
+            ->modalHeading(fn (QuizAttempt $record) => 'Override — '.$record->user->name)
+            ->modalDescription(fn (QuizAttempt $record) => 'Marked '
+                .round((float) $record->score).'% · '
+                .($record->passed ? 'passed' : 'not passed')
+                .'. The score is kept as it stands; only the verdict changes.')
+            ->modalSubmitActionLabel('Record override')
+            ->fillForm(fn (QuizAttempt $record) => [
+                'passed' => $record->override_passed ?? $record->passed,
+                'reason' => $record->override_reason,
+            ])
+            ->schema([
+                Select::make('passed')
+                    ->label('Result')
+                    ->options([
+                        1 => 'Pass',
+                        0 => 'Fail',
+                    ])
+                    ->required()
+                    ->native(false),
+
+                Textarea::make('reason')
+                    ->label('Reason')
+                    ->required()
+                    ->minLength(15)
+                    ->rows(3)
+                    ->helperText('Goes on the permanent record. Say what was wrong with the marking or the question — "discussed with Igor" is not a reason.'),
+            ])
+            ->action(function (array $data, QuizAttempt $record, OverrideAttemptResult $override): void {
+                $result = $override->handle(
+                    attempt: $record,
+                    actor: auth()->user(),
+                    passed: (bool) $data['passed'],
+                    reason: $data['reason'],
+                );
+
+                Notification::make()
+                    ->success()
+                    ->title('Result overridden')
+                    ->body('Recorded as '.($result->passed ? 'a pass' : 'a fail')
+                        .'. The score stays at '.round((float) $result->score).'%.')
                     ->send();
             });
     }

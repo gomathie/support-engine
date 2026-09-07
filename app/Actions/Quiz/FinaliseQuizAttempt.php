@@ -41,7 +41,12 @@ class FinaliseQuizAttempt
                 'status' => AttemptStatus::Completed,
                 'points_earned' => $earned,
                 'score' => $score,
-                'passed' => $score >= $passMark,
+
+                // A recorded override wins over the arithmetic. Re-marking a
+                // written answer re-runs this method, and a human decision to
+                // uphold an appeal must not evaporate when it does. The score
+                // above is still the real one — only the verdict is overridden.
+                'passed' => $attempt->override_passed ?? ($score >= $passMark),
                 'completed_at' => $attempt->completed_at ?? now(),
                 'reviewed_at' => $reviewer ? now() : $attempt->reviewed_at,
                 'reviewed_by' => $reviewer?->id ?? $attempt->reviewed_by,

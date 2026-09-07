@@ -24,6 +24,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'reviewed_at',
     'reviewed_by',
     'passed',
+    'override_passed',
+    'override_reason',
+    'overridden_by',
+    'overridden_at',
     'passing_score',
     'started_at',
     'completed_at',
@@ -38,10 +42,28 @@ class QuizAttempt extends Model
             'status' => AttemptStatus::class,
             'score' => 'decimal:2',
             'passed' => 'boolean',
+            'override_passed' => 'boolean',
             'started_at' => 'datetime',
             'completed_at' => 'datetime',
             'reviewed_at' => 'datetime',
+            'overridden_at' => 'datetime',
         ];
+    }
+
+    /** Whether a human overturned the marked result. */
+    public function wasOverridden(): bool
+    {
+        return $this->override_passed !== null;
+    }
+
+    public function overriddenBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'overridden_by');
+    }
+
+    public function overrideLogs(): HasMany
+    {
+        return $this->hasMany(GradeOverrideLog::class)->latest('occurred_at');
     }
 
     public function scopeCompleted(Builder $query): Builder

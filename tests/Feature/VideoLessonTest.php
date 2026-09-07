@@ -127,13 +127,12 @@ class VideoLessonTest extends TestCase
      * Video authoring is gated on videos.manage: Admin and Trainer hold it,
      * Trainee does not.
      *
-     * Note what this does NOT yet show. The plan describes the Trainer
-     * capabilities as "revocable per person", but the permission is granted
-     * through the Trainer *role*, and spatie has no per-user deny — revoking it
-     * from one trainer is not possible without taking it from all of them.
-     * Making that claim true means granting videos.manage, quizzes.manage and
-     * content.audit directly per user instead of on the role. Recorded as a
-     * follow-up rather than changed here, because it affects all three.
+     * The grant is per role, and that is deliberate. An early draft of the plan
+     * called it "revocable per person"; it is not, because spatie has no
+     * per-user deny and the permission is held by the role. Per-user grants were
+     * considered and rejected — they would leave no single place to see what a
+     * Trainer can do. The assertion below pins the role-level behaviour so a
+     * future change to it is a decision rather than an accident.
      */
     public function test_video_authoring_follows_the_videos_manage_permission(): void
     {
@@ -149,8 +148,8 @@ class VideoLessonTest extends TestCase
         $trainer->revokePermissionTo('videos.manage');
         $this->assertTrue(
             $trainer->fresh()->can('videos.manage'),
-            'Documents current behaviour: the permission comes from the role, '
-            .'so it survives a per-user revoke. See the docblock.',
+            'The permission comes from the Trainer role, so it survives a '
+            .'per-user revoke. Taking it away means taking it from the role.',
         );
     }
 
@@ -166,7 +165,11 @@ class VideoLessonTest extends TestCase
     public function test_video_is_an_offered_lesson_type(): void
     {
         $this->assertArrayHasKey('video_embed', LessonType::options());
-        $this->assertSame('Video', LessonType::VideoEmbed->label());
+
+        // The label names the method, because the author is choosing between
+        // two of them in the same dropdown.
+        $this->assertSame('Video (YouTube / Vimeo)', LessonType::VideoEmbed->label());
+
         $this->assertTrue(LessonType::VideoEmbed->isVideo());
         $this->assertFalse(LessonType::RichText->isVideo());
     }

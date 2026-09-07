@@ -28,6 +28,12 @@ use Illuminate\Support\Str;
     'video_id',
     'video_duration_seconds',
     'video_transcript',
+    'video_disk',
+    'video_path',
+    'video_original_name',
+    'video_mime_type',
+    'video_size_bytes',
+    'video_status',
     'estimated_minutes',
     'completion_requirement',
     'position',
@@ -131,6 +137,27 @@ class Lesson extends Model
         }
 
         return VideoEmbed::parse($this->video_id, $this->video_provider);
+    }
+
+    /** An uploaded video is playable once a file is actually on the disk. */
+    public function hasUploadedVideo(): bool
+    {
+        return $this->type->isUploadedVideo() && filled($this->video_path);
+    }
+
+    /** "412 MB" — the size as the author needs to see it against the 500 MB cap. */
+    public function videoSizeForHumans(): ?string
+    {
+        $bytes = (int) $this->video_size_bytes;
+
+        if ($bytes <= 0) {
+            return null;
+        }
+
+        $units = ['B', 'KB', 'MB', 'GB'];
+        $power = min((int) floor(log($bytes, 1024)), count($units) - 1);
+
+        return round($bytes / (1024 ** $power), $power > 1 ? 1 : 0).' '.$units[$power];
     }
 
     /** "6:30" — how the duration reads next to the title. */

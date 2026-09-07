@@ -5,6 +5,7 @@ use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LessonController;
+use App\Http\Controllers\LessonVideoController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgressController;
@@ -56,6 +57,11 @@ Route::middleware(['auth', 'active'])->group(function (): void {
         ->name('lessons.complete');
     Route::delete('courses/{course}/lessons/{lesson}/complete', [LessonController::class, 'uncomplete'])
         ->name('lessons.uncomplete');
+
+    // The only route to an uploaded video's bytes. The file lives on the
+    // private disk; this runs the lesson policy first.
+    Route::get('courses/{course}/lessons/{lesson}/video', [LessonVideoController::class, 'stream'])
+        ->name('lessons.video');
 
     // -------------------------------------------------------------- quizzes
     Route::get('courses/{course}/quiz/{quiz}', [QuizController::class, 'show'])

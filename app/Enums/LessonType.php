@@ -15,6 +15,7 @@ enum LessonType: string
 {
     case RichText = 'rich_text';
     case VideoEmbed = 'video_embed';
+    case VideoUpload = 'video_upload';
     case Pdf = 'pdf';
     case Image = 'image';
     case Document = 'document';
@@ -25,7 +26,8 @@ enum LessonType: string
     {
         return match ($this) {
             self::RichText => 'Rich text',
-            self::VideoEmbed => 'Video',
+            self::VideoEmbed => 'Video (YouTube / Vimeo)',
+            self::VideoUpload => 'Video (uploaded file)',
             self::Pdf => 'PDF',
             self::Image => 'Image',
             self::Document => 'Document',
@@ -40,10 +42,16 @@ enum LessonType: string
         return in_array($this, [self::Pdf, self::Image, self::Document, self::Download], true);
     }
 
-    /** Types whose payload is a video reference on the lesson itself. */
+    /** Types whose payload is a video, hosted or uploaded. */
     public function isVideo(): bool
     {
-        return $this === self::VideoEmbed;
+        return in_array($this, [self::VideoEmbed, self::VideoUpload], true);
+    }
+
+    /** An uploaded file on the private disk, rather than a third-party embed. */
+    public function isUploadedVideo(): bool
+    {
+        return $this === self::VideoUpload;
     }
 
     public function icon(): string
@@ -51,6 +59,7 @@ enum LessonType: string
         return match ($this) {
             self::RichText => 'heroicon-o-document-text',
             self::VideoEmbed => 'heroicon-o-play-circle',
+            self::VideoUpload => 'heroicon-o-film',
             self::Pdf => 'heroicon-o-document',
             self::Image => 'heroicon-o-photo',
             self::Document => 'heroicon-o-paper-clip',

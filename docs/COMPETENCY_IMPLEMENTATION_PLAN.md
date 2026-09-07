@@ -242,7 +242,9 @@ The grading queue already exists. Phase 2 adds cohort filtering (grade only assi
 | Override pass/fail for assigned Trainees | ✅ | ✅ | ❌ | **Partial** — awards points; no direct override |
 | Retake failed exam (mandatory full re-sit) | N/A | N/A | ✅ | ✅ Built — a new attempt is always the whole paper |
 
-*"if granted"* = the capability is a permission on the Trainer role, revocable per person. `spatie/laravel-permission` is already wired for exactly this.
+*"if granted"* = the capability is a named permission on the Trainer **role**, not an implied tier — so "can build quizzes" is separable from "can assign trainees", which is what prevents the accidental role escalation in §6(f).
+
+> **Corrected after implementation.** An earlier draft of this line said "revocable per person". It is not: the permission is held by the role, and `spatie/laravel-permission` has no per-user deny, so revoking `videos.manage` from one Trainer would take it from all of them. Granting is per role and applies to every Trainer. Making it genuinely per person would mean granting `videos.manage`, `quizzes.manage` and `content.audit` directly to each user instead of through the role — **decided against**: role-level is the intended granularity, and per-user grants would leave no single place to see what a Trainer can do.
 
 ### Progression logic
 

@@ -172,6 +172,41 @@ function toggleComplete() {
                     </div>
                 </div>
 
+                <!-- Uploaded video. The src is a route, not a storage URL —
+                     the file has no public address and the route runs the
+                     lesson policy before a byte is served. -->
+                <div v-else-if="lesson.type === 'video_upload' && lesson.video_src" id="lesson-body">
+                    <video
+                        controls
+                        preload="metadata"
+                        controlslist="nodownload"
+                        class="w-full rounded-xl border border-line bg-black"
+                    >
+                        <source :src="lesson.video_src" :type="lesson.video_mime || 'video/mp4'" />
+                        Your browser cannot play this video.
+                    </video>
+
+                    <p v-if="lesson.video_duration" class="mt-2 text-xs text-ink-dis">
+                        {{ lesson.video_duration }}
+                    </p>
+
+                    <div v-if="lesson.video_transcript" class="mt-6">
+                        <button
+                            type="button"
+                            class="flex w-full items-center justify-between rounded-lg border border-line bg-surface-alt px-4 py-3 text-left text-sm font-semibold text-ink-pri"
+                            @click="transcriptOpen = !transcriptOpen"
+                        >
+                            <span>Transcript</span>
+                            <span class="text-ink-dis">{{ transcriptOpen ? '−' : '+' }}</span>
+                        </button>
+
+                        <div
+                            v-show="transcriptOpen"
+                            class="mt-2 max-h-96 overflow-y-auto rounded-lg border border-line p-4 text-sm leading-relaxed whitespace-pre-wrap text-ink-sec"
+                        >{{ lesson.video_transcript }}</div>
+                    </div>
+                </div>
+
                 <div v-else-if="lesson.type === 'pdf' && primaryResource" id="lesson-body">
                     <iframe
                         :src="primaryResource.stream_url"

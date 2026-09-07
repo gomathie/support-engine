@@ -23,13 +23,15 @@ class QuizAttemptPolicy
         }
 
         /*
-         * Two abilities are excluded from the administrator bypass:
+         * Three abilities are excluded from the administrator bypass:
          *
          *  - grade, so "never mark your own paper" holds for everyone;
+         *  - override, for the same reason with more at stake — an
+         *    administrator must not be able to overturn their own fail;
          *  - submit, so nobody can submit an attempt that is not theirs, or one
          *    that has already been graded.
          */
-        if (in_array($ability, ['grade', 'submit'], true)) {
+        if (in_array($ability, ['grade', 'override', 'submit'], true)) {
             return null;
         }
 
@@ -79,6 +81,21 @@ class QuizAttemptPolicy
     public function grade(User $user, QuizAttempt $attempt): bool
     {
         return $user->canGrade($attempt->user);
+    }
+
+    /**
+     * Overturning a marked pass or fail.
+     *
+     * Grading with a bigger hammer, so it follows the same cohort boundary —
+     * and additionally needs `grades.override`, which is a named permission
+     * rather than something the Trainer role implies. "Nobody marks their own
+     * paper" is inherited from canGrade(), which is why this is excluded from
+     * the administrator bypass in before().
+     */
+    public function override(User $user, QuizAttempt $attempt): bool
+    {
+        return $user->canGrade($attempt->user)
+            && $user->hasPermissionTo('grades.override');
     }
 
     public function create(User $user): bool

@@ -8,6 +8,8 @@ use App\Models\CourseModule;
 use App\Models\Lesson;
 use App\Support\Video\VideoEmbed;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -16,6 +18,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class LessonForm
 {
@@ -117,6 +120,64 @@ class LessonForm
                  *
                  * Gated on videos.manage, which is grantable per Trainer.
                  */
+                Section::make('Video file')
+                    ->description('Uploaded to the private disk. There is no public URL — playback goes through a route that checks the lesson policy first.')
+                    ->visible(fn ($get) => $get('type') === LessonType::VideoUpload->value
+                        && (Filament::auth()->user()?->can('videos.manage') ?? false))
+                    ->columns(2)
+                    ->schema([
+                        FileUpload::make('video_path')
+                            ->label('Video')
+                            ->disk('private')
+                            ->directory('lesson-videos')
+                            ->visibility('private')
+                            ->columnSpanFull()
+
+                            // §5.1: MP4 (H.264/AAC), MOV, WEBM. The browser
+                            // filter is a convenience; the server-side mime
+                            // check below is what actually holds.
+                            ->acceptedFileTypes(['video/mp4', 'video/quicktime', 'video/webm'])
+
+                            // 500 MB, in kilobytes. PHP's upload_max_filesize
+                            // and post_max_size have to allow this too.
+                            ->maxSize(512000)
+
+                            ->helperText('MP4 (H.264/AAC), MOV or WEBM · up to 500 MB. Over the limit, trim to 5–7 minutes or export at 1080p.')
+
+                            // The row carries what the file was and where it
+                            // went, so a later move to S3 does not strand it.
+                            ->afterStateUpdated(function ($state, $set): void {
+                                if (! $state instanceof TemporaryUploadedFile) {
+                                    return;
+                                }
+
+                                $set('video_disk', 'private');
+                                $set('video_original_name', $state->getClientOriginalName());
+                                $set('video_mime_type', $state->getMimeType());
+                                $set('video_size_bytes', $state->getSize());
+                                $set('video_status', 'ready');
+                            }),
+
+                        TextInput::make('video_original_name')
+                            ->label('Original filename')
+                            ->readOnly()
+                            ->dehydrated(),
+
+                        TextInput::make('video_mime_type')
+                            ->label('Format')
+                            ->readOnly()
+                            ->dehydrated(),
+
+                        Hidden::make('video_disk'),
+                        Hidden::make('video_size_bytes'),
+
+                        // Transcoding is not built (see PA-10 in the delivery
+                        // log), so an upload is ready as soon as it lands. The
+                        // field exists so the queued pipeline has somewhere to
+                        // report without another migration.
+                        Hidden::make('video_status'),
+                    ]),
+
                 Section::make('Video')
                     ->visible(fn ($get) => $get('type') === LessonType::VideoEmbed->value
                         && (Filament::auth()->user()?->can('videos.manage') ?? false))
