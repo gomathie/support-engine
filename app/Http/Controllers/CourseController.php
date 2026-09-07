@@ -148,6 +148,20 @@ class CourseController extends Controller
                     ->filter(fn ($l) => $completed->has($l->id))
                     ->count(),
                 'lesson_count' => $module->lessons->count(),
+
+                // The knowledge check at the end of the lesson. Passing it is
+                // required to finish the course, so it belongs on the card
+                // rather than being something they discover at the end.
+                'knowledge_check' => ($check = $module->knowledgeCheck()) && $check->is_published
+                    ? [
+                        'id' => $check->id,
+                        'title' => $check->title,
+                        'passing_score' => $check->passing_score,
+                        'passed' => $check->passedBy($user),
+                        'attempts_used' => $check->attemptsUsedBy($user),
+                        'max_attempts' => $check->max_attempts,
+                    ]
+                    : null,
             ])->all(),
 
             /*

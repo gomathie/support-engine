@@ -66,6 +66,31 @@ class RecalculateCourseProgress
                 $quizSatisfied = $finalQuiz->passedBy($user);
             }
 
+            // ------------------------------------------ knowledge checks
+            /*
+             * Every lesson ends with a knowledge check, and every one of them
+             * has to be passed.
+             *
+             * These are module-scoped quizzes. Without this they were
+             * decoration: a trainee could skip every check and still finish the
+             * course on the final exam alone, which makes "you must pass" untrue
+             * for the thing sitting at the end of each lesson.
+             */
+            $knowledgeChecks = $course->quizzes()
+                ->whereNotNull('course_module_id')
+                ->whereNull('lesson_id')
+                ->where('is_published', true)
+                ->get();
+
+            $checksSatisfied = $knowledgeChecks
+                ->every(fn ($check) => $check->passedBy($user));
+
+            // Out of attempts on a check they have not passed is as terminal as
+            // failing the final exam, and should not read as "in progress".
+            $checkExhausted = $knowledgeChecks->contains(
+                fn ($check) => ! $check->passedBy($user) && ! $check->hasAttemptsRemainingFor($user)
+            );
+
             // ------------------------------------------- practical tasks
             /*
              * Every published practical on the course has to be passed.
@@ -96,7 +121,7 @@ class RecalculateCourseProgress
             $progress->started_at ??= $hasStarted ? now() : null;
             $progress->last_activity_at = now();
 
-            if ($lessonsSatisfied && $quizSatisfied && $practicalsSatisfied) {
+            if ($lessonsSatisfied && $quizSatisfied && $practicalsSatisfied && $checksSatisfied) {
                 $progress->status = ProgressStatus::Completed;
                 $progress->completed_at ??= now();
             } else {
@@ -107,6 +132,11 @@ class RecalculateCourseProgress
                     $finalQuiz !== null
                         && ! $quizSatisfied
                         && ! $finalQuiz->hasAttemptsRemainingFor($user) => ProgressStatus::Failed,
+
+                    // Same for a knowledge check they can no longer retake:
+                    // the course can never be finished, so it must not sit at
+                    // "in progress" waiting for something that cannot happen.
+                    $checkExhausted => ProgressStatus::Failed,
 
                     $this->isOverdue($user, $course) => ProgressStatus::Overdue,
 

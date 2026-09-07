@@ -159,6 +159,48 @@ const toggle = (id) => (collapsed.value[id] = !collapsed.value[id]);
                             {{ lesson.type_label }}
                         </span>
                     </Link>
+
+                    <!-- The knowledge check that closes the lesson. Passing it
+                         is required to finish the course, so it sits here at
+                         the end rather than being found later. -->
+                    <Link
+                        v-if="module.knowledge_check"
+                        :href="route('quizzes.show', [course.slug, module.knowledge_check.id])"
+                        class="flex items-center gap-3 bg-surface-alt px-5 py-3 no-underline transition-colors hover:bg-surface"
+                    >
+                        <span
+                            class="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md border-2"
+                            :class="
+                                module.knowledge_check.passed
+                                    ? 'border-ok bg-ok'
+                                    : 'border-line-strong'
+                            "
+                        >
+                            <svg
+                                v-if="module.knowledge_check.passed"
+                                class="h-3 w-3 fill-none stroke-white stroke-[3]"
+                                viewBox="0 0 24 24"
+                            >
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </span>
+
+                        <span class="flex-1 text-sm font-medium text-ink">
+                            {{ module.knowledge_check.title }}
+                        </span>
+
+                        <StatusPill
+                            v-if="module.knowledge_check.passed"
+                            label="Passed"
+                            tone="positive"
+                        />
+                        <span
+                            v-else
+                            class="chip bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300"
+                        >
+                            {{ module.knowledge_check.passing_score }}% to pass
+                        </span>
+                    </Link>
                 </div>
             </div>
         </div>

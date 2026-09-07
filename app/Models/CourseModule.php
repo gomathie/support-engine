@@ -12,6 +12,34 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[Fillable(['course_id', 'title', 'subtitle', 'description', 'docs_reference', 'position', 'is_published'])]
 class CourseModule extends Model
 {
+    /**
+     * The knowledge check at the end of this lesson.
+     *
+     * Module-scoped rather than lesson-scoped: one check covering the lesson's
+     * topics, sat once, rather than a question after every page.
+     */
+    public function knowledgeCheck(): ?Quiz
+    {
+        return Quiz::query()
+            ->where('course_module_id', $this->getKey())
+            ->whereNull('lesson_id')
+            ->first();
+    }
+
+    /**
+     * Every lesson is supposed to end with one, and passing it is required to
+     * finish the course. A lesson without one can be read and left, so the gap
+     * is worth seeing rather than discovering later.
+     */
+    public function hasKnowledgeCheck(): bool
+    {
+        return Quiz::query()
+            ->where('course_module_id', $this->getKey())
+            ->whereNull('lesson_id')
+            ->where('is_published', true)
+            ->exists();
+    }
+
     use HasFactory, SoftDeletes;
 
     protected function casts(): array

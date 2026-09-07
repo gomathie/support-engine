@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\CourseModules\Tables;
 
 use App\Models\Course;
+use App\Models\CourseModule;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -33,9 +34,25 @@ class CourseModulesTable
                     ->limit(60),
 
                 TextColumn::make('lessons_count')
-                    ->label('Lessons')
+                    ->label('Topics')
                     ->counts('lessons')
                     ->alignEnd(),
+
+                /*
+                 * Every lesson is meant to end with a knowledge check, and
+                 * passing it is required to finish the course. A lesson without
+                 * one can be read and left — so the gap is shown here rather
+                 * than discovered when somebody completes a course having been
+                 * tested on nothing.
+                 */
+                TextColumn::make('knowledge_check')
+                    ->label('Knowledge check')
+                    ->state(fn (CourseModule $record) => $record->hasKnowledgeCheck() ? 'Yes' : 'Missing')
+                    ->badge()
+                    ->color(fn ($state) => $state === 'Yes' ? 'success' : 'warning')
+                    ->tooltip(fn (CourseModule $record) => $record->hasKnowledgeCheck()
+                        ? null
+                        : 'No published quiz at the end of this lesson. Trainees can read it and move on.'),
 
                 IconColumn::make('is_published')
                     ->label('Published')
