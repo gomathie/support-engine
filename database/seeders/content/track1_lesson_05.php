@@ -11,9 +11,9 @@
  */
 
 return [
-    'module_subtitle' => 'Working with objects (part 2) and object list',
+    'lesson_subtitle' => 'Working with objects (part 2) and object list',
 
-    'lessons' => [
+    'topics' => [
 
         // ─────────────────────────────────────────────────────────
         'Configure color status indicators' => [
@@ -44,6 +44,38 @@ return [
 <li>The object row and map label will immediately show the chosen color.</li>
 </ol>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Color Status Indicators',
+                'description' => 'Test your understanding of standard telemetry status colors and custom highlighting.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'What does an orange status indicator signify for a vehicle in PILOT?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Orange indicates "Idling" — the engine is running (ignition ON) but the vehicle is stationary.',
+                        'options' => [
+                            ['text' => 'Idling: engine is running (ignition ON) but vehicle is stationary', 'correct' => true],
+                            ['text' => 'Emergency panic button triggered', 'correct' => false],
+                            ['text' => 'GPS device battery is critically low', 'correct' => false],
+                            ['text' => 'Vehicle has been deregistered from the contract', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'What does a blue status icon signify for an asset?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Blue indicates "Parked" — the vehicle is stationary with ignition OFF.',
+                        'options' => [
+                            ['text' => 'Parked: vehicle is stationary with ignition OFF', 'correct' => true],
+                            ['text' => 'The vehicle is travelling over 100 km/h', 'correct' => false],
+                            ['text' => 'The tracker is updating firmware over the air', 'correct' => false],
+                            ['text' => 'The fuel tank level is increasing', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -76,6 +108,38 @@ HTML,
 
 <p>To perform actions on the whole group, right-click the group name to build group history, open all group objects on the map, or send commands.</p>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Object Groups & Hierarchy',
+                'description' => 'Verify your understanding of creating folders and moving objects between groups.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'How can an operator quickly assign an object into a group folder in the left sidebar?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Operators can drag and drop objects directly onto group folders, or select the group in the object card\'s Settings tab.',
+                        'options' => [
+                            ['text' => 'Drag and drop the object onto the group folder, or pick the group in the Object Card Settings tab', 'correct' => true],
+                            ['text' => 'Send a specialized SMS command to the GPS hardware', 'correct' => false],
+                            ['text' => 'Export the group list to a CSV file', 'correct' => false],
+                            ['text' => 'Restart the PostgreSQL database container', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'What operational convenience is unlocked by right-clicking an object group folder?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Right-clicking a group allows bulk operations: viewing all group assets on the map, generating group reports, or sending batch commands.',
+                        'options' => [
+                            ['text' => 'Executing bulk actions such as displaying all group objects on the map or building group history', 'correct' => true],
+                            ['text' => 'Automatically refunding customer SIM subscriptions', 'correct' => false],
+                            ['text' => 'Converting vehicle icons into stationary generators', 'correct' => false],
+                            ['text' => 'Deleting the user\'s login credentials', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -107,6 +171,38 @@ HTML,
 
 <blockquote><p><strong>Display persistence:</strong> Column configurations are saved automatically in your user account profile in the database. When you log in from another browser or workstation, your custom table layout is preserved.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Object Table Columns & Order',
+                'description' => 'Test your proficiency configuring visible table columns and personal column ordering.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'Where is the button to open the Table Settings column chooser in the object list?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The Table settings gear icon is located in the top-right corner of the object list table header.',
+                        'options' => [
+                            ['text' => 'The gear icon in the top-right corner of the object list table header', 'correct' => true],
+                            ['text' => 'In the browser developer console', 'correct' => false],
+                            ['text' => 'Under the map basemap selection dock', 'correct' => false],
+                            ['text' => 'Inside the Report Scheduler queue', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'How does PILOT handle custom column choices when an operator logs in from a different computer?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Column layouts are saved to the user\'s server profile in the database, preserving their customized order across workstations.',
+                        'options' => [
+                            ['text' => 'Settings are saved to the user profile in the database and persist across different workstations', 'correct' => true],
+                            ['text' => 'Settings reset to factory defaults upon every logout', 'correct' => false],
+                            ['text' => 'Columns must be reconfigured every 30 minutes', 'correct' => false],
+                            ['text' => 'Columns only persist if stored on a physical USB drive', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -134,6 +230,38 @@ HTML,
 
 <blockquote><p><strong>Support troubleshooting:</strong> When a customer calls panicked saying "Half my fleet has vanished from PILOT!", the very first thing to check is whether they inadvertently clicked one of the top panel status buttons. Clicking the "Idling" or "Moving" counter filters out all other vehicles.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Filtering Objects & Troubleshooting Views',
+                'description' => 'Test your knowledge of quick status filters and diagnosing filtered fleet views.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'What is the fastest way for an operator to isolate only active vehicles in motion on both the table and map?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Clicking the green "Moving" counter on the top panel instantly filters both the object list and map to active moving assets.',
+                        'options' => [
+                            ['text' => 'Click the green "Moving" number on the top panel', 'correct' => true],
+                            ['text' => 'Create a brand new contract in the admin panel', 'correct' => false],
+                            ['text' => 'Delete all parked vehicles from the database', 'correct' => false],
+                            ['text' => 'Change the basemap layer to satellite view', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'A customer calls saying "I had 40 vehicles yesterday, but today only 6 appear in my list!" What should you ask them to verify first?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'A status filter (e.g. Moving or Idling) clicked on the top panel or dropdown filters out the rest of the fleet. Checking the active filter resolves the issue immediately.',
+                        'options' => [
+                            ['text' => 'Check whether a status filter (such as Moving or Idling) is active on the top panel or list dropdown', 'correct' => true],
+                            ['text' => 'Ask them to replace all 40 GPS tracking devices immediately', 'correct' => false],
+                            ['text' => 'Tell them the vehicles were permanently wiped from PILOT servers', 'correct' => false],
+                            ['text' => 'Instruct them to switch cellular carriers', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
 

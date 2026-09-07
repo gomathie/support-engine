@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\Lessons\Pages;
+namespace App\Filament\Resources\Topics\Pages;
 
-use App\Filament\Resources\Lessons\LessonResource;
+use App\Filament\Resources\Topics\TopicResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditLesson extends EditRecord
+class EditTopic extends EditRecord
 {
-    protected static string $resource = LessonResource::class;
+    protected static string $resource = TopicResource::class;
 
     protected function getHeaderActions(): array
     {

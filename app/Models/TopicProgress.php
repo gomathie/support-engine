@@ -10,17 +10,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'user_id',
-    'lesson_id',
+    'topic_id',
     'course_id',
     'completed_at',
     'time_spent_seconds',
     'last_viewed_at',
 ])]
-class LessonProgress extends Model
+class TopicProgress extends Model
 {
     use HasFactory;
 
-    protected $table = 'lesson_progress';
+    protected $table = 'topic_progress';
 
     protected function casts(): array
     {
@@ -36,9 +36,9 @@ class LessonProgress extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function lesson(): BelongsTo
+    public function topic(): BelongsTo
     {
-        return $this->belongsTo(Lesson::class);
+        return $this->belongsTo(Topic::class);
     }
 
     public function course(): BelongsTo

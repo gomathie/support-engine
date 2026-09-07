@@ -3,15 +3,15 @@
 namespace App\Enums;
 
 /**
- * Content types a lesson can carry. Adding one means adding a case here and a
- * matching branch in resources/js/Pages/Lessons/Show.vue — no migration, because
- * lessons.type is a plain string column.
+ * Content types a topic can carry. Adding one means adding a case here and a
+ * matching branch in resources/js/Pages/Topics/Show.vue — no migration, because
+ * topics.type is a plain string column.
  *
  * Video was excluded under the original brief. The competency plan reverses
  * that: §4.1 makes short video the default delivery format for re-aligned
  * content. VideoEmbed (PA-9) covers hosted video; native upload follows in PA-10.
  */
-enum LessonType: string
+enum TopicType: string
 {
     case RichText = 'rich_text';
     case VideoEmbed = 'video_embed';
@@ -36,7 +36,7 @@ enum LessonType: string
         };
     }
 
-    /** Types whose payload lives in lesson_resources rather than lessons.content. */
+    /** Types whose payload lives in topic_resources rather than topics.content. */
     public function requiresResource(): bool
     {
         return in_array($this, [self::Pdf, self::Image, self::Document, self::Download], true);

@@ -11,9 +11,9 @@
  */
 
 return [
-    'module_subtitle' => 'Sensors (part 1)',
+    'lesson_subtitle' => 'Sensors (part 1)',
 
-    'lessons' => [
+    'topics' => [
 
         // ─────────────────────────────────────────────────────────
         'Add an ignition sensor (two-position); verify via Points tab' => [
@@ -68,6 +68,38 @@ return [
 <li>If the value flips in reverse (shows 0 when running, 1 when off), change the sensor type to <strong>Inverse two-position</strong>.</li>
 </ol>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Ignition Sensors & Telemetry Verification',
+                'description' => 'Test your understanding of two-position binary sensors and verifying raw telemetry in the Points tab.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'How does a "Two-position" sensor interpret incoming device telemetry?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'A Two-position sensor evaluates whether incoming values sit between the Min and Max active state threshold to report a binary ON (1) or OFF (0) state.',
+                        'options' => [
+                            ['text' => 'It reports a binary ON/OFF state based on whether raw values fall within configured active thresholds', 'correct' => true],
+                            ['text' => 'It measures continuous liquid volume in gallons', 'correct' => false],
+                            ['text' => 'It calculates road tolls using GPS coordinates', 'correct' => false],
+                            ['text' => 'It transmits SMS text messages to the driver', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'Which tab in the sensor settings window displays the raw chronological stream of incoming telemetry packets from hardware?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The Points tab displays the actual raw telemetry parameter logs received by the server to verify hardware inputs before calibration.',
+                        'options' => [
+                            ['text' => 'The Points tab', 'correct' => true],
+                            ['text' => 'The News center tab', 'correct' => false],
+                            ['text' => 'The Geocoder address tab', 'correct' => false],
+                            ['text' => 'The Map Layers dock', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -111,6 +143,38 @@ HTML,
 <li>Click <strong>Save</strong>.</li>
 </ol>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Fuel Sensor Settings & Filtration',
+                'description' => 'Test your understanding of fuel refuel/drain thresholds and anti-slosh speed filtration.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'Why is the "Maximum speed for filling detection" setting essential when configuring fuel tanks in PILOT?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Vehicles do not refuel at speed; filtering out volume fluctuations while moving prevents false refuels or theft alarms caused by fuel sloshing during cornering or braking.',
+                        'options' => [
+                            ['text' => 'It prevents false refuel and theft alarms caused by fuel sloshing during vehicle motion', 'correct' => true],
+                            ['text' => 'It limits the top speed of the truck on the highway', 'correct' => false],
+                            ['text' => 'It cuts off the fuel pump when exceeding speed limits', 'correct' => false],
+                            ['text' => 'It reduces the battery consumption of the GPS hardware', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'What does PILOT do if a sudden fuel level drop is smaller than the configured Drain threshold?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Fluctuations smaller than the drain threshold are treated as normal engine consumption or road vibration and will not trigger a theft alarm.',
+                        'options' => [
+                            ['text' => 'It treats the drop as normal consumption or vibration and avoids false theft alerts', 'correct' => true],
+                            ['text' => 'It blocks the user account automatically', 'correct' => false],
+                            ['text' => 'It resets the calibration table to zeros', 'correct' => false],
+                            ['text' => 'It generates a police dispatch notification', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
 

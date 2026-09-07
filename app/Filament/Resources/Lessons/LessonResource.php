@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\CourseModules;
+namespace App\Filament\Resources\Lessons;
 
-use App\Filament\Resources\CourseModules\Pages\CreateCourseModule;
-use App\Filament\Resources\CourseModules\Pages\EditCourseModule;
-use App\Filament\Resources\CourseModules\Pages\ListCourseModules;
-use App\Filament\Resources\CourseModules\Schemas\CourseModuleForm;
-use App\Filament\Resources\CourseModules\Tables\CourseModulesTable;
-use App\Models\CourseModule;
+use App\Filament\Resources\Lessons\Pages\CreateLesson;
+use App\Filament\Resources\Lessons\Pages\EditLesson;
+use App\Filament\Resources\Lessons\Pages\ListLessons;
+use App\Filament\Resources\Lessons\Schemas\LessonForm;
+use App\Filament\Resources\Lessons\Tables\LessonsTable;
+use App\Models\Lesson;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -17,9 +17,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
-class CourseModuleResource extends Resource
+class LessonResource extends Resource
 {
-    protected static ?string $model = CourseModule::class;
+    protected static ?string $model = Lesson::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSquares2x2;
 
@@ -29,27 +29,27 @@ class CourseModuleResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return CourseModuleForm::configure($schema);
+        return LessonForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return CourseModulesTable::configure($table);
+        return LessonsTable::configure($table);
     }
 
     public static function getRelations(): array
     {
         return [
-            RelationManagers\LessonsRelationManager::class,
+            RelationManagers\TopicsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ListCourseModules::route('/'),
-            'create' => CreateCourseModule::route('/create'),
-            'edit' => EditCourseModule::route('/{record}/edit'),
+            'index' => ListLessons::route('/'),
+            'create' => CreateLesson::route('/create'),
+            'edit' => EditLesson::route('/{record}/edit'),
         ];
     }
 

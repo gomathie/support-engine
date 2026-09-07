@@ -3,41 +3,41 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
-use App\Models\Lesson;
+use App\Models\Topic;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * The only route to an uploaded lesson video.
+ * The only route to an uploaded topic video.
  *
  * Videos live on the `private` disk — no URL, no public visibility — so there is
  * no way to reach the bytes that skips the policy below. The path is never taken
- * from the request; only the lesson is, and the path comes from the row.
+ * from the request; only the topic is, and the path comes from the row.
  *
  * Range requests matter here in a way they do not for a PDF: a browser seeking
  * in a <video> element sends `Range`, and a server that answers 200 with the
  * whole file makes the scrubber useless on anything large.
  */
-class LessonVideoController extends Controller
+class TopicVideoController extends Controller
 {
-    public function stream(Course $course, Lesson $lesson): Response
+    public function stream(Course $course, Topic $topic): Response
     {
-        abort_unless($lesson->course_id === $course->id, 404);
+        abort_unless($topic->course_id === $course->id, 404);
 
-        // Same ability as reading the lesson itself: if you may see the page,
+        // Same ability as reading the topic itself: if you may see the page,
         // you may see the video on it. Nothing else reaches this route.
-        $this->authorize('view', $lesson);
+        $this->authorize('view', $topic);
 
-        abort_unless($lesson->type->isUploadedVideo() && $lesson->video_path, 404);
+        abort_unless($topic->type->isUploadedVideo() && $topic->video_path, 404);
 
-        $disk = Storage::disk($lesson->video_disk ?: 'private');
+        $disk = Storage::disk($topic->video_disk ?: 'private');
 
-        abort_unless($disk->exists($lesson->video_path), 404);
+        abort_unless($disk->exists($topic->video_path), 404);
 
         $headers = [
-            'Content-Type' => $lesson->video_mime_type ?: 'video/mp4',
+            'Content-Type' => $topic->video_mime_type ?: 'video/mp4',
 
             // An uploaded file rendered inline is a stored-XSS risk if a browser
             // decides the "video" is really HTML.
@@ -52,9 +52,9 @@ class LessonVideoController extends Controller
          * playback works, seeking past the buffer does not, and that is the
          * trade until the storage decision in PA-1 is made.
          */
-        if ($this->isLocal($lesson->video_disk ?: 'private')) {
+        if ($this->isLocal($topic->video_disk ?: 'private')) {
             $response = response()
-                ->file($disk->path($lesson->video_path), $headers)
+                ->file($disk->path($topic->video_path), $headers)
                 ->setAutoLastModified()
                 ->setAutoEtag();
 
@@ -74,7 +74,7 @@ class LessonVideoController extends Controller
             return $response;
         }
 
-        return $this->progressive($disk, $lesson, $headers);
+        return $this->progressive($disk, $topic, $headers);
     }
 
     private function isLocal(string $disk): bool
@@ -83,15 +83,15 @@ class LessonVideoController extends Controller
     }
 
     /** @param  array<string, string>  $headers */
-    private function progressive($disk, Lesson $lesson, array $headers): StreamedResponse
+    private function progressive($disk, Topic $topic, array $headers): StreamedResponse
     {
-        $headers['Content-Length'] = (string) $disk->size($lesson->video_path);
+        $headers['Content-Length'] = (string) $disk->size($topic->video_path);
         $headers['Accept-Ranges'] = 'none';
         $headers['Cache-Control'] = 'private, max-age=0, must-revalidate';
 
         return response()->stream(
-            function () use ($disk, $lesson): void {
-                $stream = $disk->readStream($lesson->video_path);
+            function () use ($disk, $topic): void {
+                $stream = $disk->readStream($topic->video_path);
 
                 if ($stream === null || $stream === false) {
                     return;

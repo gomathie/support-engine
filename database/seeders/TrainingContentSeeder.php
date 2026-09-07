@@ -4,12 +4,12 @@ namespace Database\Seeders;
 
 use App\Enums\CompletionRequirement;
 use App\Enums\CourseStatus;
-use App\Enums\LessonType;
+use App\Enums\TopicType;
 use App\Enums\QuestionType;
 use App\Enums\Role;
 use App\Models\Course;
-use App\Models\CourseModule;
 use App\Models\Lesson;
+use App\Models\Topic;
 use App\Models\Quiz;
 use App\Models\QuizQuestion;
 use App\Models\User;
@@ -42,37 +42,37 @@ class TrainingContentSeeder extends Seeder
                 ],
             );
 
-            foreach ($courseData['modules'] as $modulePosition => $moduleData) {
-                $module = CourseModule::query()->updateOrCreate(
+            foreach ($courseData['lessons'] as $lessonPosition => $lessonData) {
+                $lesson = Lesson::query()->updateOrCreate(
                     [
                         'course_id' => $course->id,
-                        'title' => $moduleData['title'],
+                        'title' => $lessonData['title'],
                     ],
                     [
-                        'subtitle' => $moduleData['subtitle'],
-                        'description' => $moduleData['description'],
-                        'position' => $modulePosition + 1,
+                        'subtitle' => $lessonData['subtitle'],
+                        'description' => $lessonData['description'],
+                        'position' => $lessonPosition + 1,
                         'is_published' => true,
                     ],
                 );
 
-                foreach ($moduleData['lessons'] as $lessonPosition => $title) {
-                    Lesson::query()->updateOrCreate(
+                foreach ($lessonData['topics'] as $topicPosition => $title) {
+                    Topic::query()->updateOrCreate(
                         [
-                            'course_module_id' => $module->id,
+                            'lesson_id' => $lesson->id,
                             'slug' => Str::slug(Str::limit($title, 60, '')),
                         ],
                         [
                             'course_id' => $course->id,
                             'title' => $title,
-                            'type' => LessonType::RichText,
+                            'type' => TopicType::RichText,
 
-                            // The prototype's items were checkboxes, so they map
-                            // onto the requirement that reproduces that: the
-                            // employee ticks them off themselves.
+                            // Reading is recorded on open. A topic makes no
+                            // claim about competence — the knowledge check at
+                            // the end of the lesson does.
                             'completion_requirement' => CompletionRequirement::View,
 
-                            'position' => $lessonPosition + 1,
+                            'position' => $topicPosition + 1,
                             'is_published' => true,
                         ],
                     );
@@ -98,8 +98,8 @@ class TrainingContentSeeder extends Seeder
         $quiz = Quiz::query()->updateOrCreate(
             [
                 'course_id' => $course->id,
-                'course_module_id' => null,
                 'lesson_id' => null,
+                'topic_id' => null,
             ],
             [
                 'title' => 'PILOT 1st-line final assessment',

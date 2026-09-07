@@ -3,10 +3,10 @@
 namespace Database\Seeders;
 
 use App\Enums\CompletionRequirement;
-use App\Enums\LessonType;
+use App\Enums\TopicType;
 use App\Enums\QuestionType;
-use App\Models\CourseModule;
 use App\Models\Lesson;
+use App\Models\Topic;
 use App\Models\PracticalTask;
 use App\Models\Quiz;
 use App\Models\QuizOption;
@@ -15,7 +15,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 /**
- * Puts real content into the curriculum, one lesson at a time.
+ * Puts real content into the curriculum, one topic at a time.
  *
  * The seeded courses were titles with empty bodies — §1 of the implementation
  * plan calls that out as the largest gap in the product. This seeder fills them
@@ -26,11 +26,11 @@ use Illuminate\Support\Str;
  * ADDING THE NEXT LESSON
  *
  *   1. Copy `content/track1_lesson_01.php` to the next number.
- *   2. Set `module_subtitle` to the subtitle of the module it belongs to —
- *      matched on subtitle rather than title, because "Lesson 1" exists in more
+ *   2. Set `lesson_subtitle` to the subtitle of the module it belongs to —
+ *      matched on subtitle rather than title, because "Topic 1" exists in more
  *      than one course.
- *   3. Key each entry by the lesson title already in the curriculum.
- *   4. Name the documentation page every lesson is drawn from. If the topic is
+ *   3. Key each entry by the topic title already in the curriculum.
+ *   4. Name the documentation page every topic is drawn from. If the topic is
  *      not in the docs, do not write it: set `needs_input` and say what is
  *      missing. An invented PILOT fact is worse than a visible gap, because a
  *      trainee will carry it onto a call.
@@ -79,12 +79,12 @@ class LessonContentSeeder extends Seeder
     /** @param  array<string, mixed>  $content */
     private function apply(array $content): void
     {
-        $module = CourseModule::query()
-            ->where('subtitle', $content['module_subtitle'])
+        $lesson = Lesson::query()
+            ->where('subtitle', $content['lesson_subtitle'])
             ->first();
 
-        if (! $module) {
-            $this->command?->warn('No module with subtitle: '.$content['module_subtitle']);
+        if (! $lesson) {
+            $this->command?->warn('No module with subtitle: '.$content['lesson_subtitle']);
 
             return;
         }
@@ -93,17 +93,17 @@ class LessonContentSeeder extends Seeder
         $open = 0;
         $kept = 0;
 
-        foreach ($content['lessons'] as $title => $lesson) {
-            $existing = $module->lessons()->where('title', $title)->first();
+        foreach ($content['topics'] as $title => $topic) {
+            $existing = $lesson->topics()->where('title', $title)->first();
 
             if (! $existing) {
-                $this->command?->warn("No lesson titled \"{$title}\" in {$module->title}.");
+                $this->command?->warn("No topic titled \"{$title}\" in {$lesson->title}.");
 
                 continue;
             }
 
             /*
-             * Never overwrite a lesson somebody has edited.
+             * Never overwrite a topic somebody has edited.
              *
              * Trainers author in the admin panel — that is the point of the
              * content being editable. A seeder that reapplies its own version
@@ -119,26 +119,32 @@ class LessonContentSeeder extends Seeder
                 continue;
             }
 
+            $hasQuiz = isset($topic['quiz']) && ! empty($topic['quiz']);
+
             $existing->forceFill([
-                'type' => LessonType::RichText,
-                'content' => trim($lesson['body']),
-                'estimated_minutes' => $lesson['estimated_minutes'] ?? $existing->estimated_minutes,
+                'type' => TopicType::RichText,
+                'content' => trim($topic['body']),
+                'estimated_minutes' => $topic['estimated_minutes'] ?? $existing->estimated_minutes,
 
                 /*
-                 * Reading is recorded, not self-attested. The lesson makes no
-                 * claim about competence — the knowledge check below does.
+                 * Lessons carrying a quiz require passing it to finish.
+                 * Other topics record reading on open.
                  */
-                'completion_requirement' => CompletionRequirement::View,
+                'completion_requirement' => $hasQuiz ? CompletionRequirement::Quiz : CompletionRequirement::View,
             ])->save();
 
-            isset($lesson['needs_input']) ? $open++ : $written++;
+            if ($hasQuiz) {
+                $this->seedLessonQuiz($existing, $topic['quiz']);
+            }
+
+            isset($topic['needs_input']) ? $open++ : $written++;
         }
 
-        $this->seedQuiz($module, $content['quiz'] ?? null);
-        $this->seedPracticalTask($module, $content['practical_task'] ?? $content['practical_tasks'] ?? null);
+        $this->seedQuiz($lesson, $content['quiz'] ?? null);
+        $this->seedPracticalTask($lesson, $content['practical_task'] ?? $content['practical_tasks'] ?? null);
 
         $this->command?->info(
-            $module->title.': '.$written.' written'
+            $lesson->title.': '.$written.' written'
             .($open > 0 ? ', '.$open.' awaiting subject-matter input' : '')
             .($kept > 0 ? ', '.$kept.' left alone (already has content)' : '')
         );
@@ -157,28 +163,28 @@ class LessonContentSeeder extends Seeder
     }
 
     /**
-     * The knowledge check at the end of the lesson.
+     * The knowledge check at the end of the topic.
      *
-     * Module-scoped — `course_module_id` set, `lesson_id` null — so it is a
-     * lesson test rather than the course's final exam. A course may only have
+     * Module-scoped — `lesson_id` set, `topic_id` null — so it is a
+     * topic test rather than the course's final exam. A course may only have
      * one of those, and it is not this.
      *
      * @param  array<string, mixed>|null  $quiz
      */
-    private function seedQuiz(CourseModule $module, ?array $quiz): void
+    private function seedQuiz(Lesson $lesson, ?array $quiz): void
     {
         if (! $quiz) {
             return;
         }
 
         /*
-         * Same rule as the lesson bodies: once a knowledge check exists, it
+         * Same rule as the topic bodies: once a knowledge check exists, it
          * belongs to whoever has been maintaining it. Rewriting the questions
          * would discard a trainer's corrections — and the options are deleted
          * and recreated below, so it would not even be a merge.
          */
         $already = Quiz::query()
-            ->where('course_module_id', $module->getKey())
+            ->where('lesson_id', $lesson->getKey())
             ->where('title', $quiz['title'])
             ->exists();
 
@@ -190,9 +196,48 @@ class LessonContentSeeder extends Seeder
 
         $record = Quiz::query()->updateOrCreate(
             [
-                'course_id' => $module->course_id,
-                'course_module_id' => $module->getKey(),
+                'course_id' => $lesson->course_id,
+                'lesson_id' => $lesson->getKey(),
                 'title' => $quiz['title'],
+            ],
+            [
+                'description' => $quiz['description'] ?? null,
+                'passing_score' => $quiz['passing_score'] ?? 70,
+                'max_attempts' => $quiz['max_attempts'] ?? 3,
+                'time_limit_minutes' => $quiz['time_limit_minutes'] ?? null,
+                'is_published' => true,
+            ],
+        );
+
+        foreach ($quiz['questions'] as $position => $question) {
+            $this->seedQuestion($record, $question, $position + 1);
+        }
+    }
+
+    /**
+     * Dedicated knowledge check attached to a specific topic.
+     *
+     * @param  array<string, mixed>  $quiz
+     */
+    private function seedLessonQuiz(Topic $topic, array $quiz): void
+    {
+        $title = $quiz['title'] ?? ($topic->title.' — Knowledge check');
+
+        $already = Quiz::query()
+            ->where('topic_id', $topic->getKey())
+            ->where('title', $title)
+            ->exists();
+
+        if ($already && ! $this->overwriting()) {
+            return;
+        }
+
+        $record = Quiz::query()->updateOrCreate(
+            [
+                'course_id' => $topic->course_id,
+                'lesson_id' => $topic->lesson_id,
+                'topic_id' => $topic->getKey(),
+                'title' => $title,
             ],
             [
                 'description' => $quiz['description'] ?? null,
@@ -239,11 +284,11 @@ class LessonContentSeeder extends Seeder
     }
 
     /**
-     * Practical task(s) attached to the module or its lessons.
+     * Practical task(s) attached to the module or its topics.
      *
      * @param  array<string, mixed>|array<int, array<string, mixed>>|null  $taskData
      */
-    private function seedPracticalTask(CourseModule $module, ?array $taskData): void
+    private function seedPracticalTask(Lesson $lesson, ?array $taskData): void
     {
         if (! $taskData) {
             return;
@@ -257,7 +302,7 @@ class LessonContentSeeder extends Seeder
             }
 
             $already = PracticalTask::query()
-                ->where('course_id', $module->course_id)
+                ->where('course_id', $lesson->course_id)
                 ->where('title', $data['title'])
                 ->exists();
 
@@ -269,16 +314,16 @@ class LessonContentSeeder extends Seeder
 
             $lessonId = null;
             if (isset($data['lesson_title'])) {
-                $lessonId = $module->lessons()->where('title', $data['lesson_title'])->value('id');
+                $lessonId = $lesson->topics()->where('title', $data['lesson_title'])->value('id');
             }
 
             PracticalTask::query()->updateOrCreate(
                 [
-                    'course_id' => $module->course_id,
+                    'course_id' => $lesson->course_id,
                     'title' => $data['title'],
                 ],
                 [
-                    'lesson_id' => $lessonId,
+                    'topic_id' => $lessonId,
                     'brief' => $data['brief'] ?? '',
                     'submission_instructions' => $data['submission_instructions'] ?? null,
                     'expected_evidence' => $data['expected_evidence'] ?? null,

@@ -12,9 +12,9 @@
  */
 
 return [
-    'module_subtitle' => 'User and rights management',
+    'lesson_subtitle' => 'User and rights management',
 
-    'lessons' => [
+    'topics' => [
 
         // ─────────────────────────────────────────────────────────
         'Create a new user with role "User"' => [
@@ -57,6 +57,38 @@ return [
 
 <p>The account owner is highlighted in green in the user list. Neither the account owner nor the currently signed-in user can be deleted directly in the user interface. This safeguard ensures contract access can never be accidentally severed.</p>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: User Creation & Roles',
+                'description' => 'Verify your understanding of user roles, mandatory fields, and account protection rules.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'When a new account is created with the "User" role, which monitored objects can they see by default?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'A new User starts with zero visible objects until an administrator explicitly checks off objects on their Vehicles or Object tags tab.',
+                        'options' => [
+                            ['text' => 'Zero objects — visibility must be explicitly granted on the Vehicles or Object tags tab', 'correct' => true],
+                            ['text' => 'All vehicles across all contracts in the company', 'correct' => false],
+                            ['text' => 'Only stationary vehicles with ignition off', 'correct' => false],
+                            ['text' => 'Any vehicle with a Teltonika tracker installed', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'Which account in the Staff and Groups list is protected against accidental deletion in the interface?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Neither the contract account owner nor the currently logged-in user can be deleted in the user interface.',
+                        'options' => [
+                            ['text' => 'The contract account owner and the currently signed-in user', 'correct' => true],
+                            ['text' => 'Any user who has logged in within the last 24 hours', 'correct' => false],
+                            ['text' => 'Only users with verified mobile phone numbers', 'correct' => false],
+                            ['text' => 'Users who have not been assigned any objects', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -92,6 +124,38 @@ HTML,
 
 <blockquote><p><strong>Diagnosing missing objects:</strong> When a user complains they cannot find a specific vehicle in the Online list or Reports dropdown, check their User Card → <strong>Vehicles</strong> tab first. If the checkbox next to the vehicle is unchecked, PILOT behaves as if the vehicle does not exist for that user.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Object Rights & Tag Assignment',
+                'description' => 'Test your ability to configure vehicle visibility and tag-based access control.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'Which User Card tab allows an administrator to select specific vehicles a user is allowed to monitor?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The Vehicles (Objects) tab contains the tree of all contract objects where individual checkboxes grant visibility.',
+                        'options' => [
+                            ['text' => 'The Vehicles (Objects) tab', 'correct' => true],
+                            ['text' => 'The Driver scorecard tab', 'correct' => false],
+                            ['text' => 'The Geocoder tool panel', 'correct' => false],
+                            ['text' => 'The SMTP Gateway tab', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'How can an administrator automatically grant a user access to any newly added delivery van without manually editing the user card each time?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Assigning an Object Tag (e.g. "Delivery Vans") grants the user access to all present and future vehicles carrying that tag.',
+                        'options' => [
+                            ['text' => 'Assign the "Delivery Vans" tag on the user\'s Object tags tab', 'correct' => true],
+                            ['text' => 'Make the user a Super Admin in the billing console', 'correct' => false],
+                            ['text' => 'Set the tracker protocol to UDP broadcast', 'correct' => false],
+                            ['text' => 'Move the user into a separate database schema', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -137,6 +201,38 @@ HTML,
 <li>Select the template and click <strong>Save</strong>. All checkboxes in the Rights tab will update immediately to match the template.</li>
 </ol>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Functional Rights & Rights Templates',
+                'description' => 'Test your understanding of granular permissions and rights template reuse.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'Where does a saved rights template appear when creating or editing a user account?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Saved templates appear in the Settings tab under the Type dropdown list, marked with the suffix "(template)".',
+                        'options' => [
+                            ['text' => 'In the Settings tab under the Type dropdown, marked as "(template)"', 'correct' => true],
+                            ['text' => 'In the Map Tools dock', 'correct' => false],
+                            ['text' => 'Inside the browser cookies directory', 'correct' => false],
+                            ['text' => 'In the Top panel news center', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'What is the primary operational benefit of creating rights templates for common roles like "Dispatcher"?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Templates eliminate repetitive manual configuration and guarantee consistent permissions across all staff in that role.',
+                        'options' => [
+                            ['text' => 'Standardizes permissions and prevents configuration errors when onboarding new staff', 'correct' => true],
+                            ['text' => 'Increases cellular transmission speeds from tracking hardware', 'correct' => false],
+                            ['text' => 'Bypasses the contract\'s monthly subscription fee', 'correct' => false],
+                            ['text' => 'Automatically creates physical SIM cards', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -176,6 +272,38 @@ HTML,
 
 <blockquote><p><strong>Why block instead of delete?</strong> Deleting a user permanently destroys their personal workspace, custom views, assigned report schedules, and saved token permissions. If the employee returns or access is restored, rebuilding that configuration from scratch wastes hours. Always block first.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Blocking & Unblocking Users',
+                'description' => 'Verify your understanding of account status indicators and suspension procedures.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'In the Staff and Groups list, what does a red icon in the Status column indicate?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'A red status icon signifies that the user account is blocked, terminating active sessions and preventing further logins.',
+                        'options' => [
+                            ['text' => 'The account is blocked and cannot sign in', 'correct' => true],
+                            ['text' => 'The user has exceeded their GPS data limit', 'correct' => false],
+                            ['text' => 'The user\'s password has expired', 'correct' => false],
+                            ['text' => 'The user is actively logged in on a mobile phone', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'Why should an administrator block a departing or suspended employee\'s account rather than deleting it?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Blocking immediately revokes access while preserving the employee\'s report schedules, workspace settings, and historical audit trail.',
+                        'options' => [
+                            ['text' => 'Blocking preserves user history, custom views, and report configurations while terminating access', 'correct' => true],
+                            ['text' => 'Deleted accounts can never be recreated under any circumstance', 'correct' => false],
+                            ['text' => 'Deleting an account immediately shuts down the tracking server', 'correct' => false],
+                            ['text' => 'PILOT charges a penalty fee for deleting users', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
 

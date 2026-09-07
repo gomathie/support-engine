@@ -48,8 +48,8 @@ class RoleSeeder extends Seeder
             /*
              * A trainer authors the whole course, not fragments of one.
              *
-             * They previously held lessons.manage and quizzes.manage but not
-             * courses.create — able to write the lessons and the exam, but not
+             * They previously held topics.manage and quizzes.manage but not
+             * courses.create — able to write the topics and the exam, but not
              * the course those sit in, which meant every new course needed an
              * administrator. Authoring is the job; the course is the unit of it.
              *
@@ -58,7 +58,7 @@ class RoleSeeder extends Seeder
              * with it, and that is an administrator's decision.
              */
             'courses.view', 'courses.create', 'courses.update', 'courses.publish',
-            'lessons.manage',
+            'topics.manage',
             'quizzes.manage',
             'content.audit',
             'videos.manage',
@@ -84,7 +84,7 @@ class RoleSeeder extends Seeder
         return [
             // Content authoring
             'courses.view', 'courses.create', 'courses.update', 'courses.delete', 'courses.publish',
-            'lessons.manage',
+            'topics.manage',
             'quizzes.manage',
             'videos.manage',
             'content.audit',

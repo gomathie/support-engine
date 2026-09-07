@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             DepartmentSeeder::class,
             UserSeeder::class,
             TrainingContentSeeder::class,
+            LessonContentSeeder::class,
             // Section A of the examination, with its answer key.
             PilotExamSeeder::class,
 

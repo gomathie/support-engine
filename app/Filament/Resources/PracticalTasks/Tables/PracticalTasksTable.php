@@ -26,7 +26,7 @@ class PracticalTasksTable
                     ->sortable()
                     ->weight('bold')
                     ->wrap()
-                    ->description(fn (PracticalTask $record) => $record->lesson?->title),
+                    ->description(fn (PracticalTask $record) => $record->topic?->title),
 
                 TextColumn::make('course.title')
                     ->label('Course')

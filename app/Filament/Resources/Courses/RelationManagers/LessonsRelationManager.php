@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\Courses\RelationManagers;
 
-use App\Filament\Resources\Lessons\LessonResource;
-use App\Models\CourseModule;
+use App\Filament\Resources\Topics\TopicResource;
+use App\Models\Lesson;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -24,9 +24,9 @@ use Filament\Tables\Table;
  * resource and picking the parent from a dropdown. Reordering here is what
  * decides the order an employee works through the course.
  */
-class ModulesRelationManager extends RelationManager
+class LessonsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'modules';
+    protected static string $relationship = "lessons";
 
     protected static ?string $title = 'Modules';
 
@@ -52,7 +52,7 @@ class ModulesRelationManager extends RelationManager
                 Toggle::make('is_published')
                     ->default(true)
                     ->columnSpanFull()
-                    ->helperText('Unpublished modules and their lessons do not count toward progress.'),
+                    ->helperText('Unpublished modules and their topics do not count toward progress.'),
             ]);
     }
 
@@ -63,11 +63,11 @@ class ModulesRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('title')
                     ->weight('bold')
-                    ->description(fn (CourseModule $record) => $record->subtitle),
+                    ->description(fn (Lesson $record) => $record->subtitle),
 
                 TextColumn::make('lessons_count')
                     ->label('Lessons')
-                    ->counts('lessons')
+                    ->counts('topics')
                     ->alignEnd(),
 
                 IconColumn::make('is_published')
@@ -84,11 +84,11 @@ class ModulesRelationManager extends RelationManager
                 // Lessons live on the module, so the natural next step from
                 // here is the module's own edit screen rather than a nested
                 // repeater four levels deep.
-                Action::make('lessons')
+                Action::make('topics')
                     ->label('Lessons')
                     ->icon('heroicon-o-document-text')
                     ->color('gray')
-                    ->url(fn (CourseModule $record) => LessonResource::getUrl('index', [
+                    ->url(fn (Lesson $record) => TopicResource::getUrl('index', [
                         'tableFilters' => ['course_id' => ['value' => $record->course_id]],
                     ])),
 
@@ -101,6 +101,6 @@ class ModulesRelationManager extends RelationManager
                 ]),
             ])
             ->emptyStateHeading('No modules yet')
-            ->emptyStateDescription('A course is made of modules, and each module holds the lessons.');
+            ->emptyStateDescription('A course is made of modules, and each module holds the topics.');
     }
 }

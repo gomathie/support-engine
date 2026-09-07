@@ -72,9 +72,9 @@ class Reports extends Page implements HasTable
                     ->sortable()
                     ->alignEnd(),
 
-                TextColumn::make('completed_lessons')
+                TextColumn::make('completed_topics')
                     ->label('Lessons')
-                    ->state(fn (CourseProgress $r) => $r->completed_lessons.' / '.$r->total_lessons)
+                    ->state(fn (CourseProgress $r) => $r->completed_topics.' / '.$r->total_topics)
                     ->alignEnd(),
 
                 TextColumn::make('final_score')
@@ -205,8 +205,8 @@ class Reports extends Page implements HasTable
                     $row->user?->department?->name,
                     $row->course?->title,
                     round((float) $row->percentage),
-                    $row->completed_lessons,
-                    $row->total_lessons,
+                    $row->completed_topics,
+                    $row->total_topics,
                     $row->final_score === null ? '' : round((float) $row->final_score),
                     $row->status->label(),
                     $row->started_at?->format('Y-m-d'),

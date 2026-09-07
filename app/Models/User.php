@@ -240,9 +240,9 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(CourseProgress::class);
     }
 
-    public function lessonProgress(): HasMany
+    public function topicProgress(): HasMany
     {
-        return $this->hasMany(LessonProgress::class);
+        return $this->hasMany(TopicProgress::class);
     }
 
     public function quizAttempts(): HasMany

@@ -5,10 +5,10 @@ namespace Database\Seeders;
 use App\Actions\Cohorts\AssignTrainee;
 use App\Actions\Practical\SubmitPracticalTask;
 use App\Enums\CompletionRequirement;
-use App\Enums\LessonType;
+use App\Enums\TopicType;
 use App\Models\Course;
-use App\Models\CourseModule;
 use App\Models\Lesson;
+use App\Models\Topic;
 use App\Models\PracticalTask;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -45,18 +45,18 @@ class DemoCompetencySeeder extends Seeder
         $this->command?->info('Demo data ready. See the course, the admin panel and Success metrics.');
     }
 
-    /** A video lesson, so the embedded player and transcript are visible. */
+    /** A video topic, so the embedded player and transcript are visible. */
     private function seedVideoLesson(Course $course): void
     {
-        $module = $course->modules()->orderBy('position')->first()
-            ?? CourseModule::factory()->for($course)->create(['title' => 'Demo module']);
+        $lesson = $course->lessons()->orderBy('position')->first()
+            ?? Lesson::factory()->for($course)->create(['title' => 'Demo module']);
 
-        Lesson::query()->updateOrCreate(
-            ['course_module_id' => $module->getKey(), 'slug' => 'demo-video-sensor-basics'],
+        Topic::query()->updateOrCreate(
+            ['lesson_id' => $lesson->getKey(), 'slug' => 'demo-video-sensor-basics'],
             [
                 'title' => 'Reading a fuel sensor (demo video)',
                 'description' => 'A short walkthrough of the sensor tab and what the raw value tells you.',
-                'type' => LessonType::VideoEmbed,
+                'type' => TopicType::VideoEmbed,
                 'video_provider' => 'youtube',
                 'video_id' => 'aqz-KE-bpKQ',
                 'video_duration_seconds' => 372,

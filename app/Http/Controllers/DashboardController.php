@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\ProgressStatus;
 use App\Models\Course;
 use App\Models\CourseProgress;
-use App\Models\Lesson;
+use App\Models\Topic;
 use App\Models\QuizAttempt;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -112,7 +112,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * The first unfinished lesson in the most urgent unfinished course.
+     * The first unfinished topic in the most urgent unfinished course.
      *
      * "Most urgent" means: whatever is already underway, then anything with a
      * deadline soonest, then required before optional. Picking up where they
@@ -142,35 +142,35 @@ class DashboardController extends Controller
             ])
             ->first();
 
-        $completedIds = $user->lessonProgress()
+        $completedIds = $user->topicProgress()
             ->where('course_id', $target->course_id)
             ->whereNotNull('completed_at')
-            ->pluck('lesson_id');
+            ->pluck('topic_id');
 
-        $lesson = Lesson::query()
-            ->join('course_modules', 'course_modules.id', '=', 'lessons.course_module_id')
-            ->where('lessons.course_id', $target->course_id)
+        $topic = Topic::query()
+            ->join('lessons', 'lessons.id', '=', 'topics.lesson_id')
+            ->where('topics.course_id', $target->course_id)
+            ->where('topics.is_published', true)
             ->where('lessons.is_published', true)
-            ->where('course_modules.is_published', true)
-            ->whereNotIn('lessons.id', $completedIds)
-            ->orderBy('course_modules.position')
+            ->whereNotIn('topics.id', $completedIds)
             ->orderBy('lessons.position')
-            ->select('lessons.id', 'lessons.slug', 'lessons.title', 'course_modules.title as module_title')
+            ->orderBy('topics.position')
+            ->select('topics.id', 'topics.slug', 'topics.title', 'lessons.title as module_title')
             ->first();
 
-        if (! $lesson) {
+        if (! $topic) {
             return null;
         }
 
         return [
-            'title' => $lesson->title,
-            'module_title' => $lesson->module_title,
+            'title' => $topic->title,
+            'module_title' => $topic->module_title,
             'course_title' => $target->course->title,
             'course_slug' => $target->course->slug,
-            'url' => route('lessons.show', [$target->course->slug, $lesson->slug]),
+            'url' => route('topics.show', [$target->course->slug, $topic->slug]),
             'percentage' => (float) $target->percentage,
-            'completed_lessons' => $target->completed_lessons,
-            'total_lessons' => $target->total_lessons,
+            'completed_topics' => $target->completed_topics,
+            'total_topics' => $target->total_topics,
         ];
     }
 
@@ -189,8 +189,8 @@ class DashboardController extends Controller
             'estimated_minutes' => $course->estimated_minutes,
             'is_required' => $course->is_required,
             'percentage' => (float) $progress->percentage,
-            'completed_lessons' => $progress->completed_lessons,
-            'total_lessons' => $progress->total_lessons,
+            'completed_topics' => $progress->completed_topics,
+            'total_topics' => $progress->total_topics,
             'status' => $progress->status->value,
             'status_label' => $progress->status->label(),
             'status_tone' => $progress->status->tone(),

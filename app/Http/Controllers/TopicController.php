@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Progress\CompleteLesson;
+use App\Actions\Progress\CompleteTopic;
 use App\Models\Course;
-use App\Models\Lesson;
+use App\Models\Topic;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -12,72 +12,72 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Mews\Purifier\Facades\Purifier;
 
-class LessonController extends Controller
+class TopicController extends Controller
 {
     public function show(
         Request $request,
         Course $course,
-        Lesson $lesson,
-        CompleteLesson $completeLesson,
+        Topic $topic,
+        CompleteTopic $completeLesson,
     ): Response {
-        abort_unless($lesson->course_id === $course->id, 404);
+        abort_unless($topic->course_id === $course->id, 404);
 
-        $this->authorize('view', $lesson);
+        $this->authorize('view', $topic);
 
         $user = $request->user();
 
-        $lesson->load(['resources', 'annotations', 'quiz', 'module']);
+        $topic->load(['resources', 'annotations', 'quiz', 'lesson']);
 
-        // Records the visit, and completes the lesson if that is all it takes.
-        if ($user->can('complete', $lesson)) {
-            $completeLesson->touch($user, $lesson);
+        // Records the visit, and completes the topic if that is all it takes.
+        if ($user->can('complete', $topic)) {
+            $completeLesson->touch($user, $topic);
         }
 
-        return Inertia::render('Lessons/Show', [
+        return Inertia::render('Topics/Show', [
             'course' => [
                 'title' => $course->title,
                 'slug' => $course->slug,
             ],
 
-            'lesson' => [
-                'id' => $lesson->id,
-                'title' => $lesson->title,
-                'slug' => $lesson->slug,
-                'description' => $lesson->description,
-                'type' => $lesson->type->value,
-                'type_label' => $lesson->type->label(),
+            'topic' => [
+                'id' => $topic->id,
+                'title' => $topic->title,
+                'slug' => $topic->slug,
+                'description' => $topic->description,
+                'type' => $topic->type->value,
+                'type_label' => $topic->type->label(),
 
-                // Sanitised on the way out as well as on the way in. Lesson HTML
+                // Sanitised on the way out as well as on the way in. Topic HTML
                 // is authored by trusted staff, but a compromised admin account
                 // should not become stored XSS against every employee.
-                'content' => $lesson->content ? $this->sanitize($lesson->content) : null,
+                'content' => $topic->content ? $this->sanitize($topic->content) : null,
 
-                'external_url' => $lesson->external_url,
+                'external_url' => $topic->external_url,
 
                 // Rebuilt from the stored provider and id, never from a stored
                 // URL — the iframe src must not be author-controlled text.
-                'video' => $lesson->videoEmbed()?->toArray(),
+                'video' => $topic->videoEmbed()?->toArray(),
 
                 // A route, not a file path or a storage URL. The bytes are on
                 // the private disk and only this route reaches them, after the
-                // same policy that let the lesson render at all.
-                'video_src' => $lesson->hasUploadedVideo()
-                    ? route('lessons.video', [$course->slug, $lesson->slug])
+                // same policy that let the topic render at all.
+                'video_src' => $topic->hasUploadedVideo()
+                    ? route('topics.video', [$course->slug, $topic->slug])
                     : null,
-                'video_mime' => $lesson->hasUploadedVideo() ? $lesson->video_mime_type : null,
+                'video_mime' => $topic->hasUploadedVideo() ? $topic->video_mime_type : null,
 
-                'video_duration' => $lesson->videoDurationForHumans(),
+                'video_duration' => $topic->videoDurationForHumans(),
 
                 // Plain text. Rendered with interpolation rather than v-html,
                 // so it needs no sanitising pass.
-                'video_transcript' => $lesson->video_transcript,
+                'video_transcript' => $topic->video_transcript,
 
-                'estimated_minutes' => $lesson->estimated_minutes,
-                'completion_requirement' => $lesson->completion_requirement->value,
-                'module_title' => $lesson->module?->title,
+                'estimated_minutes' => $topic->estimated_minutes,
+                'completion_requirement' => $topic->completion_requirement->value,
+                'module_title' => $topic->lesson?->title,
             ],
 
-            'resources' => $lesson->resources
+            'resources' => $topic->resources
                 ->map(fn ($resource) => [
                     'id' => $resource->id,
                     'name' => $resource->name,
@@ -89,8 +89,8 @@ class LessonController extends Controller
                     'stream_url' => route('resources.stream', $resource),
                 ])->all(),
 
-            // Replaces the runtime DOM scan in the prototype's skills module.
-            'annotations' => $lesson->annotations
+            // Replaces the runtime DOM scan in the prototype's skills lesson.
+            'annotations' => $topic->annotations
                 ->map(fn ($annotation) => [
                     'id' => $annotation->id,
                     'type' => $annotation->type,
@@ -100,20 +100,20 @@ class LessonController extends Controller
                     'is_resolved' => $annotation->is_resolved,
                 ])->all(),
 
-            'quiz' => $lesson->quiz && $lesson->quiz->is_published ? [
-                'id' => $lesson->quiz->id,
-                'title' => $lesson->quiz->title,
-                'passing_score' => $lesson->quiz->passing_score,
-                'passed' => $lesson->quiz->passedBy($user),
-                'attempts_used' => $lesson->quiz->attemptsUsedBy($user),
-                'max_attempts' => $lesson->quiz->max_attempts,
+            'quiz' => $topic->quiz && $topic->quiz->is_published ? [
+                'id' => $topic->quiz->id,
+                'title' => $topic->quiz->title,
+                'passing_score' => $topic->quiz->passing_score,
+                'passed' => $topic->quiz->passedBy($user),
+                'attempts_used' => $topic->quiz->attemptsUsedBy($user),
+                'max_attempts' => $topic->quiz->max_attempts,
             ] : null,
 
-            'navigation' => $this->navigation($course, $lesson),
+            'navigation' => $this->navigation($course, $topic),
 
             'state' => [
-                'completed' => $lesson->completedBy($user),
-                'can_complete' => $user->can('complete', $lesson),
+                'completed' => $topic->completedBy($user),
+                'can_complete' => $user->can('complete', $topic),
             ],
         ]);
     }
@@ -121,14 +121,14 @@ class LessonController extends Controller
     public function complete(
         Request $request,
         Course $course,
-        Lesson $lesson,
-        CompleteLesson $completeLesson,
+        Topic $topic,
+        CompleteTopic $completeLesson,
     ): RedirectResponse {
-        abort_unless($lesson->course_id === $course->id, 404);
+        abort_unless($topic->course_id === $course->id, 404);
 
-        $this->authorize('complete', $lesson);
+        $this->authorize('complete', $topic);
 
-        $completeLesson->handle($request->user(), $lesson);
+        $completeLesson->handle($request->user(), $topic);
 
         return back();
     }
@@ -136,14 +136,14 @@ class LessonController extends Controller
     public function uncomplete(
         Request $request,
         Course $course,
-        Lesson $lesson,
-        CompleteLesson $completeLesson,
+        Topic $topic,
+        CompleteTopic $completeLesson,
     ): RedirectResponse {
-        abort_unless($lesson->course_id === $course->id, 404);
+        abort_unless($topic->course_id === $course->id, 404);
 
-        $this->authorize('complete', $lesson);
+        $this->authorize('complete', $topic);
 
-        $completeLesson->undo($request->user(), $lesson);
+        $completeLesson->undo($request->user(), $topic);
 
         return back();
     }
@@ -154,25 +154,25 @@ class LessonController extends Controller
      *
      * @return array<string, mixed>
      */
-    private function navigation(Course $course, Lesson $lesson): array
+    private function navigation(Course $course, Topic $topic): array
     {
         // Both tables carry a course_id, so every column here is qualified —
         // an unqualified one makes PostgreSQL reject the query as ambiguous.
-        $ordered = Lesson::query()
-            ->join('course_modules', 'course_modules.id', '=', 'lessons.course_module_id')
-            ->where('lessons.course_id', $course->id)
+        $ordered = Topic::query()
+            ->join('lessons', 'lessons.id', '=', 'topics.lesson_id')
+            ->where('topics.course_id', $course->id)
+            ->where('topics.is_published', true)
             ->where('lessons.is_published', true)
-            ->where('course_modules.is_published', true)
-            ->orderBy('course_modules.position')
             ->orderBy('lessons.position')
-            ->select('lessons.id', 'lessons.slug', 'lessons.title')
+            ->orderBy('topics.position')
+            ->select('topics.id', 'topics.slug', 'topics.title')
             ->get();
 
-        $index = $ordered->search(fn ($l) => $l->id === $lesson->id);
+        $index = $ordered->search(fn ($l) => $l->id === $topic->id);
 
         $link = fn ($item) => $item ? [
             'title' => $item->title,
-            'url' => route('lessons.show', [$course->slug, $item->slug]),
+            'url' => route('topics.show', [$course->slug, $item->slug]),
         ] : null;
 
         return [
@@ -185,6 +185,6 @@ class LessonController extends Controller
 
     private function sanitize(string $html): string
     {
-        return Purifier::clean($html, 'lesson');
+        return Purifier::clean($html, 'topic');
     }
 }

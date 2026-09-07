@@ -7,7 +7,7 @@ import StatusPill from '@/Components/StatusPill.vue';
 
 const props = defineProps({
     course: { type: Object, required: true },
-    modules: { type: Array, default: () => [] },
+    lessons: { type: Array, default: () => [] },
     progress: { type: Object, required: true },
     final_quiz: { type: Object, default: null },
     practical_tasks: { type: Array, default: () => [] },
@@ -55,7 +55,7 @@ const toggle = (id) => (collapsed.value[id] = !collapsed.value[id]);
                     ></div>
                 </div>
                 <p class="mt-2 text-sm text-white/80">
-                    {{ progress.completed_lessons }} of {{ progress.total_lessons }} lessons ·
+                    {{ progress.completed_topics }} of {{ progress.total_topics }} topics ·
                     {{ Math.round(progress.percentage) }}%
                 </p>
             </div>
@@ -70,74 +70,74 @@ const toggle = (id) => (collapsed.value[id] = !collapsed.value[id]);
 
         <!-- ─── MODULES ─────────────────────────────────────── -->
         <div class="mb-8 flex flex-col gap-3">
-            <div v-for="module in modules" :key="module.id" class="card overflow-hidden">
+            <div v-for="lesson in lessons" :key="lesson.id" class="card overflow-hidden">
                 <button
                     type="button"
                     class="flex w-full cursor-pointer items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-surface-alt"
-                    :aria-expanded="!collapsed[module.id]"
-                    @click="toggle(module.id)"
+                    :aria-expanded="!collapsed[lesson.id]"
+                    @click="toggle(lesson.id)"
                 >
                     <span
                         class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold"
                         :class="
-                            module.lesson_count > 0 && module.completed_count === module.lesson_count
+                            lesson.lesson_count > 0 && lesson.completed_count === lesson.lesson_count
                                 ? 'bg-ok text-white'
                                 : 'bg-surface-alt text-ink-sec'
                         "
                     >
                         <template
                             v-if="
-                                module.lesson_count > 0 &&
-                                module.completed_count === module.lesson_count
+                                lesson.lesson_count > 0 &&
+                                lesson.completed_count === lesson.lesson_count
                             "
                         >
                             ✓
                         </template>
-                        <template v-else>{{ module.completed_count }}</template>
+                        <template v-else>{{ lesson.completed_count }}</template>
                     </span>
 
                     <span class="min-w-0 flex-1">
-                        <span class="block text-sm font-bold text-navy">{{ module.title }}</span>
-                        <span v-if="module.subtitle" class="block truncate text-sm text-ink-sec">
-                            {{ module.subtitle }}
+                        <span class="block text-sm font-bold text-navy">{{ lesson.title }}</span>
+                        <span v-if="lesson.subtitle" class="block truncate text-sm text-ink-sec">
+                            {{ lesson.subtitle }}
                         </span>
                     </span>
 
                     <span class="shrink-0 text-xs font-medium text-ink-dis">
-                        {{ module.completed_count }}/{{ module.lesson_count }}
+                        {{ lesson.completed_count }}/{{ lesson.lesson_count }}
                     </span>
 
                     <svg
                         class="h-4 w-4 shrink-0 fill-none stroke-current stroke-2 text-ink-dis transition-transform"
-                        :class="collapsed[module.id] ? '-rotate-90' : ''"
+                        :class="collapsed[lesson.id] ? '-rotate-90' : ''"
                         viewBox="0 0 24 24"
                     >
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
                     </svg>
                 </button>
 
-                <div v-show="!collapsed[module.id]" class="divide-y divide-line border-t border-line">
+                <div v-show="!collapsed[lesson.id]" class="divide-y divide-line border-t border-line">
                     <p
-                        v-if="module.description"
+                        v-if="lesson.description"
                         class="px-5 py-3 text-sm leading-relaxed text-ink-sec"
                     >
-                        {{ module.description }}
+                        {{ lesson.description }}
                     </p>
 
                     <Link
-                        v-for="lesson in module.lessons"
-                        :key="lesson.id"
-                        :href="route('lessons.show', [course.slug, lesson.slug])"
+                        v-for="topic in lesson.topics"
+                        :key="topic.id"
+                        :href="route('topics.show', [course.slug, topic.slug])"
                         class="flex items-center gap-3 px-5 py-3 no-underline transition-colors hover:bg-surface-alt"
                     >
                         <span
                             class="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md border-2"
                             :class="
-                                lesson.completed ? 'border-ok bg-ok' : 'border-line-strong'
+                                topic.completed ? 'border-ok bg-ok' : 'border-line-strong'
                             "
                         >
                             <svg
-                                v-if="lesson.completed"
+                                v-if="topic.completed"
                                 class="h-3 w-3 fill-none stroke-white stroke-[3]"
                                 viewBox="0 0 24 24"
                             >
@@ -147,37 +147,37 @@ const toggle = (id) => (collapsed.value[id] = !collapsed.value[id]);
 
                         <span
                             class="flex-1 text-sm"
-                            :class="lesson.completed ? 'text-ink-dis line-through' : 'text-ink'"
+                            :class="topic.completed ? 'text-ink-dis line-through' : 'text-ink'"
                         >
-                            {{ lesson.title }}
+                            {{ topic.title }}
                         </span>
 
-                        <span v-if="lesson.has_quiz" class="chip bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300">
+                        <span v-if="topic.has_quiz" class="chip bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300">
                             Quiz
                         </span>
                         <span class="chip hidden bg-surface-alt text-ink-sec sm:inline-flex">
-                            {{ lesson.type_label }}
+                            {{ topic.type_label }}
                         </span>
                     </Link>
 
-                    <!-- The knowledge check that closes the lesson. Passing it
+                    <!-- The knowledge check that closes the topic. Passing it
                          is required to finish the course, so it sits here at
                          the end rather than being found later. -->
                     <Link
-                        v-if="module.knowledge_check"
-                        :href="route('quizzes.show', [course.slug, module.knowledge_check.id])"
+                        v-if="lesson.knowledge_check"
+                        :href="route('quizzes.show', [course.slug, lesson.knowledge_check.id])"
                         class="flex items-center gap-3 bg-surface-alt px-5 py-3 no-underline transition-colors hover:bg-surface"
                     >
                         <span
                             class="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md border-2"
                             :class="
-                                module.knowledge_check.passed
+                                lesson.knowledge_check.passed
                                     ? 'border-ok bg-ok'
                                     : 'border-line-strong'
                             "
                         >
                             <svg
-                                v-if="module.knowledge_check.passed"
+                                v-if="lesson.knowledge_check.passed"
                                 class="h-3 w-3 fill-none stroke-white stroke-[3]"
                                 viewBox="0 0 24 24"
                             >
@@ -186,11 +186,11 @@ const toggle = (id) => (collapsed.value[id] = !collapsed.value[id]);
                         </span>
 
                         <span class="flex-1 text-sm font-medium text-ink">
-                            {{ module.knowledge_check.title }}
+                            {{ lesson.knowledge_check.title }}
                         </span>
 
                         <StatusPill
-                            v-if="module.knowledge_check.passed"
+                            v-if="lesson.knowledge_check.passed"
                             label="Passed"
                             tone="positive"
                         />
@@ -198,7 +198,7 @@ const toggle = (id) => (collapsed.value[id] = !collapsed.value[id]);
                             v-else
                             class="chip bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300"
                         >
-                            {{ module.knowledge_check.passing_score }}% to pass
+                            {{ lesson.knowledge_check.passing_score }}% to pass
                         </span>
                     </Link>
                 </div>
@@ -293,7 +293,7 @@ const toggle = (id) => (collapsed.value[id] = !collapsed.value[id]);
             <!-- Locked in the UI *and* by QuizPolicy::attempt — the hidden
                  button is the courtesy, the policy is the control. -->
             <p v-else class="text-sm text-ink-dis italic">
-                Complete every lesson to unlock the final assessment.
+                Complete every topic to unlock the final assessment.
             </p>
         </div>
     </EmployeeLayout>

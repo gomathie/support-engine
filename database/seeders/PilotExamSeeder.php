@@ -6,6 +6,7 @@ use App\Enums\CourseStatus;
 use App\Enums\QuestionType;
 use App\Enums\Role;
 use App\Models\Course;
+use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\QuizQuestion;
 use App\Models\User;
@@ -65,8 +66,21 @@ class PilotExamSeeder extends Seeder
                 'title' => 'PILOT Technical Support Employee Examination – Section A',
             ],
             [
-                'course_module_id' => null,
-                'lesson_id' => null,
+                /*
+                 * Scoped to the final lesson, alongside Sections B and C.
+                 *
+                 * It used to be course-scoped, which made it a *second* final
+                 * exam. `RecalculateCourseProgress` reads `finalQuiz()->first()`,
+                 * so the course already had its gate and this sat in front of
+                 * trainees looking exactly like the exam that counted while
+                 * counting for nothing. The three sections belong together.
+                 */
+                'lesson_id' => Lesson::query()
+                    ->where('course_id', $course->id)
+                    ->where('subtitle', 'Final testing and consultation')
+                    ->value('id'),
+
+                'topic_id' => null,
                 'description' => 'The official PILOT advanced knowledge test. '
                     .'40 questions, one correct answer each. '
                     .'You need 70 % (28 correct) to pass. Time limit: 60 minutes.',
@@ -76,6 +90,14 @@ class PilotExamSeeder extends Seeder
                 'shuffle_questions' => false, // preserve official numbering
                 'shuffle_options' => false,
                 'show_feedback' => true,
+
+                /*
+                 * Live. The answer key was confirmed on 2026-09-08, which
+                 * closes PA-16 — the long-standing blocker on this exam
+                 * deciding anything. Before that it was published but
+                 * course-scoped, so it looked authoritative and counted for
+                 * nothing; now it is lesson-scoped and gates the final lesson.
+                 */
                 'is_published' => true,
             ],
         );

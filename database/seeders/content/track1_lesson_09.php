@@ -12,9 +12,9 @@
  */
 
 return [
-    'module_subtitle' => 'Contract settings and notifications',
+    'lesson_subtitle' => 'Contract settings and notifications',
 
-    'lessons' => [
+    'topics' => [
 
         // ─────────────────────────────────────────────────────────
         'Add a test email in contract settings and send confirmation' => [
@@ -51,6 +51,38 @@ return [
 
 <blockquote><p><strong>First-line diagnostic rule:</strong> When a customer reports "I set up automated daily reports but nobody is receiving them!", the very first check is Account Settings → Privacy. In 90% of cases, the email address was entered but never confirmed.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Email Setup & Address Confirmation',
+                'description' => 'Test your understanding of email verification rules and status badge indicators.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'What happens in PILOT if an administrator adds an email address but the mailbox owner never clicks the confirmation link?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Unconfirmed email addresses remain inactive with a red badge, and PILOT withholds all automated dispatches and scheduled reports.',
+                        'options' => [
+                            ['text' => 'The email remains unconfirmed and PILOT withholds all notifications and scheduled reports', 'correct' => true],
+                            ['text' => 'PILOT automatically sends the emails as SMS messages instead', 'correct' => false],
+                            ['text' => 'The user account is locked and deleted within 24 hours', 'correct' => false],
+                            ['text' => 'All tracking hardware stops transmitting coordinates', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'What does a green check badge next to an email address in Account Settings indicate?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'A green check badge signifies that the email address is confirmed and active for automated reporting and alerts.',
+                        'options' => [
+                            ['text' => 'The email address is confirmed and actively eligible for automated dispatches', 'correct' => true],
+                            ['text' => 'The email has zero spam filters applied', 'correct' => false],
+                            ['text' => 'The email address is hosted on Microsoft Exchange', 'correct' => false],
+                            ['text' => 'The user has super administrator privileges', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -84,6 +116,38 @@ HTML,
 
 <p>When any vehicle in the account exceeds the configured speed threshold, an instant alert is generated and dispatched within seconds.</p>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Speed Alerts & Dispatch Channels',
+                'description' => 'Verify your understanding of alert rule activation, delivery channels, and notification contents.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'Which delivery channels can PILOT utilize to dispatch real-time speed violation alerts?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'PILOT supports email, live browser web pop-ups, and SMS/push notifications.',
+                        'options' => [
+                            ['text' => 'Email, browser web pop-up banners, and SMS / mobile push', 'correct' => true],
+                            ['text' => 'Only printed letters sent by postal mail', 'correct' => false],
+                            ['text' => 'FM radio broadcasts', 'correct' => false],
+                            ['text' => 'Direct vehicle horn activation only', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'What critical details are included in an automated speed limit violation alert?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The notification provides vehicle name, driver, location address, recorded peak speed, and timestamp.',
+                        'options' => [
+                            ['text' => 'Vehicle callsign, driver name, location address, peak speed, and timestamp', 'correct' => true],
+                            ['text' => 'Only the driver\'s home address', 'correct' => false],
+                            ['text' => 'A copy of the annual insurance policy', 'correct' => false],
+                            ['text' => 'A photo of the company CEO', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -116,6 +180,38 @@ HTML,
 
 <blockquote><p><strong>Code expiration note:</strong> The 6-digit TOTP code expires every 30 seconds. If an end user reports "My 2FA code is rejected", advise them to wait for the next 30-second cycle and enter the fresh code immediately.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Two-Factor Authentication Security',
+                'description' => 'Test your proficiency configuring TOTP authenticators and troubleshooting login verification.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'Which two methods of Two-Factor Authentication (2FA) does PILOT support for operator accounts?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'PILOT supports TOTP (authenticator applications like Google or Microsoft Authenticator) and Email one-time verification codes.',
+                        'options' => [
+                            ['text' => 'TOTP authenticator app and Email verification code', 'correct' => true],
+                            ['text' => 'Facial recognition camera hardware only', 'correct' => false],
+                            ['text' => 'Physical smart cards only', 'correct' => false],
+                            ['text' => 'Landline automated phone calls only', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'How frequently does a standard TOTP authenticator application rotate its 6-digit login token?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Standard TOTP codes expire and refresh every 30 seconds.',
+                        'options' => [
+                            ['text' => 'Every 30 seconds', 'correct' => true],
+                            ['text' => 'Every 24 hours', 'correct' => false],
+                            ['text' => 'Every 5 minutes', 'correct' => false],
+                            ['text' => 'Only once a month', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
 

@@ -11,9 +11,9 @@
  */
 
 return [
-    'module_subtitle' => 'Interface and navigation',
+    'lesson_subtitle' => 'Interface and navigation',
 
-    'lessons' => [
+    'topics' => [
 
         // ─────────────────────────────────────────────────────────
         'Log in to the system' => [
@@ -53,6 +53,38 @@ monitored objects on a live map.</li>
 <blockquote><p><strong>On a call:</strong> knowing the three-area layout lets you guide someone
 without seeing their screen: "Look at the top bar… now click the left sidebar tab…"</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: System Login & Workspace Layout',
+                'description' => 'Verify your understanding of system login and the three primary screen areas.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'Which section of the PILOT platform loads automatically as the main workspace immediately after successful login?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'docs.pilot-gps.com specifies that upon logging in, the system immediately loads the Online section as the primary monitoring workspace.',
+                        'options' => [
+                            ['text' => 'The Online section', 'correct' => true],
+                            ['text' => 'The Reports archive', 'correct' => false],
+                            ['text' => 'The Admin Billing panel', 'correct' => false],
+                            ['text' => 'The Sensor Calibration editor', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'What are the three main structural areas of the PILOT workspace?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The PILOT workspace is divided into the Top panel (navigation/statuses), Left sidebar (section menu and tabs), and the central Map area.',
+                        'options' => [
+                            ['text' => 'Top panel, Left sidebar (section menu), and Map area', 'correct' => true],
+                            ['text' => 'Header, Footer, and Terminal window', 'correct' => false],
+                            ['text' => 'Admin panel, Billing ledger, and Driver chat', 'correct' => false],
+                            ['text' => 'Sensor table, Geofence list, and Video stream', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -146,6 +178,38 @@ double-check important details or contact Support for clarification.</p></blockq
 Those are your object statuses. What numbers do you see?" — this quickly reveals whether
 objects are present and active, or if something is wrong.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Top Panel Elements & Status Counters',
+                'description' => 'Test your knowledge of the top panel counters, navigation menu, and configuration icons.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'What happens when a user clicks on one of the colored object status numbers (e.g. green for Moving) on the top panel?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Clicking a status icon in the top panel automatically filters the object list to display only the vehicles matching that specific status.',
+                        'options' => [
+                            ['text' => 'It automatically filters the object list to show only vehicles in that status', 'correct' => true],
+                            ['text' => 'It immediately reboots the tracking devices', 'correct' => false],
+                            ['text' => 'It generates a PDF mileage invoice', 'correct' => false],
+                            ['text' => 'It deletes all inactive objects from the contract', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'Which top panel element allows an operator to change interface language, date/time formatting, and personal password?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The gear icon opens the Configuration window where personal info, language, password, and date/time regional preferences are maintained.',
+                        'options' => [
+                            ['text' => 'The Gear icon (Configuration)', 'correct' => true],
+                            ['text' => 'The AI Assistant button', 'correct' => false],
+                            ['text' => 'The Map Selector tool', 'correct' => false],
+                            ['text' => 'The Geocoder search box', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -172,6 +236,38 @@ hybrid views that overlay street names on satellite imagery.</p>
 says objects appear in the wrong place. Satellite view makes it easier to verify whether a
 vehicle is parked inside a yard or on the road next to it.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Map Layers & Satellite Basemaps',
+                'description' => 'Verify your understanding of selecting basemaps and default view persistence.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'Where is the Map Selector button located in the PILOT workspace?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The Map Selector is situated inside the map tools control dock in the bottom-right corner of the map viewport.',
+                        'options' => [
+                            ['text' => 'In the Map Tools dock in the bottom-right corner of the map', 'correct' => true],
+                            ['text' => 'Inside the browser address bar', 'correct' => false],
+                            ['text' => 'Under the user password setting in Admin Panel', 'correct' => false],
+                            ['text' => 'In the Report Scheduler queue', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'When an operator switches the map basemap to Yandex Sat, when does this preference apply?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'docs.pilot-gps.com notes that the chosen basemap becomes the user\'s persistent default and loads automatically on subsequent logins.',
+                        'options' => [
+                            ['text' => 'It becomes the default basemap and persists across subsequent logins', 'correct' => true],
+                            ['text' => 'It resets back to default OpenStreetMap immediately upon page refresh', 'correct' => false],
+                            ['text' => 'It only stays active for 15 minutes', 'correct' => false],
+                            ['text' => 'It applies globally to every other user in the company', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -243,6 +339,38 @@ Auto orientation.</li>
 customer asks "how far is my truck from the delivery point?" — it gives a real driving
 distance, not a straight-line estimate.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Map Tools & Distance Measurement',
+                'description' => 'Test your proficiency using distance measurement, road routing, and proximity calculation tools.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'How does the "Measure distance along roads" tool differ from the standard straight-line "Measure distance" tool?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Measure distance along roads snaps waypoints to actual road networks and provides real driving distance with estimated travel time rather than direct line-of-sight distance.',
+                        'options' => [
+                            ['text' => 'It routes along real road networks and computes estimated travel time', 'correct' => true],
+                            ['text' => 'It requires GPS hardware to be uninstalled', 'correct' => false],
+                            ['text' => 'It only works inside geofences', 'correct' => false],
+                            ['text' => 'It measures fuel consumption instead of kilometers', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'Which tool allows a dispatcher to click a delivery warehouse and identify which vehicle is closest with its estimated arrival time?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The "Distance to the nearest vehicle" tool calculates the closest monitored asset to a clicked map point along with estimated transit time.',
+                        'options' => [
+                            ['text' => 'Distance to the nearest vehicle', 'correct' => true],
+                            ['text' => 'Geocoder search', 'correct' => false],
+                            ['text' => 'Print map tool', 'correct' => false],
+                            ['text' => 'Object status counter', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
 

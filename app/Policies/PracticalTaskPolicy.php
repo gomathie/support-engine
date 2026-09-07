@@ -9,7 +9,7 @@ use App\Models\User;
 /**
  * Access to a practical task, derived from access to its course.
  *
- * Same rule as LessonPolicy: never granted directly, or an unenrolled employee
+ * Same rule as TopicPolicy: never granted directly, or an unenrolled employee
  * could read the brief by URL even though the course listing hides it.
  */
 class PracticalTaskPolicy
@@ -42,7 +42,7 @@ class PracticalTaskPolicy
      * Starting or handing in work on it.
      *
      * Enrolment, not merely visibility — trainers and admins browse content
-     * without it counting as their own training, exactly as lesson completion
+     * without it counting as their own training, exactly as topic completion
      * works.
      */
     public function attempt(User $user, PracticalTask $task): bool
@@ -58,16 +58,16 @@ class PracticalTaskPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('lessons.manage');
+        return $user->hasPermissionTo('topics.manage');
     }
 
     public function update(User $user, PracticalTask $task): bool
     {
-        return $user->hasPermissionTo('lessons.manage');
+        return $user->hasPermissionTo('topics.manage');
     }
 
     public function delete(User $user, PracticalTask $task): bool
     {
-        return $user->hasPermissionTo('lessons.manage');
+        return $user->hasPermissionTo('topics.manage');
     }
 }

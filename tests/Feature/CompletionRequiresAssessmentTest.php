@@ -5,13 +5,13 @@ namespace Tests\Feature;
 use App\Actions\Enrollment\EnrollEmployee;
 use App\Actions\Practical\GradePracticalSubmission;
 use App\Actions\Practical\SubmitPracticalTask;
-use App\Actions\Progress\CompleteLesson;
+use App\Actions\Progress\CompleteTopic;
 use App\Enums\CompletionRequirement;
 use App\Enums\ProgressStatus;
 use App\Enums\RubricCriterion;
 use App\Models\Course;
-use App\Models\CourseModule;
 use App\Models\Lesson;
+use App\Models\Topic;
 use App\Models\PracticalTask;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -39,9 +39,9 @@ class CompletionRequiresAssessmentTest extends TestCase
     private function courseWithPractical(): array
     {
         $course = Course::factory()->create();
-        $module = CourseModule::factory()->for($course)->create();
+        $lesson = Lesson::factory()->for($course)->create();
 
-        Lesson::factory()->count(2)->for($module, 'module')->create();
+        Topic::factory()->count(2)->for($lesson, 'lesson')->create();
 
         $task = PracticalTask::query()->create([
             'course_id' => $course->id,
@@ -57,8 +57,8 @@ class CompletionRequiresAssessmentTest extends TestCase
     {
         app(EnrollEmployee::class)->handle($user, $course);
 
-        foreach ($course->lessons as $lesson) {
-            app(CompleteLesson::class)->handle($user, $lesson);
+        foreach ($course->topics as $topic) {
+            app(CompleteTopic::class)->handle($user, $topic);
         }
     }
 
@@ -70,7 +70,7 @@ class CompletionRequiresAssessmentTest extends TestCase
     // ─── THE RULE ────────────────────────────────────────────
 
     /**
-     * The gap this closes: a trainee could previously read every lesson, be
+     * The gap this closes: a trainee could previously read every topic, be
      * marked complete, collect a certificate and be awarded a competency level
      * having never demonstrated anything.
      */
@@ -108,7 +108,7 @@ class CompletionRequiresAssessmentTest extends TestCase
         $this->assertSame(
             ProgressStatus::Completed,
             $this->statusFor($user->fresh(), $course),
-            'Marking the practical must complete the course without another lesson tick.',
+            'Marking the practical must complete the course without another topic tick.',
         );
     }
 
@@ -159,8 +159,8 @@ class CompletionRequiresAssessmentTest extends TestCase
     public function test_a_course_with_no_practical_still_completes_on_its_lessons(): void
     {
         $course = Course::factory()->create();
-        $module = CourseModule::factory()->for($course)->create();
-        Lesson::factory()->count(2)->for($module, 'module')->create();
+        $lesson = Lesson::factory()->for($course)->create();
+        Topic::factory()->count(2)->for($lesson, 'lesson')->create();
 
         $user = $this->trainee();
         $this->readEverything($user, $course->fresh());
@@ -178,7 +178,7 @@ class CompletionRequiresAssessmentTest extends TestCase
     {
         $this->seed(\Database\Seeders\TrainingContentSeeder::class);
 
-        $selfAttested = Lesson::query()
+        $selfAttested = Topic::query()
             ->where('completion_requirement', CompletionRequirement::Acknowledge->value)
             ->count();
 
@@ -201,14 +201,14 @@ class CompletionRequiresAssessmentTest extends TestCase
     public function test_a_new_lesson_defaults_to_a_reading_record(): void
     {
         $course = Course::factory()->create();
-        $module = CourseModule::factory()->for($course)->create();
+        $lesson = Lesson::factory()->for($course)->create();
 
-        $lesson = Lesson::query()->create([
-            'course_module_id' => $module->id,
-            'title' => 'A lesson with no requirement stated',
+        $topic = Topic::query()->create([
+            'lesson_id' => $lesson->id,
+            'title' => 'A topic with no requirement stated',
         ]);
 
-        $this->assertSame(CompletionRequirement::View, $lesson->fresh()->completion_requirement);
+        $this->assertSame(CompletionRequirement::View, $topic->fresh()->completion_requirement);
     }
 
     // ─── LESSON NUMBERING ────────────────────────────────────
@@ -218,7 +218,7 @@ class CompletionRequiresAssessmentTest extends TestCase
     {
         $this->seed(\Database\Seeders\TrainingContentSeeder::class);
 
-        $dated = \App\Models\CourseModule::query()->where('title', 'like', 'Day %')->count();
+        $dated = \App\Models\Lesson::query()->where('title', 'like', 'Day %')->count();
 
         $this->assertSame(0, $dated, 'Modules must not be labelled by day.');
 

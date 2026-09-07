@@ -3,12 +3,12 @@
 namespace App\Enums;
 
 /**
- * What it takes to finish one lesson.
+ * What it takes to finish one topic.
  *
  * Read this alongside the course-level rule in RecalculateCourseProgress, because
  * the division of labour between them is the whole point:
  *
- *   A finished lesson is a **reading record**, not a claim of competence.
+ *   A finished topic is a **reading record**, not a claim of competence.
  *
  * Competence is decided by the final exam and the practical task, both of which
  * are marked by somebody other than the learner. That is why View is the sensible
@@ -19,7 +19,7 @@ namespace App\Enums;
  */
 enum CompletionRequirement: string
 {
-    /** Opening the lesson records that it was read. */
+    /** Opening the topic records that it was read. */
     case View = 'view';
 
     /**
@@ -49,7 +49,7 @@ enum CompletionRequirement: string
     }
 
     /**
-     * Whether finishing this lesson required somebody other than the learner to
+     * Whether finishing this topic required somebody other than the learner to
      * agree. Only these two are evidence of anything.
      */
     public function isAssessed(): bool

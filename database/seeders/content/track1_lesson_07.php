@@ -11,9 +11,9 @@
  */
 
 return [
-    'module_subtitle' => 'Sensors (part 2)',
+    'lesson_subtitle' => 'Sensors (part 2)',
 
-    'lessons' => [
+    'topics' => [
 
         // ─────────────────────────────────────────────────────────
         'Set up a 3–4 point calibration table for the fuel sensor' => [
@@ -46,6 +46,38 @@ return [
 
 <blockquote><p><strong>Support tip:</strong> If a customer complains their fuel chart looks erratic or shows negative values, inspect the calibration table. If points are entered out of numerical order (e.g. X=1000 after X=2500), the interpolation engine calculates erratic slope transitions.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Fuel Calibration Tables',
+                'description' => 'Verify your understanding of calibration curves, raw telemetry mapping, and interpolation rules.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'What is the purpose of a Calibration Table in PILOT sensor configuration?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'A calibration table maps non-linear raw sensor readings (mV, Hz, or counts) to true physical volumes (liters) using linear interpolation between known dip points.',
+                        'options' => [
+                            ['text' => 'It translates raw electrical sensor units (mV, Hz, Ohm) into true physical liters', 'correct' => true],
+                            ['text' => 'It sets the maximum speed limit of the truck', 'correct' => false],
+                            ['text' => 'It pairs Bluetooth accessories to mobile phones', 'correct' => false],
+                            ['text' => 'It calculates billing subscriptions for SIM cards', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'Why must calibration reference points (X values) always be entered in ascending numerical order?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Entering points out of order causes erratic interpolation math resulting in negative values or spike artifacts.',
+                        'options' => [
+                            ['text' => 'It ensures smooth linear interpolation without erratic calculation spikes or negative dips', 'correct' => true],
+                            ['text' => 'PILOT will reject the device IMEI otherwise', 'correct' => false],
+                            ['text' => 'It prevents cellular data overage fees', 'correct' => false],
+                            ['text' => 'It is required by vehicle warranty regulations', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -84,6 +116,38 @@ HTML,
 <li>When a packet with <code>12650</code> arrives, PILOT calculates <code>12650 / 1000 = 12.65</code>. The object tooltip and history charts will show <strong>12.65 V</strong>.</li>
 </ol>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Sensor Conversion Formulas',
+                'description' => 'Test your knowledge of conversion formula syntax, mathematical operators, and decimal notation.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'If a GPS tracker sends external battery voltage as millivolts (e.g. 12650 for 12.65V), which conversion formula should you apply in PILOT?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Dividing millivolts by 1000 (`/1000`) converts the value into standard volts (12.65 V).',
+                        'options' => [
+                            ['text' => '/1000', 'correct' => true],
+                            ['text' => '*1000', 'correct' => false],
+                            ['text' => '+1000', 'correct' => false],
+                            ['text' => '=1000', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'Which decimal separator is strictly required when entering fractional numbers into PILOT conversion formulas?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'PILOT formulas require period notation (`.`, e.g. `25.4`), as commas will result in formula parsing errors.',
+                        'options' => [
+                            ['text' => 'A period / dot (e.g. 25.4)', 'correct' => true],
+                            ['text' => 'A comma (e.g. 25,4)', 'correct' => false],
+                            ['text' => 'A colon (e.g. 25:4)', 'correct' => false],
+                            ['text' => 'A semicolon (e.g. 25;4)', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -123,6 +187,38 @@ HTML,
 
 <p>To apply a template across 20 vehicles at once: in the Online object list, hold <code>Ctrl</code> and select all target vehicles. Right-click the selection, choose <strong>Sensor templates</strong>, pick your saved template, and click <strong>Use template</strong>.</p>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Sensor Templates & Batch Application',
+                'description' => 'Test your understanding of hardware model constraints and applying sensor templates in bulk.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'What is the mandatory prerequisite before applying a saved sensor template to a vehicle?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'A sensor template relies on hardware-specific telemetry tags and can only be applied to objects using the exact same tracker model.',
+                        'options' => [
+                            ['text' => 'The target object must use the exact same GPS tracker hardware model as the template', 'correct' => true],
+                            ['text' => 'The vehicle must be currently driving over 50 km/h', 'correct' => false],
+                            ['text' => 'The user must be the Super Administrator of the entire platform', 'correct' => false],
+                            ['text' => 'The vehicle must have zero existing odometer mileage', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'How can an administrator apply a sensor template to 20 identical vehicles simultaneously in PILOT?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Operators can multi-select vehicles in the object list, right-click, select Sensor templates, and apply the template in one step.',
+                        'options' => [
+                            ['text' => 'Select all 20 vehicles in the object list, right-click, and choose Sensor templates → Use template', 'correct' => true],
+                            ['text' => 'Create 20 separate administrative contracts', 'correct' => false],
+                            ['text' => 'Reinstall the PILOT mobile app', 'correct' => false],
+                            ['text' => 'Manually retype all formulas and calibration tables 20 times', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
 

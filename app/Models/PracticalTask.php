@@ -20,7 +20,7 @@ use Illuminate\Support\Str;
  */
 #[Fillable([
     'course_id',
-    'lesson_id',
+    'topic_id',
     'title',
     'slug',
     'brief',
@@ -79,11 +79,11 @@ class PracticalTask extends Model
         static::saving(function (self $task): void {
             $task->slug ??= Str::slug(Str::limit($task->title, 60, ''));
 
-            // Denormalised the same way lessons are: a task attached to a
-            // lesson must belong to that lesson's course.
-            if ($task->lesson_id) {
-                $lessonCourseId = Lesson::withTrashed()
-                    ->whereKey($task->lesson_id)
+            // Denormalised the same way topics are: a task attached to a
+            // topic must belong to that topic's course.
+            if ($task->topic_id) {
+                $lessonCourseId = Topic::withTrashed()
+                    ->whereKey($task->topic_id)
                     ->value('course_id');
 
                 if ($lessonCourseId) {
@@ -108,9 +108,9 @@ class PracticalTask extends Model
         return $this->belongsTo(Course::class);
     }
 
-    public function lesson(): BelongsTo
+    public function topic(): BelongsTo
     {
-        return $this->belongsTo(Lesson::class);
+        return $this->belongsTo(Topic::class);
     }
 
     public function submissions(): HasMany

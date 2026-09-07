@@ -55,11 +55,11 @@ const finished = computed(() => props.courses.filter((c) => c.status === 'comple
                 {{
                     is_new_starter
                         ? 'Your onboarding is mapped out below. Work through it at your own pace — everything you tick is saved, so you can stop and pick up where you left off.'
-                        : 'Short, focused lessons that get you productive on the PILOT platform.'
+                        : 'Short, focused topics that get you productive on the PILOT platform.'
                 }}
             </p>
 
-            <!-- Next lesson: the primary action on this page. -->
+            <!-- Next topic: the primary action on this page. -->
             <div
                 v-if="next_lesson"
                 class="mt-6 rounded-xl bg-white/10 p-4 sm:p-5"
@@ -88,7 +88,7 @@ const finished = computed(() => props.courses.filter((c) => c.status === 'comple
                     </Link>
                 </div>
 
-                <div v-if="next_lesson.total_lessons" class="mt-4">
+                <div v-if="next_lesson.total_topics" class="mt-4">
                     <div class="h-2 overflow-hidden rounded-full bg-white/20">
                         <div
                             class="h-full rounded-full bg-white transition-[width] duration-500"
@@ -96,8 +96,8 @@ const finished = computed(() => props.courses.filter((c) => c.status === 'comple
                         ></div>
                     </div>
                     <p class="mt-1.5 text-xs text-white/70">
-                        {{ next_lesson.completed_lessons }} of
-                        {{ next_lesson.total_lessons }} lessons in this course
+                        {{ next_lesson.completed_topics }} of
+                        {{ next_lesson.total_topics }} topics in this course
                     </p>
                 </div>
             </div>

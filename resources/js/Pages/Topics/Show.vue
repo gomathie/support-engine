@@ -1,21 +1,21 @@
 <script setup>
 /**
- * The lesson viewer: a table of contents on the left, the lesson "paper" on
+ * The topic viewer: a table of contents on the left, the topic "paper" on
  * the right, and a branch per content type.
  *
- * Adding a content type means adding a branch here and a case to the LessonType
+ * Adding a content type means adding a branch here and a case to the TopicType
  * enum. Nothing else changes.
  */
 import { computed, ref } from 'vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import EmployeeLayout from '@/Layouts/EmployeeLayout.vue';
-import LessonToc from '@/Components/LessonToc.vue';
+import TopicToc from '@/Components/TopicToc.vue';
 import AnnotationDrawer from '@/Components/AnnotationDrawer.vue';
 import StatusPill from '@/Components/StatusPill.vue';
 
 const props = defineProps({
     course: { type: Object, required: true },
-    lesson: { type: Object, required: true },
+    topic: { type: Object, required: true },
     resources: { type: Array, default: () => [] },
     annotations: { type: Array, default: () => [] },
     quiz: { type: Object, default: null },
@@ -27,7 +27,7 @@ const drawerOpen = ref(false);
 const tocOpen = ref(false);
 const saving = ref(false);
 
-// Collapsed by default: the video is the lesson, the transcript is the
+// Collapsed by default: the video is the topic, the transcript is the
 // reference you open when you want to find one line again.
 const transcriptOpen = ref(false);
 
@@ -38,9 +38,9 @@ function toggleComplete() {
     saving.value = true;
 
     router.visit(
-        route(props.state.completed ? 'lessons.uncomplete' : 'lessons.complete', [
+        route(props.state.completed ? 'topics.uncomplete' : 'topics.complete', [
             props.course.slug,
-            props.lesson.slug,
+            props.topic.slug,
         ]),
         {
             method: props.state.completed ? 'delete' : 'post',
@@ -52,7 +52,7 @@ function toggleComplete() {
 </script>
 
 <template>
-    <Head :title="lesson.title" />
+    <Head :title="topic.title" />
 
     <EmployeeLayout>
         <!-- ─── BREADCRUMB ──────────────────────────────────── -->
@@ -67,7 +67,7 @@ function toggleComplete() {
             <div class="flex-1"></div>
 
             <span v-if="navigation.position" class="text-sm text-ink-dis">
-                Lesson {{ navigation.position }} of {{ navigation.total }}
+                Topic {{ navigation.position }} of {{ navigation.total }}
             </span>
 
             <button
@@ -92,22 +92,22 @@ function toggleComplete() {
             <!-- ─── TOC ─────────────────────────────────────── -->
             <div :class="tocOpen ? 'block' : 'hidden lg:block'">
                 <div class="card p-4 lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
-                    <LessonToc content-selector="#lesson-body" />
+                    <TopicToc content-selector="#topic-body" />
                 </div>
             </div>
 
             <!-- ─── ARTICLE ─────────────────────────────────── -->
             <article class="card min-w-0 p-6 sm:p-9">
-                <p v-if="lesson.module_title" class="mb-2 text-sm font-medium text-brand">
-                    {{ lesson.module_title }}
+                <p v-if="topic.module_title" class="mb-2 text-sm font-medium text-brand">
+                    {{ topic.module_title }}
                 </p>
 
                 <h1 class="mb-3 text-2xl leading-tight font-extrabold text-navy sm:text-3xl">
-                    {{ lesson.title }}
+                    {{ topic.title }}
                 </h1>
 
-                <p v-if="lesson.description" class="mb-4 text-base text-ink-sec">
-                    {{ lesson.description }}
+                <p v-if="topic.description" class="mb-4 text-base text-ink-sec">
+                    {{ topic.description }}
                 </p>
 
                 <div class="mb-7 flex flex-wrap items-center gap-2 border-b border-line pb-5">
@@ -115,32 +115,32 @@ function toggleComplete() {
                         :label="state.completed ? 'Completed' : 'Not completed'"
                         :tone="state.completed ? 'positive' : 'neutral'"
                     />
-                    <span class="chip bg-surface-alt text-ink-sec">{{ lesson.type_label }}</span>
-                    <span v-if="lesson.estimated_minutes" class="chip bg-surface-alt text-ink-sec">
-                        ~{{ lesson.estimated_minutes }} min
+                    <span class="chip bg-surface-alt text-ink-sec">{{ topic.type_label }}</span>
+                    <span v-if="topic.estimated_minutes" class="chip bg-surface-alt text-ink-sec">
+                        ~{{ topic.estimated_minutes }} min
                     </span>
                 </div>
 
                 <!-- ═══ CONTENT BY TYPE ═════════════════════════ -->
 
                 <!-- v-html is safe here: the server ran the body through
-                     HTMLPurifier's `lesson` allowlist, which strips script,
+                     HTMLPurifier's `topic` allowlist, which strips script,
                      iframe, style and every event handler. -->
                 <div
-                    v-if="lesson.type === 'rich_text' && lesson.content"
-                    id="lesson-body"
-                    class="lesson-prose prose max-w-none"
-                    v-html="lesson.content"
+                    v-if="topic.type === 'rich_text' && topic.content"
+                    id="topic-body"
+                    class="topic-prose prose max-w-none"
+                    v-html="topic.content"
                 ></div>
 
                 <!-- The src comes from the server, rebuilt from a stored
                      provider and id against a fixed template — never from a
                      URL an author pasted. See App\Support\Video\VideoEmbed. -->
-                <div v-else-if="lesson.type === 'video_embed' && lesson.video" id="lesson-body">
+                <div v-else-if="topic.type === 'video_embed' && topic.video" id="topic-body">
                     <div class="relative w-full overflow-hidden rounded-xl border border-line bg-black pt-[56.25%]">
                         <iframe
-                            :src="lesson.video.embed_url"
-                            :title="lesson.title"
+                            :src="topic.video.embed_url"
+                            :title="topic.title"
                             class="absolute inset-0 h-full w-full"
                             frameborder="0"
                             allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
@@ -149,13 +149,13 @@ function toggleComplete() {
                     </div>
 
                     <p class="mt-2 flex flex-wrap items-center gap-2 text-xs text-ink-dis">
-                        <span>{{ lesson.video.provider_label }}</span>
-                        <span v-if="lesson.video_duration">· {{ lesson.video_duration }}</span>
+                        <span>{{ topic.video.provider_label }}</span>
+                        <span v-if="topic.video_duration">· {{ topic.video_duration }}</span>
                     </p>
 
                     <!-- Adults scan before they watch, so the transcript is a
-                         first-class part of the lesson rather than a download. -->
-                    <div v-if="lesson.video_transcript" class="mt-6">
+                         first-class part of the topic rather than a download. -->
+                    <div v-if="topic.video_transcript" class="mt-6">
                         <button
                             type="button"
                             class="flex w-full items-center justify-between rounded-lg border border-line bg-surface-alt px-4 py-3 text-left text-sm font-semibold text-ink-pri"
@@ -168,29 +168,29 @@ function toggleComplete() {
                         <div
                             v-show="transcriptOpen"
                             class="mt-2 max-h-96 overflow-y-auto rounded-lg border border-line p-4 text-sm leading-relaxed whitespace-pre-wrap text-ink-sec"
-                        >{{ lesson.video_transcript }}</div>
+                        >{{ topic.video_transcript }}</div>
                     </div>
                 </div>
 
                 <!-- Uploaded video. The src is a route, not a storage URL —
                      the file has no public address and the route runs the
-                     lesson policy before a byte is served. -->
-                <div v-else-if="lesson.type === 'video_upload' && lesson.video_src" id="lesson-body">
+                     topic policy before a byte is served. -->
+                <div v-else-if="topic.type === 'video_upload' && topic.video_src" id="topic-body">
                     <video
                         controls
                         preload="metadata"
                         controlslist="nodownload"
                         class="w-full rounded-xl border border-line bg-black"
                     >
-                        <source :src="lesson.video_src" :type="lesson.video_mime || 'video/mp4'" />
+                        <source :src="topic.video_src" :type="topic.video_mime || 'video/mp4'" />
                         Your browser cannot play this video.
                     </video>
 
-                    <p v-if="lesson.video_duration" class="mt-2 text-xs text-ink-dis">
-                        {{ lesson.video_duration }}
+                    <p v-if="topic.video_duration" class="mt-2 text-xs text-ink-dis">
+                        {{ topic.video_duration }}
                     </p>
 
-                    <div v-if="lesson.video_transcript" class="mt-6">
+                    <div v-if="topic.video_transcript" class="mt-6">
                         <button
                             type="button"
                             class="flex w-full items-center justify-between rounded-lg border border-line bg-surface-alt px-4 py-3 text-left text-sm font-semibold text-ink-pri"
@@ -203,11 +203,11 @@ function toggleComplete() {
                         <div
                             v-show="transcriptOpen"
                             class="mt-2 max-h-96 overflow-y-auto rounded-lg border border-line p-4 text-sm leading-relaxed whitespace-pre-wrap text-ink-sec"
-                        >{{ lesson.video_transcript }}</div>
+                        >{{ topic.video_transcript }}</div>
                     </div>
                 </div>
 
-                <div v-else-if="lesson.type === 'pdf' && primaryResource" id="lesson-body">
+                <div v-else-if="topic.type === 'pdf' && primaryResource" id="topic-body">
                     <iframe
                         :src="primaryResource.stream_url"
                         class="h-[70vh] w-full rounded-xl border border-line"
@@ -215,37 +215,37 @@ function toggleComplete() {
                     ></iframe>
                 </div>
 
-                <div v-else-if="lesson.type === 'image' && primaryResource" id="lesson-body">
+                <div v-else-if="topic.type === 'image' && primaryResource" id="topic-body">
                     <img
                         :src="primaryResource.stream_url"
-                        :alt="primaryResource.description || lesson.title"
+                        :alt="primaryResource.description || topic.title"
                         class="max-w-full rounded-xl border border-line"
                     />
                 </div>
 
                 <div
-                    v-else-if="lesson.type === 'external_link' && lesson.external_url"
-                    id="lesson-body"
+                    v-else-if="topic.type === 'external_link' && topic.external_url"
+                    id="topic-body"
                 >
                     <a
-                        :href="lesson.external_url"
+                        :href="topic.external_url"
                         target="_blank"
                         rel="noopener noreferrer"
                         class="inline-block rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white no-underline hover:bg-brand-hover"
                     >
                         Open external resource ↗
                     </a>
-                    <p class="mt-2 text-sm break-all text-ink-dis">{{ lesson.external_url }}</p>
+                    <p class="mt-2 text-sm break-all text-ink-dis">{{ topic.external_url }}</p>
                 </div>
 
-                <div v-else id="lesson-body">
+                <div v-else id="topic-body">
                     <div
-                        v-if="lesson.content"
-                        class="lesson-prose prose max-w-none"
-                        v-html="lesson.content"
+                        v-if="topic.content"
+                        class="topic-prose prose max-w-none"
+                        v-html="topic.content"
                     ></div>
                     <p v-else class="text-sm text-ink-dis italic">
-                        This lesson has no inline content — see the resources below.
+                        This topic has no inline content — see the resources below.
                     </p>
                 </div>
 
@@ -306,7 +306,7 @@ function toggleComplete() {
 
                 <!-- ═══ COMPLETE ════════════════════════════════ -->
                 <div
-                    v-if="state.can_complete && lesson.completion_requirement === 'acknowledge'"
+                    v-if="state.can_complete && topic.completion_requirement === 'acknowledge'"
                     class="mt-9 border-t border-line pt-6"
                 >
                     <button
@@ -325,10 +325,10 @@ function toggleComplete() {
                 </div>
 
                 <p
-                    v-else-if="lesson.completion_requirement === 'quiz'"
+                    v-else-if="topic.completion_requirement === 'quiz'"
                     class="mt-9 border-t border-line pt-6 text-sm text-ink-dis italic"
                 >
-                    This lesson is completed by passing its quiz.
+                    This topic is completed by passing its quiz.
                 </p>
             </article>
         </div>

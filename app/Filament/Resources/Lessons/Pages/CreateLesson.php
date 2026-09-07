@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\CourseModules\Pages;
+namespace App\Filament\Resources\Lessons\Pages;
 
-use App\Filament\Resources\CourseModules\CourseModuleResource;
+use App\Filament\Resources\Lessons\LessonResource;
 use Filament\Resources\Pages\CreateRecord;
 
-class CreateCourseModule extends CreateRecord
+class CreateLesson extends CreateRecord
 {
-    protected static string $resource = CourseModuleResource::class;
+    protected static string $resource = LessonResource::class;
 }

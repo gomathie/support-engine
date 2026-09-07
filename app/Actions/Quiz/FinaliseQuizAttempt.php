@@ -2,7 +2,7 @@
 
 namespace App\Actions\Quiz;
 
-use App\Actions\Progress\CompleteLesson;
+use App\Actions\Progress\CompleteTopic;
 use App\Actions\Progress\RecalculateCourseProgress;
 use App\Enums\AttemptStatus;
 use App\Enums\CompletionRequirement;
@@ -21,7 +21,7 @@ class FinaliseQuizAttempt
 {
     public function __construct(
         private readonly RecalculateCourseProgress $recalculate,
-        private readonly CompleteLesson $completeLesson,
+        private readonly CompleteTopic $completeLesson,
     ) {}
 
     public function handle(QuizAttempt $attempt, ?User $reviewer = null): QuizAttempt
@@ -54,13 +54,13 @@ class FinaliseQuizAttempt
 
             $attempt->refresh();
 
-            // A passing attempt can complete the lesson it is attached to, and
+            // A passing attempt can complete the topic it is attached to, and
             // in either case the course rollup needs recomputing.
-            if ($attempt->passed && $attempt->quiz->lesson_id) {
-                $lesson = $attempt->quiz->lesson;
+            if ($attempt->passed && $attempt->quiz->topic_id) {
+                $topic = $attempt->quiz->topic;
 
-                if ($lesson && $lesson->completion_requirement === CompletionRequirement::Quiz) {
-                    $this->completeLesson->handle($attempt->user, $lesson);
+                if ($topic && $topic->completion_requirement === CompletionRequirement::Quiz) {
+                    $this->completeLesson->handle($attempt->user, $topic);
 
                     return $attempt->refresh();
                 }

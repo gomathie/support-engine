@@ -56,9 +56,9 @@ class QuizResource extends Resource
     public static function applyScope(array $data, string $scope): array
     {
         return match ($scope) {
-            Quiz::SCOPE_MODULE => [...$data, 'lesson_id' => null],
-            Quiz::SCOPE_LESSON => [...$data, 'course_module_id' => null],
-            default => [...$data, 'course_module_id' => null, 'lesson_id' => null],
+            Quiz::SCOPE_LESSON => [...$data, 'topic_id' => null],
+            Quiz::SCOPE_TOPIC => [...$data, 'lesson_id' => null],
+            default => [...$data, 'lesson_id' => null, 'topic_id' => null],
         };
     }
 

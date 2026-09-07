@@ -32,10 +32,10 @@ class QuizzesTable
                     ->badge()
                     ->color(fn (Quiz $record) => match ($record->scope()) {
                         Quiz::SCOPE_FINAL => 'primary',
-                        Quiz::SCOPE_MODULE => 'warning',
+                        Quiz::SCOPE_LESSON => 'warning',
                         default => 'gray',
                     })
-                    ->description(fn (Quiz $record) => $record->module?->title ?? $record->lesson?->title),
+                    ->description(fn (Quiz $record) => $record->lesson?->title ?? $record->topic?->title),
 
                 TextColumn::make('questions_count')
                     ->label('Questions')
@@ -96,7 +96,7 @@ class QuizzesTable
 
                 Filter::make('final_only')
                     ->label('Final exams only')
-                    ->query(fn ($query) => $query->whereNull('course_module_id')->whereNull('lesson_id')),
+                    ->query(fn ($query) => $query->whereNull('lesson_id')->whereNull('topic_id')),
 
                 TernaryFilter::make('is_published'),
             ])
@@ -112,7 +112,7 @@ class QuizzesTable
             ->emptyStateHeading('No assessments yet')
             ->emptyStateDescription(
                 'A final exam gates course completion and the certificate. Module tests and '
-                .'lesson knowledge checks are optional.'
+                .'topic knowledge checks are optional.'
             );
     }
 }

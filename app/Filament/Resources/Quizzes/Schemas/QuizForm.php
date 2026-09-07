@@ -4,8 +4,8 @@ namespace App\Filament\Resources\Quizzes\Schemas;
 
 use App\Enums\QuestionType;
 use App\Models\Course;
-use App\Models\CourseModule;
 use App\Models\Lesson;
+use App\Models\Topic;
 use App\Models\Quiz;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Radio;
@@ -46,14 +46,14 @@ class QuizForm
                             ->hiddenLabel()
                             ->options([
                                 Quiz::SCOPE_FINAL => 'Final exam for the whole course',
-                                Quiz::SCOPE_MODULE => 'End-of-module test',
-                                Quiz::SCOPE_LESSON => 'Knowledge check on one lesson',
+                                Quiz::SCOPE_LESSON => 'End-of-lesson knowledge check',
+                                Quiz::SCOPE_TOPIC => 'Knowledge check on one topic',
                             ])
                             ->descriptions([
-                                Quiz::SCOPE_FINAL => 'Unlocks once every lesson is complete. Passing it '
+                                Quiz::SCOPE_FINAL => 'Unlocks once every topic is complete. Passing it '
                                     .'completes the course and issues the certificate.',
-                                Quiz::SCOPE_MODULE => 'Sits at the end of one module.',
-                                Quiz::SCOPE_LESSON => 'Attached to a single lesson. Set that lesson\'s '
+                                Quiz::SCOPE_LESSON => 'Sits at the end of one lesson.',
+                                Quiz::SCOPE_TOPIC => 'Attached to a single topic. Set that topic\'s '
                                     .'completion requirement to "quiz" to make it mandatory.',
                             ])
                             ->default(Quiz::SCOPE_FINAL)
@@ -64,21 +64,8 @@ class QuizForm
                                 $component->state($record?->scope() ?? Quiz::SCOPE_FINAL);
                             }),
 
-                        Select::make('course_module_id')
-                            ->label('Module')
-                            ->options(fn (Get $get) => $get('course_id')
-                                ? CourseModule::query()
-                                    ->where('course_id', $get('course_id'))
-                                    ->orderBy('position')
-                                    ->pluck('title', 'id')
-                                    ->all()
-                                : [])
-                            ->searchable()
-                            ->required()
-                            ->visible(fn (Get $get) => $get('scope') === Quiz::SCOPE_MODULE),
-
                         Select::make('lesson_id')
-                            ->label('Lesson')
+                            ->label('Module')
                             ->options(fn (Get $get) => $get('course_id')
                                 ? Lesson::query()
                                     ->where('course_id', $get('course_id'))
@@ -89,6 +76,19 @@ class QuizForm
                             ->searchable()
                             ->required()
                             ->visible(fn (Get $get) => $get('scope') === Quiz::SCOPE_LESSON),
+
+                        Select::make('topic_id')
+                            ->label('Topic')
+                            ->options(fn (Get $get) => $get('course_id')
+                                ? Topic::query()
+                                    ->where('course_id', $get('course_id'))
+                                    ->orderBy('position')
+                                    ->pluck('title', 'id')
+                                    ->all()
+                                : [])
+                            ->searchable()
+                            ->required()
+                            ->visible(fn (Get $get) => $get('scope') === Quiz::SCOPE_TOPIC),
                     ]),
 
                 Section::make('Details')
@@ -139,7 +139,7 @@ class QuizForm
                         Toggle::make('is_published')
                             ->columnSpanFull()
                             ->helperText('Unpublished assessments are invisible to employees, and a '
-                                .'course with an unpublished final exam completes on lessons alone.'),
+                                .'course with an unpublished final exam completes on topics alone.'),
                     ]),
 
                 Section::make('Questions')

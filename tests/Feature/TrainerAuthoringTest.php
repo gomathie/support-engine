@@ -4,8 +4,8 @@ namespace Tests\Feature;
 
 use App\Filament\Resources\Courses\CourseResource;
 use App\Models\Course;
-use App\Models\CourseModule;
 use App\Models\Lesson;
+use App\Models\Topic;
 use App\Models\PracticalTask;
 use App\Models\Quiz;
 use App\Models\QuizQuestion;
@@ -15,8 +15,8 @@ use Tests\TestCase;
 /**
  * A trainer authors the whole course, not fragments of one.
  *
- * They previously held lessons.manage and quizzes.manage but not
- * courses.create — able to write the lessons and the exam, but not the course
+ * They previously held topics.manage and quizzes.manage but not
+ * courses.create — able to write the topics and the exam, but not the course
  * those sit in, so every new course needed an administrator.
  */
 class TrainerAuthoringTest extends TestCase
@@ -35,7 +35,7 @@ class TrainerAuthoringTest extends TestCase
         $this->assertTrue($trainer->can('publish', $course));
 
         // The pieces that go inside it.
-        $this->assertTrue($trainer->can('lessons.manage'));
+        $this->assertTrue($trainer->can('topics.manage'));
         $this->assertTrue($trainer->can('quizzes.manage'));
     }
 
@@ -59,7 +59,7 @@ class TrainerAuthoringTest extends TestCase
         $this->assertFalse($trainee->can('create', Course::class));
         $this->assertFalse($trainee->can('update', $course));
         $this->assertFalse($trainee->can('publish', $course));
-        $this->assertFalse($trainee->can('lessons.manage'));
+        $this->assertFalse($trainee->can('topics.manage'));
         $this->assertFalse($trainee->can('quizzes.manage'));
     }
 
@@ -78,14 +78,14 @@ class TrainerAuthoringTest extends TestCase
 
     /**
      * "Trainees must pass" only holds if there is something to pass. A course
-     * with neither an exam nor a practical is finished by opening the lessons,
+     * with neither an exam nor a practical is finished by opening the topics,
      * which is the old model wearing new clothes — so it is surfaced.
      */
     public function test_a_course_with_no_exam_or_practical_is_marked_as_reading_only(): void
     {
         $course = Course::factory()->create();
-        $module = CourseModule::factory()->for($course)->create();
-        Lesson::factory()->for($module, 'module')->create();
+        $lesson = Lesson::factory()->for($course)->create();
+        Topic::factory()->for($lesson, 'lesson')->create();
 
         $this->assertFalse($course->fresh()->isAssessed());
     }

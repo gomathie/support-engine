@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\CourseModules\RelationManagers;
+namespace App\Filament\Resources\Lessons\RelationManagers;
 
 use App\Enums\CompletionRequirement;
-use App\Enums\LessonType;
-use App\Filament\Resources\Lessons\LessonResource;
-use App\Models\Lesson;
+use App\Enums\TopicType;
+use App\Filament\Resources\Topics\TopicResource;
+use App\Models\Topic;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -24,12 +24,12 @@ use Filament\Tables\Table;
 use Illuminate\Support\Str;
 
 /**
- * Lessons edited on their module. The seeded curriculum arrived as titles with
+ * Lessons edited on their lesson. The seeded curriculum arrived as titles with
  * no body — this is where a trainer fills that in.
  */
-class LessonsRelationManager extends RelationManager
+class TopicsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'lessons';
+    protected static string $relationship = 'topics';
 
     protected static ?string $title = 'Lessons';
 
@@ -54,8 +54,8 @@ class LessonsRelationManager extends RelationManager
                     ->maxLength(255),
 
                 Select::make('type')
-                    ->options(LessonType::options())
-                    ->default(LessonType::RichText->value)
+                    ->options(TopicType::options())
+                    ->default(TopicType::RichText->value)
                     ->required()
                     ->live(),
 
@@ -63,14 +63,14 @@ class LessonsRelationManager extends RelationManager
                     ->rows(2)
                     ->columnSpanFull(),
 
-                // Sanitised on the way out through HTMLPurifier's `lesson`
+                // Sanitised on the way out through HTMLPurifier's `topic`
                 // allowlist, so a compromised author account cannot become
                 // stored XSS against every employee.
                 RichEditor::make('content')
                     ->columnSpanFull()
                     ->visible(fn ($get) => in_array(
                         $get('type'),
-                        [LessonType::RichText->value, LessonType::Download->value],
+                        [TopicType::RichText->value, TopicType::Download->value],
                         true,
                     ))
                     ->helperText('Sanitised on save and again on display.'),
@@ -79,7 +79,7 @@ class LessonsRelationManager extends RelationManager
                     ->url()
                     ->maxLength(255)
                     ->columnSpanFull()
-                    ->visible(fn ($get) => $get('type') === LessonType::ExternalLink->value),
+                    ->visible(fn ($get) => $get('type') === TopicType::ExternalLink->value),
 
                 Select::make('completion_requirement')
                     ->options(CompletionRequirement::options())
@@ -105,11 +105,11 @@ class LessonsRelationManager extends RelationManager
                 TextColumn::make('title')
                     ->weight('bold')
                     ->wrap()
-                    ->description(fn (Lesson $record) => $record->description),
+                    ->description(fn (Topic $record) => $record->description),
 
                 TextColumn::make('type')
                     ->badge()
-                    ->formatStateUsing(fn (LessonType $state) => $state->label())
+                    ->formatStateUsing(fn (TopicType $state) => $state->label())
                     ->color('gray'),
 
                 TextColumn::make('completion_requirement')
@@ -122,16 +122,16 @@ class LessonsRelationManager extends RelationManager
                     ->counts('resources')
                     ->alignEnd(),
 
-                // A rich-text lesson with no body is a title and nothing else —
+                // A rich-text topic with no body is a title and nothing else —
                 // exactly what the seeded curriculum starts as.
                 IconColumn::make('has_content')
                     ->label('Body')
-                    ->state(fn (Lesson $record) => filled($record->content) || $record->resources()->exists())
+                    ->state(fn (Topic $record) => filled($record->content) || $record->resources()->exists())
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-exclamation-circle')
                     ->falseColor('warning')
-                    ->tooltip(fn (Lesson $record) => filled($record->content)
+                    ->tooltip(fn (Topic $record) => filled($record->content)
                         ? null
                         : 'No content yet — the employee sees only the title.'),
 
@@ -142,15 +142,15 @@ class LessonsRelationManager extends RelationManager
             ->reorderable('position')
             ->defaultSort('position')
             ->headerActions([
-                CreateAction::make()->label('Add lesson'),
+                CreateAction::make()->label('Add topic'),
             ])
             ->recordActions([
-                // Files live on the lesson's own screen, where the uploader is.
+                // Files live on the topic's own screen, where the uploader is.
                 Action::make('open')
                     ->label('Files')
                     ->icon('heroicon-o-paper-clip')
                     ->color('gray')
-                    ->url(fn (Lesson $record) => LessonResource::getUrl('edit', ['record' => $record])),
+                    ->url(fn (Topic $record) => TopicResource::getUrl('edit', ['record' => $record])),
 
                 \Filament\Actions\EditAction::make(),
                 DeleteAction::make(),
@@ -160,6 +160,6 @@ class LessonsRelationManager extends RelationManager
                     DeleteBulkAction::make(),
                 ]),
             ])
-            ->emptyStateHeading('No lessons in this module');
+            ->emptyStateHeading('No topics in this module');
     }
 }

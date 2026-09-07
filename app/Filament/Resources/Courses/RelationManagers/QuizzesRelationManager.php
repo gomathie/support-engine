@@ -37,10 +37,10 @@ class QuizzesRelationManager extends RelationManager
                     ->badge()
                     ->color(fn (Quiz $record) => match ($record->scope()) {
                         Quiz::SCOPE_FINAL => 'primary',
-                        Quiz::SCOPE_MODULE => 'warning',
+                        Quiz::SCOPE_LESSON => 'warning',
                         default => 'gray',
                     })
-                    ->description(fn (Quiz $record) => $record->module?->title ?? $record->lesson?->title),
+                    ->description(fn (Quiz $record) => $record->lesson?->title ?? $record->topic?->title),
 
                 TextColumn::make('questions_count')
                     ->label('Questions')
@@ -71,8 +71,8 @@ class QuizzesRelationManager extends RelationManager
                         $course = $this->getOwnerRecord();
 
                         $quiz = $course->quizzes()->create([
-                            'course_module_id' => null,
                             'lesson_id' => null,
+                            'topic_id' => null,
                             'title' => $course->title.' — final exam',
                             'description' => 'Covers the whole course. Passing it completes the course '
                                 .'and issues your certificate.',
@@ -109,10 +109,10 @@ class QuizzesRelationManager extends RelationManager
 
                 DeleteAction::make(),
             ])
-            ->defaultSort('course_module_id')
+            ->defaultSort('lesson_id')
             ->emptyStateHeading('No assessments on this course')
             ->emptyStateDescription(
-                'Without a final exam, the course completes as soon as every lesson is ticked off.'
+                'Without a final exam, the course completes as soon as every topic is ticked off.'
             );
     }
 }

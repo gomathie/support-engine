@@ -93,7 +93,7 @@ class CalculateKpis
     /**
      * KPI 2 — how much of the back catalogue has been dispositioned.
      *
-     * Needs an audit disposition on each lesson (keep / rewrite / merge /
+     * Needs an audit disposition on each topic (keep / rewrite / merge /
      * retire), which is PA-5's Re-alignment Matrix. Nothing records it yet.
      */
     private function lessonsRealigned(): array
@@ -101,9 +101,9 @@ class CalculateKpis
         return $this->notMeasurable(
             2,
             'Lessons re-aligned',
-            'Dispositioned ÷ '.DB::table('lessons')->count(),
+            'Dispositioned ÷ '.DB::table('topics')->count(),
             '100% by end of Phase 3',
-            'No lesson carries an audit disposition. Needs the Content Re-alignment Matrix (PA-5) to exist as data rather than a spreadsheet.',
+            'No topic carries an audit disposition. Needs the Content Re-alignment Matrix (PA-5) to exist as data rather than a spreadsheet.',
         );
     }
 

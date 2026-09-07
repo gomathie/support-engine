@@ -3,29 +3,29 @@
 namespace Database\Factories;
 
 use App\Enums\CompletionRequirement;
-use App\Enums\LessonType;
-use App\Models\CourseModule;
+use App\Enums\TopicType;
 use App\Models\Lesson;
+use App\Models\Topic;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @extends Factory<Lesson>
+ * @extends Factory<Topic>
  */
-class LessonFactory extends Factory
+class TopicFactory extends Factory
 {
-    protected $model = Lesson::class;
+    protected $model = Topic::class;
 
     public function definition(): array
     {
         $title = fake()->unique()->sentence(5);
 
         return [
-            'course_module_id' => CourseModule::factory(),
+            'lesson_id' => Lesson::factory(),
             'title' => $title,
             'slug' => Str::slug($title),
             'description' => fake()->sentence(),
-            'type' => LessonType::RichText,
+            'type' => TopicType::RichText,
             'content' => '<p>'.fake()->paragraph().'</p>',
             'completion_requirement' => CompletionRequirement::View,
             'estimated_minutes' => fake()->numberBetween(5, 60),

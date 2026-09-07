@@ -11,9 +11,9 @@
  */
 
 return [
-    'module_subtitle' => 'Additional modules and tools',
+    'lesson_subtitle' => 'Additional modules and tools',
 
-    'lessons' => [
+    'topics' => [
 
         // ─────────────────────────────────────────────────────────
         'Describe the Notifications module and its requirements' => [
@@ -38,6 +38,38 @@ return [
 
 <blockquote><p><strong>Support tip:</strong> If a customer asks "Why don't I see the Notifications tab in my settings?", don't spend 20 minutes debugging their browser cache. Check the Admin Panel to see if the module was ever activated for their contract.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Notifications Module & Requirements',
+                'description' => 'Verify understanding of modular architecture and notification prerequisites in PILOT.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'What are the three prerequisites for automated event notifications to work in PILOT?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Automated notifications require that the Notifications module is enabled for the contract, the recipient email has a verified green badge, and the device reports the required telemetry.',
+                        'options' => [
+                            ['text' => 'Module activated on contract in Admin Panel, confirmed recipient email in Privacy, and active sensor telemetry reporting', 'correct' => true],
+                            ['text' => 'Administrator logged in at all times, dedicated SMS gateway server, and vehicle ignition turned off', 'correct' => false],
+                            ['text' => 'Paid subscription to third-party weather API, browser open in Chrome, and GPS refresh rate set to 1 second', 'correct' => false],
+                            ['text' => 'User profile set to Owner role, static home IP address, and Teltonika hardware only', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'If a customer complains that the Notifications tab is missing from their interface, what is the primary cause?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'PILOT uses modular architecture: optional modules like Notifications must be enabled on the contract level in the Admin Panel, otherwise related tabs and tools remain completely hidden.',
+                        'options' => [
+                            ['text' => 'The Notifications module is not enabled for the client\'s contract in the Administrative Panel', 'correct' => true],
+                            ['text' => 'The user has not cleared their local browser cookies and cache', 'correct' => false],
+                            ['text' => 'The GPS tracking hardware has run out of battery power', 'correct' => false],
+                            ['text' => 'The vehicle speed has exceeded 120 km/h', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -77,6 +109,38 @@ HTML,
 <li>Copy the generated URL or iframe code and send it to the client.</li>
 </ol>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Monitor Tokens & Access Tokens',
+                'description' => 'Test your knowledge of time-bound tracking links and passwordless authentication tokens.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'What is the key functional difference between a Monitor Token and an Access Token?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'A Monitor Token provides an expiring public map link showing selected assets without credentials. An Access Token provides a passwordless direct login URL into a user profile for enterprise integrations.',
+                        'options' => [
+                            ['text' => 'A Monitor Token generates a public tracking link for specific vehicles without credentials; an Access Token signs a user into their PILOT profile without entering a password', 'correct' => true],
+                            ['text' => 'A Monitor Token is used exclusively for fuel calibration; an Access Token is used for generating mileage reports', 'correct' => false],
+                            ['text' => 'A Monitor Token permanently deletes GPS data after 24 hours; an Access Token downloads device firmware updates', 'correct' => false],
+                            ['text' => 'A Monitor Token requires biometric authentication; an Access Token can only be opened from a mobile phone', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'Which permissions must an administrator grant to a user before they can generate tracking tokens?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Creating and managing tokens requires the Edit Tokens right (to generate links) and Delete Tokens right (to revoke links) on the user\'s Rights tab.',
+                        'options' => [
+                            ['text' => 'Edit Tokens and Delete Tokens under the Rights tab in Staff and groups', 'correct' => true],
+                            ['text' => 'Edit Reports and Manage Geofences', 'correct' => false],
+                            ['text' => 'View Live Telemetry and Send Raw GPRS Commands', 'correct' => false],
+                            ['text' => 'System Root Access in the PostgreSQL database', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -110,6 +174,38 @@ HTML,
 <li>Click <strong>Save</strong>.</li>
 </ol>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Report Scheduler Automation',
+                'description' => 'Check your understanding of automated report schedules and recurring email delivery.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'What does the Report Scheduler allow a fleet manager to configure?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The Report Scheduler automates scheduled execution of saved report templates and automatically delivers the generated XLSX or PDF attachments to confirmed email recipients.',
+                        'options' => [
+                            ['text' => 'Automatically run report templates on recurring schedules (daily/weekly/monthly) and deliver Excel or PDF files to confirmed emails', 'correct' => true],
+                            ['text' => 'Schedule mechanical maintenance reminders directly inside the vehicle engine computer', 'correct' => false],
+                            ['text' => 'Automatically shut down the GPS server every weekend for maintenance', 'correct' => false],
+                            ['text' => 'Send speed warning SMS messages to local traffic police authorities', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'Do users need to be logged into PILOT for scheduled reports to be generated and delivered?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Scheduled reports are processed by background server workers independently of any active user sessions or open browser windows.',
+                        'options' => [
+                            ['text' => 'No, reports are generated automatically by background server queues even when no users are logged in', 'correct' => true],
+                            ['text' => 'Yes, at least one administrator must have an active browser tab open at the scheduled delivery time', 'correct' => false],
+                            ['text' => 'Yes, the vehicle driver must acknowledge a prompt on their mobile app before dispatch', 'correct' => false],
+                            ['text' => 'No, but the computer running the browser must remain powered on in sleep mode', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
 

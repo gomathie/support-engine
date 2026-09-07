@@ -3,10 +3,10 @@
 namespace Tests\Feature;
 
 use App\Actions\Enrollment\EnrollEmployee;
-use App\Enums\LessonType;
+use App\Enums\TopicType;
 use App\Models\Course;
-use App\Models\CourseModule;
 use App\Models\Lesson;
+use App\Models\Topic;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -15,22 +15,22 @@ use Tests\TestCase;
  * Native video upload (PA-10) — the second video method.
  *
  * The thing worth testing hardest is the boundary: the file has no public URL,
- * and the single route to it runs the lesson policy first. An employee who is
- * not enrolled must not be able to pull the bytes by knowing the lesson slug.
+ * and the single route to it runs the topic policy first. An employee who is
+ * not enrolled must not be able to pull the bytes by knowing the topic slug.
  */
 class VideoUploadLessonTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function uploadedVideoLesson(array $attributes = []): Lesson
+    private function uploadedVideoLesson(array $attributes = []): Topic
     {
         $course = Course::factory()->create();
-        $module = CourseModule::factory()->for($course)->create();
+        $lesson = Lesson::factory()->for($course)->create();
 
-        $lesson = Lesson::factory()->for($module, 'module')->create([
-            'type' => LessonType::VideoUpload,
+        $topic = Topic::factory()->for($lesson, 'lesson')->create([
+            'type' => TopicType::VideoUpload,
             'video_disk' => 'private',
-            'video_path' => 'lesson-videos/walkthrough.mp4',
+            'video_path' => 'topic-videos/walkthrough.mp4',
             'video_original_name' => 'sensor walkthrough.mp4',
             'video_mime_type' => 'video/mp4',
             'video_size_bytes' => 41_943_040,
@@ -40,22 +40,22 @@ class VideoUploadLessonTest extends TestCase
         ]);
 
         // 28 bytes — the Range assertion below depends on the exact length.
-        if ($lesson->video_path) {
-            Storage::disk('private')->put($lesson->video_path, 'not-really-a-video-but-bytes');
+        if ($topic->video_path) {
+            Storage::disk('private')->put($topic->video_path, 'not-really-a-video-but-bytes');
         }
 
-        return $lesson->fresh();
+        return $topic->fresh();
     }
 
     public function test_an_enrolled_employee_can_stream_the_video(): void
     {
-        $lesson = $this->uploadedVideoLesson();
+        $topic = $this->uploadedVideoLesson();
         $user = $this->trainee();
 
-        app(EnrollEmployee::class)->handle($user, $lesson->course);
+        app(EnrollEmployee::class)->handle($user, $topic->course);
 
         $response = $this->actingAs($user)
-            ->get(route('lessons.video', [$lesson->course->slug, $lesson->slug]));
+            ->get(route('topics.video', [$topic->course->slug, $topic->slug]));
 
         $response->assertSuccessful();
         $response->assertHeader('Content-Type', 'video/mp4');
@@ -72,34 +72,34 @@ class VideoUploadLessonTest extends TestCase
      */
     public function test_an_employee_who_cannot_see_the_lesson_cannot_stream_it(): void
     {
-        $lesson = $this->uploadedVideoLesson();
+        $topic = $this->uploadedVideoLesson();
 
         // Not enrolled, and the course is not otherwise open to them.
         $outsider = $this->trainee();
 
         $this->actingAs($outsider)
-            ->get(route('lessons.video', [$lesson->course->slug, $lesson->slug]))
+            ->get(route('topics.video', [$topic->course->slug, $topic->slug]))
             ->assertForbidden();
     }
 
     public function test_a_guest_cannot_stream_the_video(): void
     {
-        $lesson = $this->uploadedVideoLesson();
+        $topic = $this->uploadedVideoLesson();
 
-        $this->get(route('lessons.video', [$lesson->course->slug, $lesson->slug]))
+        $this->get(route('topics.video', [$topic->course->slug, $topic->slug]))
             ->assertRedirect(route('login'));
     }
 
     /** Seeking in a <video> element sends Range; a 200 makes the scrubber useless. */
     public function test_range_requests_are_answered_with_partial_content(): void
     {
-        $lesson = $this->uploadedVideoLesson();
+        $topic = $this->uploadedVideoLesson();
         $user = $this->trainee();
 
-        app(EnrollEmployee::class)->handle($user, $lesson->course);
+        app(EnrollEmployee::class)->handle($user, $topic->course);
 
         $response = $this->actingAs($user)->get(
-            route('lessons.video', [$lesson->course->slug, $lesson->slug]),
+            route('topics.video', [$topic->course->slug, $topic->slug]),
             ['Range' => 'bytes=0-9'],
         );
 
@@ -108,18 +108,18 @@ class VideoUploadLessonTest extends TestCase
         $response->assertHeader('Content-Length', '10');
     }
 
-    /** A lesson pointing at a file that is not there is a 404, not a 500. */
+    /** A topic pointing at a file that is not there is a 404, not a 500. */
     public function test_a_missing_file_is_not_found(): void
     {
-        $lesson = $this->uploadedVideoLesson();
+        $topic = $this->uploadedVideoLesson();
         $user = $this->trainee();
 
-        app(EnrollEmployee::class)->handle($user, $lesson->course);
+        app(EnrollEmployee::class)->handle($user, $topic->course);
 
-        Storage::disk('private')->delete($lesson->video_path);
+        Storage::disk('private')->delete($topic->video_path);
 
         $this->actingAs($user)
-            ->get(route('lessons.video', [$lesson->course->slug, $lesson->slug]))
+            ->get(route('topics.video', [$topic->course->slug, $topic->slug]))
             ->assertNotFound();
     }
 
@@ -127,10 +127,10 @@ class VideoUploadLessonTest extends TestCase
     public function test_the_route_refuses_a_lesson_that_is_not_an_uploaded_video(): void
     {
         $course = Course::factory()->create();
-        $module = CourseModule::factory()->for($course)->create();
+        $lesson = Lesson::factory()->for($course)->create();
 
-        $lesson = Lesson::factory()->for($module, 'module')->create([
-            'type' => LessonType::RichText,
+        $topic = Topic::factory()->for($lesson, 'lesson')->create([
+            'type' => TopicType::RichText,
             'content' => '<p>Reading, not watching.</p>',
         ]);
 
@@ -138,51 +138,51 @@ class VideoUploadLessonTest extends TestCase
         app(EnrollEmployee::class)->handle($user, $course);
 
         $this->actingAs($user)
-            ->get(route('lessons.video', [$course->slug, $lesson->slug]))
+            ->get(route('topics.video', [$course->slug, $topic->slug]))
             ->assertNotFound();
     }
 
-    /** A lesson id from one course must not be reachable through another. */
+    /** A topic id from one course must not be reachable through another. */
     public function test_a_lesson_from_another_course_is_not_found(): void
     {
-        $lesson = $this->uploadedVideoLesson();
+        $topic = $this->uploadedVideoLesson();
         $otherCourse = Course::factory()->create();
 
         $user = $this->trainee();
-        app(EnrollEmployee::class)->handle($user, $lesson->course);
+        app(EnrollEmployee::class)->handle($user, $topic->course);
         app(EnrollEmployee::class)->handle($user, $otherCourse);
 
         $this->actingAs($user)
-            ->get(route('lessons.video', [$otherCourse->slug, $lesson->slug]))
+            ->get(route('topics.video', [$otherCourse->slug, $topic->slug]))
             ->assertNotFound();
     }
 
     public function test_the_lesson_page_carries_a_route_not_a_storage_path(): void
     {
-        $lesson = $this->uploadedVideoLesson();
+        $topic = $this->uploadedVideoLesson();
         $user = $this->trainee();
 
-        app(EnrollEmployee::class)->handle($user, $lesson->course);
+        app(EnrollEmployee::class)->handle($user, $topic->course);
 
         $this->actingAs($user)
-            ->get(route('lessons.show', [$lesson->course->slug, $lesson->slug]))
+            ->get(route('topics.show', [$topic->course->slug, $topic->slug]))
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page
-                ->where('lesson.type', 'video_upload')
-                ->where('lesson.video_src', route('lessons.video', [$lesson->course->slug, $lesson->slug]))
-                ->where('lesson.video_mime', 'video/mp4')
-                ->where('lesson.video_duration', '6:15')
+                ->where('topic.type', 'video_upload')
+                ->where('topic.video_src', route('topics.video', [$topic->course->slug, $topic->slug]))
+                ->where('topic.video_mime', 'video/mp4')
+                ->where('topic.video_duration', '6:15')
 
                 // No embed for an uploaded file.
-                ->where('lesson.video', null));
+                ->where('topic.video', null));
     }
 
     public function test_size_is_reported_against_the_cap(): void
     {
-        $lesson = $this->uploadedVideoLesson();
+        $topic = $this->uploadedVideoLesson();
 
-        $this->assertSame('40 MB', $lesson->videoSizeForHumans());
-        $this->assertTrue($lesson->hasUploadedVideo());
+        $this->assertSame('40 MB', $topic->videoSizeForHumans());
+        $this->assertTrue($topic->hasUploadedVideo());
 
         $noFile = $this->uploadedVideoLesson(['video_path' => null, 'video_size_bytes' => null]);
 
@@ -192,12 +192,12 @@ class VideoUploadLessonTest extends TestCase
 
     public function test_uploaded_video_is_an_offered_lesson_type(): void
     {
-        $this->assertArrayHasKey('video_upload', LessonType::options());
-        $this->assertTrue(LessonType::VideoUpload->isVideo());
-        $this->assertTrue(LessonType::VideoUpload->isUploadedVideo());
+        $this->assertArrayHasKey('video_upload', TopicType::options());
+        $this->assertTrue(TopicType::VideoUpload->isVideo());
+        $this->assertTrue(TopicType::VideoUpload->isUploadedVideo());
 
         // An embed is a video, but not an uploaded one.
-        $this->assertTrue(LessonType::VideoEmbed->isVideo());
-        $this->assertFalse(LessonType::VideoEmbed->isUploadedVideo());
+        $this->assertTrue(TopicType::VideoEmbed->isVideo());
+        $this->assertFalse(TopicType::VideoEmbed->isUploadedVideo());
     }
 }

@@ -12,9 +12,9 @@
  */
 
 return [
-    'module_subtitle' => 'History and reports',
+    'lesson_subtitle' => 'History and reports',
 
-    'lessons' => [
+    'topics' => [
 
         // ─────────────────────────────────────────────────────────
         'Build 24h movement history for an object; review with the player' => [
@@ -46,6 +46,38 @@ return [
 <li><strong>Telemetry Chart</strong> — synchronized graphical plot of sensor metrics (speed, fuel volume, temperature, battery voltage) plotted over the timeline. Hovering your mouse over the chart syncs with the vehicle icon on the map.</li>
 </ol>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: History Playback & Telemetry Charts',
+                'description' => 'Test your knowledge of the History section components, playback controls, and sensor charts.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'Which component of the History workspace shows synchronized sensor metric graphs (like speed and fuel) plotted against the timeline?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The Telemetry Chart displays synchronized graphical plots of telemetry parameters that correspond directly to points on the map.',
+                        'options' => [
+                            ['text' => 'The Telemetry Chart', 'correct' => true],
+                            ['text' => 'The Geocoder address bar', 'correct' => false],
+                            ['text' => 'The Basemap selector dock', 'correct' => false],
+                            ['text' => 'The User Card Rights tab', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'What playback speed options does the Track Player toolbar support when reviewing trips?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The Track Player supports interactive playback speeds ranging from 1x real time up to 64x accelerated review.',
+                        'options' => [
+                            ['text' => 'Speeds from 1x up to 64x with play, pause, and scrub controls', 'correct' => true],
+                            ['text' => 'Only fixed 1x real-time speed', 'correct' => false],
+                            ['text' => 'Playback is only available in external media players', 'correct' => false],
+                            ['text' => 'Playback is limited to audio only', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -82,6 +114,38 @@ HTML,
 <li><strong>Stops table</strong> — address of every stop, start time, end time, and duration. Stops longer than 30 minutes are clearly flagged.</li>
 </ul>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Mileage & Stops Report Generation',
+                'description' => 'Verify your understanding of report templates, grouping parameters, and operational metrics.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'Which operational metrics are summarized in the standard "Mileage and Stops" report?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The report summarizes total mileage, engine hours, movement vs idling ratio, and stop address/duration tables.',
+                        'options' => [
+                            ['text' => 'Total mileage, engine hours, movement vs idling ratio, and detailed stops log', 'correct' => true],
+                            ['text' => 'Only driver credit card statements', 'correct' => false],
+                            ['text' => 'Cellular network tower signal frequencies', 'correct' => false],
+                            ['text' => 'Engine oil viscosity chemical ratings', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'Which parameter should be configured to generate individual daily subtotals across a week-long report period?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Configuring the Split option to "Split by days" breaks down multi-day reports into day-by-day rows and subtotals.',
+                        'options' => [
+                            ['text' => 'Set the Split option to "Split by days"', 'correct' => true],
+                            ['text' => 'Restart the web browser every night at midnight', 'correct' => false],
+                            ['text' => 'Run seven separate manual reports for each day', 'correct' => false],
+                            ['text' => 'Switch the basemap to OpenStreetMap', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -113,6 +177,38 @@ HTML,
 
 <blockquote><p><strong>Support tip:</strong> If an exported PDF cuts off columns on the right, advise the customer to adjust table columns before exporting, or switch orientation to Landscape in their account report settings.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Report Exporting & File Formats',
+                'description' => 'Test your knowledge of exporting reports to Excel, PDF, and CSV for business stakeholders.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'Which export format provides structured worksheets ready for Excel pivot tables and formulas?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Export to Excel (XLSX) provides tabular formatted spreadsheets suitable for financial calculations and pivot tables.',
+                        'options' => [
+                            ['text' => 'Excel (XLSX)', 'correct' => true],
+                            ['text' => 'MP4 video stream', 'correct' => false],
+                            ['text' => 'JPEG image snapshot', 'correct' => false],
+                            ['text' => 'Binary firmware hex file', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'If a customer states that an exported PDF report cuts off the rightmost columns, what is the best advice?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Switching orientation to Landscape or hiding unused table columns fits wide tables onto printed PDF documents.',
+                        'options' => [
+                            ['text' => 'Switch document orientation to Landscape or deselect unused columns in the table settings', 'correct' => true],
+                            ['text' => 'Advise them to replace their computer monitor', 'correct' => false],
+                            ['text' => 'Reboot the GPS tracker in the vehicle', 'correct' => false],
+                            ['text' => 'Tell them PILOT cannot print more than two columns', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
 

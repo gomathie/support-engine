@@ -4,10 +4,10 @@ namespace Tests\Feature;
 
 use App\Actions\Enrollment\EnrollEmployee;
 use App\Models\Course;
-use App\Models\CourseModule;
+use App\Models\Lesson;
 use App\Models\Department;
 use App\Models\DiagnosticTree;
-use App\Models\Lesson;
+use App\Models\Topic;
 use App\Models\Quiz;
 use App\Models\QuizQuestion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -32,8 +32,8 @@ class PageRendersTest extends TestCase
         $user = $this->trainee($department);
 
         $course = Course::factory()->create();
-        $module = CourseModule::factory()->for($course)->create();
-        $lesson = Lesson::factory()->for($module, 'module')->create();
+        $lesson = Lesson::factory()->for($course)->create();
+        $topic = Topic::factory()->for($lesson, 'lesson')->create();
 
         $quiz = Quiz::factory()->create(['course_id' => $course->id]);
         QuizQuestion::factory()->for($quiz)->withOptions(4, [0])->create();
@@ -48,7 +48,7 @@ class PageRendersTest extends TestCase
             ['Dashboard', route('dashboard')],
             ['Courses/Index', route('courses.index')],
             ['Courses/Show', route('courses.show', $course->slug)],
-            ['Lessons/Show', route('lessons.show', [$course->slug, $lesson->slug])],
+            ['Topics/Show', route('topics.show', [$course->slug, $topic->slug])],
             ['Quizzes/Show', route('quizzes.show', [$course->slug, $quiz->id])],
             ['Progress/Index', route('progress.index')],
             ['Certificates/Index', route('certificates.index')],

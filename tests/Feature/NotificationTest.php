@@ -3,10 +3,10 @@
 namespace Tests\Feature;
 
 use App\Actions\Enrollment\EnrollEmployee;
-use App\Actions\Progress\CompleteLesson;
+use App\Actions\Progress\CompleteTopic;
 use App\Models\Course;
-use App\Models\CourseModule;
 use App\Models\Lesson;
+use App\Models\Topic;
 use App\Notifications\CourseAssigned;
 use App\Notifications\TrainingDue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -83,16 +83,16 @@ class NotificationTest extends TestCase
         Notification::fake();
 
         $course = Course::factory()->create();
-        $module = CourseModule::factory()->for($course)->create();
-        Lesson::factory()->count(2)->for($module, 'module')->create();
+        $lesson = Lesson::factory()->for($course)->create();
+        Topic::factory()->count(2)->for($lesson, 'lesson')->create();
 
         $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course->fresh())
             ->update(['due_at' => now()->subDays(10)]);
 
-        foreach ($course->lessons as $lesson) {
-            app(CompleteLesson::class)->handle($user, $lesson);
+        foreach ($course->topics as $topic) {
+            app(CompleteTopic::class)->handle($user, $topic);
         }
 
         $this->artisan('training:send-reminders')->assertSuccessful();

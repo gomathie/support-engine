@@ -12,9 +12,9 @@
  */
 
 return [
-    'module_subtitle' => 'Working with objects (part 1)',
+    'lesson_subtitle' => 'Working with objects (part 1)',
 
-    'lessons' => [
+    'topics' => [
 
         // ─────────────────────────────────────────────────────────
         'Manually create a new object (car) with General + Info filled in' => [
@@ -52,6 +52,38 @@ return [
 
 <blockquote><p><strong>Support tip on IMEIs:</strong> If a customer enters a device IMEI with spaces or hyphens, the tracker will fail to connect. PILOT expects the raw 15-digit numeric IMEI without punctuation. Always verify the IMEI formatting when a freshly created object stays offline.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Adding Objects & Mandatory Fields',
+                'description' => 'Verify your understanding of mandatory object settings, IMEI requirements, and metadata.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'Which three fields are strictly required by PILOT before a newly created object can be saved?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'docs.pilot-gps.com specifies that Vehicle number/name, Device ID (unique IMEI), and Device type/model are mandatory.',
+                        'options' => [
+                            ['text' => 'Vehicle number/name, Device ID (IMEI), and Device type', 'correct' => true],
+                            ['text' => 'License plate, driver name, and fuel capacity', 'correct' => false],
+                            ['text' => 'SIM card phone number, APN, and IP address', 'correct' => false],
+                            ['text' => 'Chassis number (VIN), color, and manufacture year', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'Why does PILOT require the device IMEI to be entered as a raw 15-digit numeric sequence without spaces or dashes?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The tracker hardware transmits its numeric IMEI in network packet headers. PILOT matches this exact string to link telemetry to the object record.',
+                        'options' => [
+                            ['text' => 'PILOT parses incoming telemetry by matching the exact raw numeric IMEI in packet headers', 'correct' => true],
+                            ['text' => 'Dashes cause the browser to log the user out', 'correct' => false],
+                            ['text' => 'Cellular providers reject SMS alerts if punctuation is present', 'correct' => false],
+                            ['text' => 'It converts the object into a stationary sensor', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -81,6 +113,38 @@ HTML,
 
 <p>The object now reflects its new group in the Online tree and inherits any access policies configured for its assigned tags.</p>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Object Groups & Tags',
+                'description' => 'Test your knowledge of organizational hierarchies and tag-based permissions.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'How do Object Groups differ from Object Tags in PILOT?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Groups provide a hierarchical folder structure in the object tree, while tags are cross-cutting labels that can span across groups to govern permissions and filtering.',
+                        'options' => [
+                            ['text' => 'Groups provide structural folder trees; tags provide cross-cutting labels for filtering and rights', 'correct' => true],
+                            ['text' => 'Groups are only for boats, whereas tags are for trucks', 'correct' => false],
+                            ['text' => 'Tags require monthly subscription fees while groups are free', 'correct' => false],
+                            ['text' => 'Groups disable GPS tracking', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'In which Object Card tab are Groups and Tags configured?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Both Object Group assignment and Tags selection are configured in the Settings tab of the Object Card.',
+                        'options' => [
+                            ['text' => 'The Settings tab', 'correct' => true],
+                            ['text' => 'The Info tab', 'correct' => false],
+                            ['text' => 'The Main tab', 'correct' => false],
+                            ['text' => 'The Points tab', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -114,6 +178,38 @@ HTML,
 
 <blockquote><p><strong>Call scenario:</strong> A client calls saying "Vehicle KBC 456 was reported stolen 5 minutes ago!" You do not run a report — you right-click the vehicle, click <strong>Follow Object</strong>, and read the live street location and direction of travel directly to the client.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Context Menu Tracking Tools',
+                'description' => 'Test your proficiency using Current Track and Follow Object map tools.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'What behavior occurs when an operator clicks "Follow Object" from the right-click context menu?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The map centers on the asset and automatically pans to keep the vehicle centered as new telemetry packets arrive.',
+                        'options' => [
+                            ['text' => 'The map centers on the vehicle and continuously pans to keep it centered as new GPS packets arrive', 'correct' => true],
+                            ['text' => 'It deletes previous trips from the database', 'correct' => false],
+                            ['text' => 'It shuts off the vehicle engine remotely', 'correct' => false],
+                            ['text' => 'It switches the map basemap to terrain mode', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'What is the fastest way to view an object\'s recent driven path and replay it without leaving the Online workspace?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Selecting "Current Track" from the right-click menu instantly displays the recent polyline and player bar on the live map.',
+                        'options' => [
+                            ['text' => 'Right-click the object and select "Current Track"', 'correct' => true],
+                            ['text' => 'Export the user list to Excel', 'correct' => false],
+                            ['text' => 'Create an SMTP notification template', 'correct' => false],
+                            ['text' => 'Uncheck the vehicle in the Staff and Groups tab', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
 

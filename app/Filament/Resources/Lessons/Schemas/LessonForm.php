@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\CourseModules\Schemas;
+namespace App\Filament\Resources\Lessons\Schemas;
 
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -8,7 +8,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 
-class CourseModuleForm
+class LessonForm
 {
     public static function configure(Schema $schema): Schema
     {
@@ -26,7 +26,7 @@ class CourseModuleForm
                 TextInput::make('title')
                     ->required()
                     ->maxLength(255)
-                    ->helperText('The short label — "Lesson 1", "Final assessment". Not a day: progress is measured by assessment, not by calendar.'),
+                    ->helperText('The short label — "Topic 1", "Final assessment". Not a day: progress is measured by assessment, not by calendar.'),
 
                 TextInput::make('subtitle')
                     ->maxLength(255)
@@ -51,7 +51,7 @@ class CourseModuleForm
 
                 Toggle::make('is_published')
                     ->default(true)
-                    ->helperText('Unpublished modules and their lessons do not count toward progress.'),
+                    ->helperText('Unpublished modules and their topics do not count toward progress.'),
             ]);
     }
 }

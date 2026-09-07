@@ -3,13 +3,13 @@
 namespace Tests\Feature;
 
 use App\Actions\Enrollment\EnrollEmployee;
-use App\Actions\Progress\CompleteLesson;
+use App\Actions\Progress\CompleteTopic;
 use App\Actions\Quiz\GradeQuizAttempt;
 use App\Actions\Quiz\StartQuizAttempt;
 use App\Enums\ProgressStatus;
 use App\Models\Course;
-use App\Models\CourseModule;
 use App\Models\Lesson;
+use App\Models\Topic;
 use App\Models\Quiz;
 use App\Models\QuizQuestion;
 use App\Models\User;
@@ -18,11 +18,11 @@ use Illuminate\Support\Facades\Bus;
 use Tests\TestCase;
 
 /**
- * Every lesson ends with a knowledge check, and passing it is required.
+ * Every topic ends with a knowledge check, and passing it is required.
  *
  * Before this, a module-scoped quiz was decoration: a trainee could skip every
  * one and still finish the course on the final exam alone, which made "you must
- * pass" untrue of the thing sitting at the end of each lesson.
+ * pass" untrue of the thing sitting at the end of each topic.
  */
 class KnowledgeCheckGatesCourseTest extends TestCase
 {
@@ -35,18 +35,18 @@ class KnowledgeCheckGatesCourseTest extends TestCase
         Bus::fake();
     }
 
-    /** A course whose single lesson ends with a knowledge check. */
+    /** A course whose single topic ends with a knowledge check. */
     private function courseWithCheck(): array
     {
         $course = Course::factory()->create();
-        $module = CourseModule::factory()->for($course)->create(['title' => 'Lesson 1']);
+        $lesson = Lesson::factory()->for($course)->create(['title' => 'Lesson 1']);
 
-        Lesson::factory()->count(2)->for($module, 'module')->create();
+        Topic::factory()->count(2)->for($lesson, 'lesson')->create();
 
         $check = Quiz::factory()->create([
             'course_id' => $course->id,
-            'course_module_id' => $module->id,
-            'lesson_id' => null,
+            'lesson_id' => $lesson->id,
+            'topic_id' => null,
             'title' => 'Lesson 1 — knowledge check',
             'passing_score' => 70,
             'max_attempts' => 2,
@@ -55,15 +55,15 @@ class KnowledgeCheckGatesCourseTest extends TestCase
 
         $question = QuizQuestion::factory()->for($check)->withOptions(2, [0])->create(['points' => 1]);
 
-        return [$course->fresh(), $module, $check, $question];
+        return [$course->fresh(), $lesson, $check, $question];
     }
 
     private function readEverything(User $user, Course $course): void
     {
         app(EnrollEmployee::class)->handle($user, $course);
 
-        foreach ($course->lessons as $lesson) {
-            app(CompleteLesson::class)->handle($user, $lesson);
+        foreach ($course->topics as $topic) {
+            app(CompleteTopic::class)->handle($user, $topic);
         }
     }
 
@@ -153,18 +153,18 @@ class KnowledgeCheckGatesCourseTest extends TestCase
         $this->assertSame(ProgressStatus::Completed, $this->statusFor($user, $course));
     }
 
-    /** Every lesson's check counts, not just the first. */
+    /** Every topic's check counts, not just the first. */
     public function test_all_checks_across_the_course_must_be_passed(): void
     {
         [$course, , $first, $firstQuestion] = $this->courseWithCheck();
 
-        $second = CourseModule::factory()->for($course)->create(['title' => 'Lesson 2']);
-        Lesson::factory()->for($second, 'module')->create();
+        $second = Lesson::factory()->for($course)->create(['title' => 'Lesson 2']);
+        Topic::factory()->for($second, 'lesson')->create();
 
         $secondCheck = Quiz::factory()->create([
             'course_id' => $course->id,
-            'course_module_id' => $second->id,
-            'lesson_id' => null,
+            'lesson_id' => $second->id,
+            'topic_id' => null,
             'title' => 'Lesson 2 — knowledge check',
             'passing_score' => 70,
             'is_published' => true,
@@ -195,19 +195,19 @@ class KnowledgeCheckGatesCourseTest extends TestCase
             ->get(route('courses.show', $course->slug))
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page
-                ->where('modules.0.knowledge_check.title', 'Lesson 1 — knowledge check')
-                ->where('modules.0.knowledge_check.passing_score', 70)
-                ->where('modules.0.knowledge_check.passed', false));
+                ->where('lessons.0.knowledge_check.title', 'Lesson 1 — knowledge check')
+                ->where('lessons.0.knowledge_check.passing_score', 70)
+                ->where('lessons.0.knowledge_check.passed', false));
     }
 
-    /** A lesson with no check is a gap an author should be able to see. */
+    /** A topic with no check is a gap an author should be able to see. */
     public function test_a_module_reports_whether_it_has_a_check(): void
     {
-        [, $module] = $this->courseWithCheck();
+        [, $lesson] = $this->courseWithCheck();
 
-        $this->assertTrue($module->hasKnowledgeCheck());
+        $this->assertTrue($lesson->hasKnowledgeCheck());
 
-        $bare = CourseModule::factory()->for(Course::factory()->create())->create();
+        $bare = Lesson::factory()->for(Course::factory()->create())->create();
 
         $this->assertFalse($bare->hasKnowledgeCheck());
         $this->assertNull($bare->knowledgeCheck());

@@ -24,9 +24,9 @@
  */
 
 return [
-    'module_subtitle' => 'Introduction to PILOT and basic concepts',
+    'lesson_subtitle' => 'Introduction to PILOT and basic concepts',
 
-    'lessons' => [
+    'topics' => [
 
         // ─────────────────────────────────────────────────────────
         'Define: Object, Sensor, Contract, Account' => [
@@ -89,6 +89,38 @@ these four they are actually talking about before you start looking. "I can't se
 an object problem, a contract problem or an access problem, and they are investigated in different
 places.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Object, Sensor, Contract, Account',
+                'description' => 'Verify your understanding of core PILOT entity terminology.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'Which PILOT entity serves as the container bringing together monitored assets, user logins, and activated modules for a client?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The glossary defines a Contract as the primary entity containing all objects, users, and available software modules for a client or organization.',
+                        'options' => [
+                            ['text' => 'Contract', 'correct' => true],
+                            ['text' => 'Object', 'correct' => false],
+                            ['text' => 'Sensor', 'correct' => false],
+                            ['text' => 'Account', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'A customer says: "My vehicle is online, but I cannot see its fuel level." What is the first entity type you should investigate?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'A Sensor is attached to an object and translates raw telemetry into a specific measured parameter, such as fuel level or temperature.',
+                        'options' => [
+                            ['text' => 'Sensor configuration on the object', 'correct' => true],
+                            ['text' => 'The client\'s billing contract', 'correct' => false],
+                            ['text' => 'The user\'s browser cache', 'correct' => false],
+                            ['text' => 'The vehicle license plate in the Info tab', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -148,6 +180,38 @@ wrong place.</p>
 <blockquote><p><strong>The question to ask:</strong> "What is the address in your browser's bar?"
 It settles it faster than "are you an administrator?", because everybody thinks they are.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Personal Account vs Admin Panel',
+                'description' => 'Test your ability to distinguish user dashboard operations from admin panel tasks.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'Where are new contracts created and platform modules (such as Video or Eco Driving) activated?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Administrative Panel is where contracts are provisioned, modules activated, and partners configured. The user dashboard only accesses already-activated features.',
+                        'options' => [
+                            ['text' => 'In the Administrative Panel', 'correct' => true],
+                            ['text' => 'In the Personal Account User Dashboard', 'correct' => false],
+                            ['text' => 'In the Map Tools layer menu', 'correct' => false],
+                            ['text' => 'Inside the individual object card', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'A fleet manager calls stating they have "full Administrator rights" but cannot see billing options or module licenses. What is the cause?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Being an administrator in the user portal grants full rights over monitored resources, but zero access to the administrative panel where billing and contract modules are managed.',
+                        'options' => [
+                            ['text' => 'They have admin rights in the user dashboard, which does not confer admin panel access', 'correct' => true],
+                            ['text' => 'Their account is locked due to overdue invoices', 'correct' => false],
+                            ['text' => 'Their browser does not support WebSockets', 'correct' => false],
+                            ['text' => 'The GPS trackers are configured with wrong APN settings', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -180,6 +244,26 @@ explanation of a PILOT concept is worse than an obvious gap: you would carry it 
 
 <p>Ask your trainer, and this lesson will be filled in once the definition is confirmed.</p>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Handling Unconfirmed Terminology & Escalations',
+                'description' => 'Test your understanding of support integrity when encountering undocumented concepts.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'If a customer or training checklist mentions a term not found in official documentation (e.g., docs.pilot-gps.com), what is the correct protocol?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'An invented explanation is worse than an honest gap. Support engineers must verify unconfirmed terms with senior staff or trainers before advising clients.',
+                        'options' => [
+                            ['text' => 'Flag the gap and verify the precise meaning with a trainer or product lead before advising clients', 'correct' => true],
+                            ['text' => 'Invent a plausible guess based on other GPS platforms', 'correct' => false],
+                            ['text' => 'Tell the client the feature does not exist in PILOT without checking', 'correct' => false],
+                            ['text' => 'Close the ticket immediately', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
 

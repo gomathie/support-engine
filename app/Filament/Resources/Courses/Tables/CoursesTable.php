@@ -57,16 +57,16 @@ class CoursesTable
                     ->color(fn ($state) => $state === 'Yes' ? 'success' : 'warning')
                     ->tooltip(fn (Course $record) => $record->isAssessed()
                         ? null
-                        : 'No published exam or practical. Trainees complete this by opening the lessons.'),
+                        : 'No published exam or practical. Trainees complete this by opening the topics.'),
 
                 TextColumn::make('modules_count')
                     ->label('Modules')
-                    ->counts('modules')
+                    ->counts("lessons")
                     ->alignEnd(),
 
                 TextColumn::make('lessons_count')
                     ->label('Lessons')
-                    ->counts('lessons')
+                    ->counts('topics')
                     ->alignEnd(),
 
                 TextColumn::make('enrollments_count')

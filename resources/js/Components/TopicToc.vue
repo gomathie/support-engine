@@ -1,18 +1,18 @@
 <script setup>
 /**
- * The sticky table of contents with scroll-spy from the skills module.
+ * The sticky table of contents with scroll-spy from the skills lesson.
  *
  * Same IntersectionObserver approach and the same rootMargin
  * ('-70px 0px -75% 0px'), which is what makes the highlight land on the heading
  * nearest the top of the viewport rather than any heading merely on screen.
  *
- * Headings are discovered from the rendered lesson body rather than authored
+ * Headings are discovered from the rendered topic body rather than authored
  * separately, so a trainer editing content never has to maintain this list.
  */
 import { nextTick, onMounted, onUnmounted, ref } from 'vue';
 
 const props = defineProps({
-    contentSelector: { type: String, default: '#lesson-body' },
+    contentSelector: { type: String, default: '#topic-body' },
 });
 
 const headings = ref([]);

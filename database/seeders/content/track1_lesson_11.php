@@ -11,9 +11,9 @@
  */
 
 return [
-    'module_subtitle' => 'Comprehensive review and call simulation',
+    'lesson_subtitle' => 'Comprehensive review and call simulation',
 
-    'lessons' => [
+    'topics' => [
 
         // ─────────────────────────────────────────────────────────
         "Scenario: user can't log in — walk through diagnostic steps" => [
@@ -36,6 +36,38 @@ return [
 
 <blockquote><p><strong>Support principle:</strong> Never reset a password before confirming the user’s identity. Ensure you are speaking with an authorized contract contact before modifying credentials.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Login Failure Diagnostics',
+                'description' => 'Test your ability to diagnose authentication failures, IP restrictions, and blocked accounts.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'A user gets the error "Sign in from this IP is not allowed". What is the root cause and immediate remedy?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'IP filtering restricts sign-in to specific static IP addresses. If a user connects from a new network or home WiFi, an administrator must update or disable the IP filter on their user profile.',
+                        'options' => [
+                            ['text' => 'The user has IP filtering enabled in Privacy settings, but their current public IP changed; an administrator must update the allowed IP list', 'correct' => true],
+                            ['text' => 'The vehicle tracker was disconnected from the vehicle battery', 'correct' => false],
+                            ['text' => 'The user must restart their computer three times to reset the network adapter', 'correct' => false],
+                            ['text' => 'The contract monthly subscription was suspended', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'If a user enters correct credentials but sees "User is blocked", how can an administrator restore their access?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'User accounts can be blocked or unblocked directly by administrators in the Staff and groups table by toggling the Status icon.',
+                        'options' => [
+                            ['text' => 'In Staff and groups, locate the user card and click the red Status indicator to toggle it back to green active status', 'correct' => true],
+                            ['text' => 'By creating a new vehicle object and assigning it to the user', 'correct' => false],
+                            ['text' => 'By submitting a support ticket to the server hosting provider', 'correct' => false],
+                            ['text' => 'By deleting the contract and creating a new one', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -62,6 +94,38 @@ HTML,
 </li>
 </ol>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Missing Object Diagnostics',
+                'description' => 'Verify your step-by-step diagnostic reasoning when objects disappear from a user interface.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'A dispatcher complains that several trucks disappeared from their object list, but another user can still see them. What is the very first check?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Clicking a top panel status button filters the list to show only vehicles matching that status. Clicking "Total" clears the filter and restores all vehicles to the list.',
+                        'options' => [
+                            ['text' => 'Click the "Total" objects counter on the top panel to clear active status filters', 'correct' => true],
+                            ['text' => 'Reinstall Windows on the dispatcher workstation', 'correct' => false],
+                            ['text' => 'Assume the vehicles have all been stolen simultaneously', 'correct' => false],
+                            ['text' => 'Delete the contract and create a brand new one', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'If a user still cannot see a specific vehicle after clearing all filters and search text, what permission check is required?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Each user profile has granular vehicle visibility. If a vehicle\'s checkbox is unchecked on the Vehicles tab of the user card, the vehicle is hidden from that user.',
+                        'options' => [
+                            ['text' => 'Check the user\'s card in Staff and groups → Vehicles tab to ensure the checkbox for that vehicle is ticked', 'correct' => true],
+                            ['text' => 'Check if the user has an active Monitor Token', 'correct' => false],
+                            ['text' => 'Check if the vehicle has fuel calibration tables configured', 'correct' => false],
+                            ['text' => 'Check if the vehicle license plate contains numbers', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -88,6 +152,38 @@ HTML,
 </li>
 </ol>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Speed Notification Troubleshooting',
+                'description' => 'Diagnose notification delivery failures from telemetry triggers to mailbox receipt.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'An administrator set up an automated over-speed alert, but no emails arrive. In Account Settings → Privacy, the recipient email shows a red badge. What is the cause?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'PILOT will never send automated alerts or scheduled reports to unconfirmed email addresses (indicated by a red badge). The user must click the confirmation link sent to that email address.',
+                        'options' => [
+                            ['text' => 'The email address has not been confirmed via the verification link sent to that inbox', 'correct' => true],
+                            ['text' => 'The email address domain is blocked by government regulations', 'correct' => false],
+                            ['text' => 'The recipient email must end in @pilot-gps.com', 'correct' => false],
+                            ['text' => 'The email address has received too many notifications and was deleted', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'If the email address is confirmed green, but over-speed emails still do not arrive, what is the next diagnostic step?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'If notifications don\'t trigger, verify whether telemetry packets recorded an actual speed violation during that period, and confirm whether corporate mail filters routed the alert to junk/spam.',
+                        'options' => [
+                            ['text' => 'Check the vehicle\'s telemetry history to verify if the GPS tracker actually reported speeds exceeding the threshold, and check spam filters', 'correct' => true],
+                            ['text' => 'Immediately replace the vehicle engine', 'correct' => false],
+                            ['text' => 'Delete all user accounts in the contract', 'correct' => false],
+                            ['text' => 'Change the server time zone to UTC-12', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -115,6 +211,38 @@ HTML,
 
 <blockquote><p><strong>Outcome:</strong> The VIP client gets real-time visibility without software installation or logins, while the fleet's sensitive company data and credentials remain 100% secure.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Quiz: Temporary Access & Token Deployment',
+                'description' => 'Demonstrate best practices for granting temporary, secure client visibility without credentials.',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'Why is generating a Monitor Token preferred over creating a temporary user account for a 1-day subcontractor?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Monitor tokens provide secure, scoped, time-limited map links without exposing system logins or other client assets.',
+                        'options' => [
+                            ['text' => 'A Monitor Token expires automatically, limits visibility strictly to selected assets, and never exposes credentials or sensitive fleet data', 'correct' => true],
+                            ['text' => 'A Monitor Token is required by telematics law in all countries', 'correct' => false],
+                            ['text' => 'A temporary user account can only be created by calling PILOT telephone support', 'correct' => false],
+                            ['text' => 'A Monitor Token increases vehicle engine horsepower during the trip', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'What happens when a Monitor Token\'s validity period expires?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Once the expiration timestamp passes, the token becomes invalid and the public tracking link no longer displays live map data.',
+                        'options' => [
+                            ['text' => 'The public tracking link stops showing map telemetry and access is terminated automatically', 'correct' => true],
+                            ['text' => 'The GPS tracking hardware inside the vehicle powers off', 'correct' => false],
+                            ['text' => 'The administrator is charged a penalty fee', 'correct' => false],
+                            ['text' => 'The entire PILOT contract is locked for 24 hours', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
 

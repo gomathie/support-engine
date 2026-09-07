@@ -13,7 +13,7 @@ class IssueCertificate
 {
     /**
      * Idempotent. Called from RecalculateCourseProgress, which runs on every
-     * lesson tick and every graded attempt, so it must be safe to call
+     * topic tick and every graded attempt, so it must be safe to call
      * repeatedly for an already-certified course.
      */
     public function handle(User $user, Course $course, ?CourseProgress $progress = null): ?Certificate

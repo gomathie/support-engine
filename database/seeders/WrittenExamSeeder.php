@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Enums\QuestionType;
 use App\Models\Course;
-use App\Models\CourseModule;
+use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\QuizQuestion;
 use Illuminate\Database\Seeder;
@@ -18,7 +18,7 @@ use Illuminate\Database\Seeder;
  *
  * Section A is not seeded here: PilotExamSeeder owns it, including its answer
  * key and per-question explanations. A course can only have one final exam —
- * a quiz attached to neither a module nor a lesson — so these two are scoped to
+ * a quiz attached to neither a module nor a topic — so these two are scoped to
  * the course's last module instead. Seeding them as final exams too would give
  * the course two, and Course::finalQuiz() would pick between them arbitrarily,
  * silently deciding whether the course completes and a certificate issues.
@@ -38,11 +38,11 @@ class WrittenExamSeeder extends Seeder
             return;
         }
 
-        // Queried directly rather than through $course->modules(), whose
+        // Queried directly rather than through $course->lessons(), whose
         // relation already applies orderBy('position') — adding orderByDesc to
         // it appends a second clause the first one wins, which quietly returned
-        // the *first* module.
-        $lastModule = CourseModule::query()
+        // the *first* lesson.
+        $lastModule = Lesson::query()
             ->where('course_id', $course->id)
             ->orderByDesc('position')
             ->first();
@@ -60,7 +60,7 @@ class WrittenExamSeeder extends Seeder
     }
 
     /** @param array<string, mixed> $exam */
-    private function seedSectionB(Course $course, CourseModule $module, array $exam): void
+    private function seedSectionB(Course $course, Lesson $lesson, array $exam): void
     {
         $quiz = Quiz::query()->updateOrCreate(
             [
@@ -68,8 +68,8 @@ class WrittenExamSeeder extends Seeder
                 'title' => 'PILOT Technical Support Examination — Section B: Written Questions',
             ],
             [
-                'course_module_id' => $module->id,
-                'lesson_id' => null,
+                'lesson_id' => $lesson->id,
+                'topic_id' => null,
                 'description' => 'Fifteen written questions, five points each. Recommended time '
                     .'90–120 minutes. Answers are read and marked by an examiner, so your result '
                     .'is not immediate.',
@@ -102,12 +102,12 @@ class WrittenExamSeeder extends Seeder
             'Section B: %d written questions (%d points) on "%s".',
             count($exam['section_b']),
             count($exam['section_b']) * 5,
-            $module->title,
+            $lesson->title,
         ));
     }
 
     /** @param array<string, mixed> $exam */
-    private function seedSectionC(Course $course, CourseModule $module, array $exam): void
+    private function seedSectionC(Course $course, Lesson $lesson, array $exam): void
     {
         $quiz = Quiz::query()->updateOrCreate(
             [
@@ -115,8 +115,8 @@ class WrittenExamSeeder extends Seeder
                 'title' => 'PILOT Technical Support Examination — Section C: Practical',
             ],
             [
-                'course_module_id' => $module->id,
-                'lesson_id' => null,
+                'lesson_id' => $lesson->id,
+                'topic_id' => null,
                 'description' => 'Performed in the test environment. For each task, demonstrate '
                     .'the completed configuration to the examiner and explain the sequence of '
                     .'actions. The examiner records the outcome against each part.',
@@ -149,7 +149,7 @@ class WrittenExamSeeder extends Seeder
             'Section C: %d practical parts (%d points) on "%s".',
             count($exam['section_c']),
             count($exam['section_c']) * 5,
-            $module->title,
+            $lesson->title,
         ));
     }
 

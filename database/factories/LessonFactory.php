@@ -3,15 +3,15 @@
 namespace Database\Factories;
 
 use App\Models\Course;
-use App\Models\CourseModule;
+use App\Models\Lesson;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<CourseModule>
+ * @extends Factory<Lesson>
  */
-class CourseModuleFactory extends Factory
+class LessonFactory extends Factory
 {
-    protected $model = CourseModule::class;
+    protected $model = Lesson::class;
 
     public function definition(): array
     {

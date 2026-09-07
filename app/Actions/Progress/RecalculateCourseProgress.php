@@ -28,7 +28,7 @@ class RecalculateCourseProgress
     public function handle(User $user, Course $course): CourseProgress
     {
         return DB::transaction(function () use ($user, $course): CourseProgress {
-            // Lock the rollup so two concurrent lesson completions cannot both
+            // Lock the rollup so two concurrent topic completions cannot both
             // read "9 of 10" and race to write it.
             $progress = CourseProgress::query()
                 ->where('user_id', $user->id)
@@ -40,19 +40,19 @@ class RecalculateCourseProgress
                     'course_id' => $course->id,
                 ]);
 
-            $totalLessons = $course->lessons()->where('is_published', true)->count();
+            $totalLessons = $course->topics()->where('is_published', true)->count();
 
-            $completedLessons = $user->lessonProgress()
+            $completedLessons = $user->topicProgress()
                 ->where('course_id', $course->id)
                 ->whereNotNull('completed_at')
-                ->whereHas('lesson', fn ($q) => $q->where('is_published', true))
+                ->whereHas('topic', fn ($q) => $q->where('is_published', true))
                 ->count();
 
-            $progress->total_lessons = $totalLessons;
-            $progress->completed_lessons = min($completedLessons, $totalLessons);
+            $progress->total_topics = $totalLessons;
+            $progress->completed_topics = min($completedLessons, $totalLessons);
 
             $progress->percentage = $totalLessons > 0
-                ? round($progress->completed_lessons / $totalLessons * 100, 2)
+                ? round($progress->completed_topics / $totalLessons * 100, 2)
                 : 0;
 
             // ---------------------------------------------------- final quiz
@@ -68,17 +68,17 @@ class RecalculateCourseProgress
 
             // ------------------------------------------ knowledge checks
             /*
-             * Every lesson ends with a knowledge check, and every one of them
+             * Every topic ends with a knowledge check, and every one of them
              * has to be passed.
              *
              * These are module-scoped quizzes. Without this they were
              * decoration: a trainee could skip every check and still finish the
              * course on the final exam alone, which makes "you must pass" untrue
-             * for the thing sitting at the end of each lesson.
+             * for the thing sitting at the end of each topic.
              */
             $knowledgeChecks = $course->quizzes()
-                ->whereNotNull('course_module_id')
-                ->whereNull('lesson_id')
+                ->whereNotNull('lesson_id')
+                ->whereNull('topic_id')
                 ->where('is_published', true)
                 ->get();
 
@@ -115,8 +115,8 @@ class RecalculateCourseProgress
             $practicalsSatisfied = $practicals->count() === $practicalsPassed;
 
             // ------------------------------------------------------- status
-            $lessonsSatisfied = $totalLessons > 0 && $progress->completed_lessons >= $totalLessons;
-            $hasStarted = $progress->completed_lessons > 0 || $progress->quiz_attempts_count > 0;
+            $lessonsSatisfied = $totalLessons > 0 && $progress->completed_topics >= $totalLessons;
+            $hasStarted = $progress->completed_topics > 0 || $progress->quiz_attempts_count > 0;
 
             $progress->started_at ??= $hasStarted ? now() : null;
             $progress->last_activity_at = now();
@@ -149,7 +149,7 @@ class RecalculateCourseProgress
             $progress->save();
 
             // Certificate issuance hangs off completion rather than off the
-            // controller, so every path that can finish a course — a lesson tick,
+            // controller, so every path that can finish a course — a topic tick,
             // a passing quiz, an admin backfill — issues one.
             if ($progress->status === ProgressStatus::Completed) {
                 $this->issueCertificate->handle($user, $course, $progress);
