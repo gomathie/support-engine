@@ -66,6 +66,29 @@ class RecalculateCourseProgress
                 $quizSatisfied = $finalQuiz->passedBy($user);
             }
 
+            // ------------------------------------------- practical tasks
+            /*
+             * Every published practical on the course has to be passed.
+             *
+             * This is the difference between "read the material" and "can do the
+             * job". Without it a trainee could finish a course, collect a
+             * certificate and be awarded a competency level having never
+             * demonstrated anything — which is precisely the model this platform
+             * is moving away from.
+             */
+            $practicals = $course->practicalTasks()->where('is_published', true)->get();
+
+            $practicalsPassed = $practicals->isEmpty()
+                ? 0
+                : $course->practicalTasks()
+                    ->where('is_published', true)
+                    ->whereHas('submissions', fn ($q) => $q
+                        ->where('user_id', $user->id)
+                        ->where('passed', true))
+                    ->count();
+
+            $practicalsSatisfied = $practicals->count() === $practicalsPassed;
+
             // ------------------------------------------------------- status
             $lessonsSatisfied = $totalLessons > 0 && $progress->completed_lessons >= $totalLessons;
             $hasStarted = $progress->completed_lessons > 0 || $progress->quiz_attempts_count > 0;
@@ -73,7 +96,7 @@ class RecalculateCourseProgress
             $progress->started_at ??= $hasStarted ? now() : null;
             $progress->last_activity_at = now();
 
-            if ($lessonsSatisfied && $quizSatisfied) {
+            if ($lessonsSatisfied && $quizSatisfied && $practicalsSatisfied) {
                 $progress->status = ProgressStatus::Completed;
                 $progress->completed_at ??= now();
             } else {

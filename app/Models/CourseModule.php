@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['course_id', 'title', 'subtitle', 'description', 'position', 'is_published'])]
+#[Fillable(['course_id', 'title', 'subtitle', 'description', 'docs_reference', 'position', 'is_published'])]
 class CourseModule extends Model
 {
     use HasFactory, SoftDeletes;

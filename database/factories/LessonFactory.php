@@ -27,7 +27,7 @@ class LessonFactory extends Factory
             'description' => fake()->sentence(),
             'type' => LessonType::RichText,
             'content' => '<p>'.fake()->paragraph().'</p>',
-            'completion_requirement' => CompletionRequirement::Acknowledge,
+            'completion_requirement' => CompletionRequirement::View,
             'estimated_minutes' => fake()->numberBetween(5, 60),
             'is_published' => true,
         ];

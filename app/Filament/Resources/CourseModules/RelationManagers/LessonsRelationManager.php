@@ -83,7 +83,7 @@ class LessonsRelationManager extends RelationManager
 
                 Select::make('completion_requirement')
                     ->options(CompletionRequirement::options())
-                    ->default(CompletionRequirement::Acknowledge->value)
+                    ->default(CompletionRequirement::View->value)
                     ->required(),
 
                 TextInput::make('estimated_minutes')

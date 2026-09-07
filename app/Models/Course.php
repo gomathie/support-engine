@@ -222,6 +222,20 @@ class Course extends Model
         return $this->lessons()->where('is_published', true)->count();
     }
 
+    /**
+     * Whether finishing this course requires passing anything.
+     *
+     * A course with no published exam and no published practical can be
+     * completed by reading alone — which is the model the platform is moving
+     * away from. Legitimate for a policy briefing; a problem for training. Not
+     * blocked, but surfaced, so it is a decision rather than an oversight.
+     */
+    public function isAssessed(): bool
+    {
+        return $this->finalQuiz()->where('is_published', true)->exists()
+            || $this->practicalTasks()->where('is_published', true)->exists();
+    }
+
     public function isVisibleToEmployees(): bool
     {
         return $this->status->isVisibleToEmployees();

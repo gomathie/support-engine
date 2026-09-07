@@ -78,7 +78,7 @@ class LessonForm
 
                         Select::make('completion_requirement')
                             ->options(CompletionRequirement::options())
-                            ->default(CompletionRequirement::Acknowledge->value)
+                            ->default(CompletionRequirement::View->value)
                             ->required(),
 
                         Textarea::make('description')

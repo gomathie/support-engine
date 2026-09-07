@@ -26,7 +26,7 @@ class CourseModuleForm
                 TextInput::make('title')
                     ->required()
                     ->maxLength(255)
-                    ->helperText('The short label — "Day 1", "Module A".'),
+                    ->helperText('The short label — "Lesson 1", "Final assessment". Not a day: progress is measured by assessment, not by calendar.'),
 
                 TextInput::make('subtitle')
                     ->maxLength(255)
@@ -36,6 +36,13 @@ class CourseModuleForm
                     ->rows(3)
                     ->columnSpanFull()
                     ->helperText('The topics line under the module heading.'),
+
+                TextInput::make('docs_reference')
+                    ->label('Documentation')
+                    ->maxLength(255)
+                    ->columnSpanFull()
+                    ->placeholder('Sensors → Calibration tables')
+                    ->helperText('Which chapter of docs.pilot-gps.com this is drawn from. A chapter name rather than a URL — the docs are versioned, and deep links rot at the next release.'),
 
                 TextInput::make('position')
                     ->numeric()

@@ -46,6 +46,19 @@ class CoursesTable
                     ->boolean()
                     ->sortable(),
 
+                // A course nobody has to pass anything to finish can be
+                // completed by reading alone. Fine for a policy briefing,
+                // wrong for training — so it is shown rather than left to be
+                // discovered when somebody earns a level for turning pages.
+                TextColumn::make('assessed')
+                    ->label('Assessed')
+                    ->state(fn (Course $record) => $record->isAssessed() ? 'Yes' : 'Reading only')
+                    ->badge()
+                    ->color(fn ($state) => $state === 'Yes' ? 'success' : 'warning')
+                    ->tooltip(fn (Course $record) => $record->isAssessed()
+                        ? null
+                        : 'No published exam or practical. Trainees complete this by opening the lessons.'),
+
                 TextColumn::make('modules_count')
                     ->label('Modules')
                     ->counts('modules')

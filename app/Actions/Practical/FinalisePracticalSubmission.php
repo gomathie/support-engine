@@ -2,6 +2,7 @@
 
 namespace App\Actions\Practical;
 
+use App\Actions\Progress\RecalculateCourseProgress;
 use App\Enums\SubmissionStatus;
 use App\Models\PracticalSubmission;
 
@@ -17,6 +18,10 @@ use App\Models\PracticalSubmission;
  */
 class FinalisePracticalSubmission
 {
+    public function __construct(
+        private readonly RecalculateCourseProgress $recalculate,
+    ) {}
+
     public function handle(PracticalSubmission $submission): PracticalSubmission
     {
         $submission->load(['gradings', 'task']);
@@ -43,6 +48,20 @@ class FinalisePracticalSubmission
             'passed' => (bool) $gradings->first()->passed,
             'finalised_at' => now(),
         ])->save();
+
+        $submission->refresh();
+
+        /*
+         * A passed practical can be the last thing standing between a trainee
+         * and a finished course, so the rollup has to be recomputed here as
+         * well as on a lesson tick. Without this the course would sit at
+         * "in progress" until something else happened to nudge it.
+         */
+        $course = $submission->task?->course;
+
+        if ($course) {
+            $this->recalculate->handle($submission->user, $course);
+        }
 
         return $submission->refresh();
     }

@@ -64,7 +64,7 @@ return [
     ],
 
     [
-        'title' => '1st-line support — 2 week plan',
+        'title' => '1st-line support',
         'category' => 'TRACK 1',
         'summary' => 'The core PILOT platform: objects, sensors, rights, reports and notifications.',
         'description' => 'Two weeks from first login to handling live contacts, ending in a final '
@@ -75,7 +75,7 @@ return [
         'due_days' => 21,
         'modules' => [
             [
-                'title' => 'Day 1',
+                'title' => 'Lesson 1',
                 'subtitle' => 'Introduction to PILOT and basic concepts',
                 'description' => 'Object, Sensor, Contract, Account, Alert, Geofence; roles (User / Admin / Super Admin).',
                 'lessons' => [
@@ -85,7 +85,7 @@ return [
                 ],
             ],
             [
-                'title' => 'Day 2',
+                'title' => 'Lesson 2',
                 'subtitle' => 'Interface and navigation',
                 'description' => 'Top panel, workspace, map, map tools.',
                 'lessons' => [
@@ -96,7 +96,7 @@ return [
                 ],
             ],
             [
-                'title' => 'Day 3',
+                'title' => 'Lesson 3',
                 'subtitle' => 'User and rights management',
                 'description' => 'Creating users, assigning rights to objects/labels, rights templates.',
                 'lessons' => [
@@ -107,7 +107,7 @@ return [
                 ],
             ],
             [
-                'title' => 'Day 4',
+                'title' => 'Lesson 4',
                 'subtitle' => 'Working with objects (part 1)',
                 'description' => 'Object card, mandatory fields, device IMEI.',
                 'lessons' => [
@@ -117,7 +117,7 @@ return [
                 ],
             ],
             [
-                'title' => 'Day 5',
+                'title' => 'Lesson 5',
                 'subtitle' => 'Working with objects (part 2) and object list',
                 'description' => 'Filtering, sorting, columns, groups, color indicators.',
                 'lessons' => [
@@ -128,7 +128,7 @@ return [
                 ],
             ],
             [
-                'title' => 'Day 6',
+                'title' => 'Lesson 6',
                 'subtitle' => 'Sensors (part 1)',
                 'description' => 'Sensor types by purpose and by principle of operation.',
                 'lessons' => [
@@ -137,7 +137,7 @@ return [
                 ],
             ],
             [
-                'title' => 'Day 7',
+                'title' => 'Lesson 7',
                 'subtitle' => 'Sensors (part 2)',
                 'description' => 'Calibration tables, formulas, sensor templates.',
                 'lessons' => [
@@ -147,7 +147,7 @@ return [
                 ],
             ],
             [
-                'title' => 'Day 8',
+                'title' => 'Lesson 8',
                 'subtitle' => 'History and reports',
                 'description' => 'Track/player/events/graph, report types and parameters.',
                 'lessons' => [
@@ -157,7 +157,7 @@ return [
                 ],
             ],
             [
-                'title' => 'Day 9',
+                'title' => 'Lesson 9',
                 'subtitle' => 'Contract settings and notifications',
                 'description' => 'Password/email settings, 2FA, notification types.',
                 'lessons' => [
@@ -167,7 +167,7 @@ return [
                 ],
             ],
             [
-                'title' => 'Day 10',
+                'title' => 'Lesson 10',
                 'subtitle' => 'Additional modules and tools',
                 'description' => 'Modular architecture, report scheduler, tokens.',
                 'lessons' => [
@@ -177,7 +177,7 @@ return [
                 ],
             ],
             [
-                'title' => 'Day 11–12',
+                'title' => 'Lesson 11',
                 'subtitle' => 'Comprehensive review and call simulation',
                 'description' => 'Applying knowledge to realistic support scenarios.',
                 'lessons' => [
@@ -188,7 +188,7 @@ return [
                 ],
             ],
             [
-                'title' => 'Day 13–14',
+                'title' => 'Lesson 12',
                 'subtitle' => 'Final testing and consultation',
                 'description' => 'Assessment and open Q&A.',
                 'lessons' => [
@@ -200,7 +200,7 @@ return [
     ],
 
     [
-        'title' => 'Admin panel — 3 day plan',
+        'title' => 'Admin panel',
         'category' => 'TRACK 2',
         'summary' => 'Contracts, objects, partners, finances, modules and rebranding.',
         'description' => 'Three days in the Administrative Panel, ending in a combined end-to-end assessment.',
@@ -209,7 +209,7 @@ return [
         'estimated_minutes' => 1440,
         'modules' => [
             [
-                'title' => 'Day 1',
+                'title' => 'Lesson 1',
                 'subtitle' => 'Interface familiarization and basic operations',
                 'description' => 'Panel structure, personal settings, contracts.',
                 'lessons' => [
@@ -223,7 +223,7 @@ return [
                 ],
             ],
             [
-                'title' => 'Day 2',
+                'title' => 'Lesson 2',
                 'subtitle' => 'Objects, partners, and finances',
                 'description' => 'Object transfer/configuration, partner setup, payments.',
                 'lessons' => [
@@ -241,7 +241,7 @@ return [
                 ],
             ],
             [
-                'title' => 'Day 3',
+                'title' => 'Lesson 3',
                 'subtitle' => 'Modules, notifications, security, rebranding',
                 'description' => 'Geofences, email templates, 2FA, white-labeling.',
                 'lessons' => [
@@ -256,7 +256,7 @@ return [
                 ],
             ],
             [
-                'title' => 'Final test',
+                'title' => 'Final assessment',
                 'subtitle' => 'Combined assessment',
                 'description' => 'End-to-end tasks covering all three days.',
                 'lessons' => [

@@ -132,6 +132,7 @@ class CourseController extends Controller
                 'title' => $module->title,
                 'subtitle' => $module->subtitle,
                 'description' => $module->description,
+                'docs_reference' => $module->docs_reference,
                 'lessons' => $module->lessons->map(fn ($lesson) => [
                     'id' => $lesson->id,
                     'title' => $lesson->title,

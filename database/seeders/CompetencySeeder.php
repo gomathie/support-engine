@@ -130,9 +130,9 @@ class CompetencySeeder extends Seeder
         $mapping = [
             // course title => [level slug, area slug]
             'Onboarding: IT Support Tools & Policies' => ['basic', 'access-rights'],
-            '1st-line support — 2 week plan' => ['basic', 'objects-sensors'],
+            '1st-line support' => ['basic', 'objects-sensors'],
             'Support skills — communication, troubleshooting, escalation, standards' => ['basic', 'escalation'],
-            'Admin panel — 3 day plan' => ['second', 'admin-panel'],
+            'Admin panel' => ['second', 'admin-panel'],
         ];
 
         foreach ($mapping as $title => [$levelSlug, $areaSlug]) {

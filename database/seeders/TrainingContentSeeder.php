@@ -70,7 +70,7 @@ class TrainingContentSeeder extends Seeder
                             // The prototype's items were checkboxes, so they map
                             // onto the requirement that reproduces that: the
                             // employee ticks them off themselves.
-                            'completion_requirement' => CompletionRequirement::Acknowledge,
+                            'completion_requirement' => CompletionRequirement::View,
 
                             'position' => $lessonPosition + 1,
                             'is_published' => true,

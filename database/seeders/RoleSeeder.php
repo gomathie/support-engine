@@ -45,7 +45,19 @@ class RoleSeeder extends Seeder
          */
         $trainer = Role::findOrCreate(RoleEnum::Trainer->value, 'web');
         $trainer->syncPermissions([
-            'courses.view',
+            /*
+             * A trainer authors the whole course, not fragments of one.
+             *
+             * They previously held lessons.manage and quizzes.manage but not
+             * courses.create — able to write the lessons and the exam, but not
+             * the course those sit in, which meant every new course needed an
+             * administrator. Authoring is the job; the course is the unit of it.
+             *
+             * courses.delete is deliberately absent. Deleting a course takes
+             * other people's training records, certificates and level awards
+             * with it, and that is an administrator's decision.
+             */
+            'courses.view', 'courses.create', 'courses.update', 'courses.publish',
             'lessons.manage',
             'quizzes.manage',
             'content.audit',
