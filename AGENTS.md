@@ -139,13 +139,13 @@ header carries the rules. Three that matter:
 
 ## 5. Open questions — do not invent answers to these
 
-1. **PA-16 — the exam answer key is unconfirmed, and this is the important one.**
-   The source document (`docs/PILOT_Technical_Support_Employee_Exam_EN2.md`) has
-   an empty "Answer Key for the Examiner" heading and 15 blank `Answer:` fields.
-   `PilotExamSeeder`'s key is labelled "from the document" but **the document has
-   none**. Section A is published and live. Until Igor confirms all 40 answers,
-   Section A results are provisional and **must not gate a level award**. Do not
-   fabricate an answer key.
+1. ~~**PA-16 — the exam answer key**~~ — **CLOSED 2026-09-08.** The user
+   confirmed the Section A key is verified and correct. Section A is now
+   published and gates the final lesson. It is scoped to the lesson, **not the
+   course**: the course already has a final exam, and `finalQuiz()->first()`
+   means a second course-scoped exam gates nothing while looking like it does.
+   Sections B and C remain unpublished — publishing them is a separate decision
+   nobody has taken.
 2. **Does Level 1 require exam Sections A+B+C, or A alone?** Unanswered, so the
    seeded `level_requirements` use whole courses rather than exam sections.
 3. **Are the six competency areas correct?** Access & Rights · Objects & Sensors ·
@@ -310,3 +310,31 @@ Two mistakes in the test for it, both mine, both worth avoiding:
 Also: **do not run `artisan test --filter=...` while a full suite is running.**
 Both use `pilot_lms_testing`, and the collision surfaces as an unrelated-looking
 "select * from permissions" failure.
+
+### 2026-09-08 — Model rename, and two exam bugs (Claude)
+
+**`CourseModule` → `Lesson`, `Lesson` → `Topic`**, schema and code. The admin
+panel had two different things called a lesson once the modules were retitled.
+Done as a rename migration, not rewritten history — see
+`2026_09_07_000400`. Ordering matters: `lessons` must vacate the name before
+`course_modules` can take it.
+
+Failure modes of a mechanical rename, all hit and all fixed: the perl pass
+rewrote migration *history* (restored from git); `\bLesson\b` never matched
+`Lessons`, leaving stale namespaces that collided fatally; `SCOPE_MODULE` →
+`SCOPE_LESSON` duplicated an existing constant and silently collapsed two
+distinct tests into identical ones; a loop variable rename left `position`
+reading the outer loop.
+
+**Two exam bugs found while answering a question about lesson structure:**
+
+- **The course had two published final exams.** `RecalculateCourseProgress`
+  reads `finalQuiz()->first()`, so the second one — the official 40-question
+  Section A — was sittable, looked authoritative, and gated nothing.
+  `OneFinalExamPerCourseTest` now guards this; it has regressed once before.
+- **Section A is now lesson-scoped and published**, gating the final lesson,
+  after the key was confirmed.
+
+**Per-topic quizzes** (authored in parallel) are verified end to end by
+`TopicQuizGatesTopicTest`, including an assertion over the real seeded
+curriculum that every topic carrying a quiz is actually gated on it.
