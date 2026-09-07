@@ -1,17 +1,23 @@
 # Support Training Hub
 
-An interactive onboarding platform for new support employees. Trainees work through structured curriculum tracks — 1st-line support (2 weeks), admin panel (3 days), and support skills modules — **ticking checkboxes** as they complete each lesson to show their progress in real time.
+A training platform for support staff. Trainees work through structured curriculum tracks — 1st-line support (2 weeks), admin panel (3 days), and support skills modules — and are then **assessed** on them.
+
+> **Completion is not competence.** Ticking off a lesson records that somebody read it. Whether they can do the job is decided by a graded exam and a practical task marked against a rubric — and only that awards a competency level. The two are deliberately separate, and the work in [`docs/COMPETENCY_IMPLEMENTATION_PLAN.md`](docs/COMPETENCY_IMPLEMENTATION_PLAN.md) exists to keep them that way.
 
 ## What it does
 
 | Feature | Description |
 | --- | --- |
-| **Training Tracker** | Curriculum tracks broken into modules and lessons, with interactive checkbox completion |
-| **Progress Dashboard** | Circular gauge, per-course progress bars and completion counters — all driven by checked-off lessons |
+| **Training Tracker** | Curriculum tracks broken into modules and lessons, with checkbox completion |
+| **Lesson types** | Rich text, PDF, image, external link, download — plus **video**, either embedded (YouTube / Vimeo) or uploaded and streamed from private storage |
+| **Progress Dashboard** | Circular gauge, per-course progress bars and completion counters |
+| **Quiz Engine** | Timed assessments with server-side scoring, pass marks, attempt history, and written answers marked by a person |
+| **Practical tasks** | Real work, submitted with evidence and marked against a four-criterion rubric — with optional independent double-marking |
+| **Competency ladder** | Levels held *per area of expertise*, awarded automatically when the courses a level requires are complete |
+| **Cohorts** | Every trainee has one trainer, who marks their work; reassignments are logged with a reason |
 | **Support Panel** | 13 diagnostic decision trees (102 checks), a priority matrix, and a case-note generator for live calls |
-| **Quiz Engine** | Timed assessments with server-side scoring, pass marks and attempt history |
 | **Certificates** | Auto-generated PDF certificates on course completion, with public verification links |
-| **Admin Portal** | Filament admin for courses, employees, departments, enrollments, assignment rules and reporting |
+| **Admin Portal** | Filament admin for courses, lessons, practicals, people, cohorts, enrollments, assignment rules and reporting |
 
 ## Tech Stack
 

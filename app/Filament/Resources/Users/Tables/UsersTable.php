@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Actions\Cohorts\AssignTrainee;
 use App\Actions\Enrollment\SyncAssignmentRules;
 use App\Enums\ProgressStatus;
 use App\Enums\Role;
@@ -14,6 +15,7 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -59,6 +61,16 @@ class UsersTable
                         Role::Trainer->value => 'warning',
                         default => 'gray',
                     }),
+
+                // Who is responsible for this person's training. Distinct from
+                // their department manager — a trainer is not necessarily
+                // anybody's line manager.
+                TextColumn::make('trainer')
+                    ->label('Trainer')
+                    ->state(fn (User $record) => $record->currentTrainer()?->name)
+                    ->badge()
+                    ->color('info')
+                    ->placeholder('—'),
 
                 TextColumn::make('enrollments_count')
                     ->label('Assigned')
@@ -177,6 +189,8 @@ class UsersTable
                     }),
             ])
             ->recordActions([
+                static::assignTrainerAction(),
+
                 // Re-evaluates every assignment rule for this person. The case
                 // this exists for is somebody moving department and needing
                 // their new department's training without an administrator
@@ -214,5 +228,85 @@ class UsersTable
                 BulkActionGroup::make([]),
             ])
             ->defaultSort('name');
+    }
+
+    /**
+     * Assign, reassign or unassign this trainee's trainer (PA-13).
+     *
+     * Admin only — `trainees.assign` is deliberately absent from the Trainer
+     * role, so a trainer cannot take on work they should not have or quietly
+     * hand a struggling trainee to somebody else.
+     *
+     * The reason is required on a *re*assignment but not on a first one: there
+     * is nothing to explain about giving a new starter their first trainer,
+     * while moving somebody mid-course is exactly what an audit asks about.
+     */
+    private static function assignTrainerAction(): Action
+    {
+        return Action::make('assignTrainer')
+            ->label(fn (User $record) => $record->currentTrainer() ? 'Change trainer' : 'Assign trainer')
+            ->icon('heroicon-o-user-plus')
+            ->color('gray')
+
+            // Only for people actually being trained.
+            ->visible(fn (User $record) => $record->hasRole(Role::Trainee->value)
+                && (auth()->user()?->can('trainees.assign') ?? false))
+
+            ->modalHeading(fn (User $record) => 'Trainer for '.$record->name)
+            ->modalDescription(function (User $record): string {
+                $current = $record->currentTrainer();
+
+                return $current
+                    ? 'Currently with '.$current->name.'. The incoming trainer inherits any unmarked work.'
+                    : 'Nobody is currently responsible for this trainee.';
+            })
+            ->modalSubmitActionLabel('Save')
+            ->fillForm(fn (User $record) => [
+                'trainer_id' => $record->currentTrainer()?->getKey(),
+            ])
+            ->schema([
+                Select::make('trainer_id')
+                    ->label('Trainer')
+                    ->options(fn () => User::query()
+                        ->role(Role::Trainer->value)
+                        ->where('is_active', true)
+                        ->orderBy('name')
+                        ->pluck('name', 'id')
+                        ->all())
+                    ->searchable()
+                    ->placeholder('Nobody — remove their trainer')
+                    ->helperText('Leave empty to unassign.'),
+
+                Textarea::make('reason')
+                    ->label('Reason')
+                    ->rows(2)
+                    ->required(fn (User $record) => $record->currentTrainer() !== null)
+                    ->helperText('Recorded permanently against the change. Required when somebody already holds this trainee.'),
+            ])
+            ->action(function (array $data, User $record, AssignTrainee $assign): void {
+                $reason = $data['reason'] ?? null;
+
+                if (blank($data['trainer_id'] ?? null)) {
+                    $assign->unassign($record, auth()->user(), $reason);
+
+                    Notification::make()
+                        ->success()
+                        ->title('Trainer removed')
+                        ->body('Nobody is responsible for '.$record->name.' until you assign one.')
+                        ->send();
+
+                    return;
+                }
+
+                $trainer = User::query()->findOrFail($data['trainer_id']);
+
+                $assign->handle($record, $trainer, auth()->user(), $reason);
+
+                Notification::make()
+                    ->success()
+                    ->title('Trainer set to '.$trainer->name)
+                    ->body('They inherit any unmarked work for this trainee.')
+                    ->send();
+            });
     }
 }

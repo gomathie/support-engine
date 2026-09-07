@@ -7,6 +7,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\LessonVideoController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PracticalTaskController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\QuizController;
@@ -62,6 +63,25 @@ Route::middleware(['auth', 'active'])->group(function (): void {
     // private disk; this runs the lesson policy first.
     Route::get('courses/{course}/lessons/{lesson}/video', [LessonVideoController::class, 'stream'])
         ->name('lessons.video');
+
+    // ----------------------------------------------------- practical tasks
+    Route::get('courses/{course}/practical/{task}', [PracticalTaskController::class, 'show'])
+        ->name('practical.show');
+    Route::post('courses/{course}/practical/{task}/start', [PracticalTaskController::class, 'start'])
+        ->name('practical.start');
+    Route::put('courses/{course}/practical/{task}/draft', [PracticalTaskController::class, 'saveDraft'])
+        ->name('practical.draft');
+    Route::post('courses/{course}/practical/{task}/submit', [PracticalTaskController::class, 'submit'])
+        ->name('practical.submit');
+    Route::post('courses/{course}/practical/{task}/evidence', [PracticalTaskController::class, 'attach'])
+        ->name('practical.attach');
+    Route::delete('courses/{course}/practical/{task}/evidence/{file}', [PracticalTaskController::class, 'detach'])
+        ->name('practical.detach');
+
+    // The only route to an attachment's bytes; authorised against the
+    // submission, so trainee and trainer reach it under the same rule.
+    Route::get('practical-evidence/{file}', [PracticalTaskController::class, 'download'])
+        ->name('practical.files.download');
 
     // -------------------------------------------------------------- quizzes
     Route::get('courses/{course}/quiz/{quiz}', [QuizController::class, 'show'])

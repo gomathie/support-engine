@@ -149,6 +149,25 @@ class CourseController extends Controller
                 'lesson_count' => $module->lessons->count(),
             ])->all(),
 
+            /*
+             * Practical tasks sit alongside the modules rather than inside
+             * them: a task may hang off one lesson or stand for the whole
+             * course, and burying it in a module would hide the second kind.
+             */
+            'practical_tasks' => $course->practicalTasks()
+                ->published()
+                ->orderBy('position')
+                ->get()
+                ->map(fn ($task) => [
+                    'title' => $task->title,
+                    'slug' => $task->slug,
+                    'estimated_minutes' => $task->estimated_minutes,
+                    'lesson_title' => $task->lesson?->title,
+                    'status' => $task->latestSubmissionFor($user)?->status->value,
+                    'status_label' => $task->latestSubmissionFor($user)?->status->label(),
+                    'passed' => $task->latestSubmissionFor($user)?->passed,
+                ])->all(),
+
             'progress' => [
                 'percentage' => (float) ($progress?->percentage ?? 0),
                 'completed_lessons' => $progress?->completed_lessons ?? 0,

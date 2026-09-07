@@ -205,6 +205,11 @@ class Course extends Model
         return $this->hasMany(AssignmentRule::class);
     }
 
+    public function practicalTasks(): HasMany
+    {
+        return $this->hasMany(PracticalTask::class)->orderBy('position');
+    }
+
     public function resources(): HasManyThrough
     {
         return $this->hasManyThrough(LessonResource::class, Lesson::class);

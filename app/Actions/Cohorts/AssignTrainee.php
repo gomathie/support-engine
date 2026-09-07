@@ -2,6 +2,7 @@
 
 namespace App\Actions\Cohorts;
 
+use App\Enums\SubmissionStatus;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -126,15 +127,27 @@ class AssignTrainee
     }
 
     /**
-     * Written answers on this trainee's attempts that nobody has marked yet —
-     * the work a new trainer picks up.
+     * Unmarked work on this trainee — what a new trainer picks up.
+     *
+     * Counts written answers *and* practical submissions awaiting marking.
+     * Practicals were added in PA-14 and belong here for the same reason the
+     * written answers do: they are work sitting in the incoming trainer's queue,
+     * and a handover number that under-reports is worse than none, because it
+     * will be trusted.
      */
     private function pendingGradingCount(User $trainee): int
     {
-        return DB::table('quiz_answers')
+        $writtenAnswers = DB::table('quiz_answers')
             ->join('quiz_attempts', 'quiz_attempts.id', '=', 'quiz_answers.quiz_attempt_id')
             ->where('quiz_attempts.user_id', $trainee->getKey())
             ->whereNull('quiz_answers.graded_at')
             ->count();
+
+        $practicals = DB::table('practical_submissions')
+            ->where('user_id', $trainee->getKey())
+            ->where('status', SubmissionStatus::Submitted->value)
+            ->count();
+
+        return $writtenAnswers + $practicals;
     }
 }

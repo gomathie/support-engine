@@ -10,6 +10,7 @@ const props = defineProps({
     modules: { type: Array, default: () => [] },
     progress: { type: Object, required: true },
     final_quiz: { type: Object, default: null },
+    practical_tasks: { type: Array, default: () => [] },
     can: { type: Object, default: () => ({}) },
 });
 
@@ -160,6 +161,53 @@ const toggle = (id) => (collapsed.value[id] = !collapsed.value[id]);
                     </Link>
                 </div>
             </div>
+        </div>
+
+        <!-- ─── PRACTICAL TASKS ─────────────────────────────── -->
+        <div v-if="practical_tasks.length" class="card mb-6 p-6">
+            <div class="mb-4 flex flex-wrap items-center gap-2">
+                <span class="chip bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300">
+                    Practical
+                </span>
+                <h2 class="text-lg font-bold text-navy">Show you can do it</h2>
+            </div>
+
+            <p class="mb-4 text-sm text-ink-sec">
+                Marked by a trainer against a rubric you can read before you start.
+            </p>
+
+            <Link
+                v-for="task in practical_tasks"
+                :key="task.slug"
+                :href="route('practical.show', [course.slug, task.slug])"
+                class="flex items-center justify-between gap-3 border-t border-line px-1 py-3 no-underline transition-colors hover:bg-surface-alt"
+            >
+                <span class="min-w-0">
+                    <span class="block truncate font-medium text-ink">{{ task.title }}</span>
+                    <span v-if="task.lesson_title" class="block truncate text-xs text-ink-dis">
+                        after {{ task.lesson_title }}
+                    </span>
+                </span>
+
+                <span class="flex shrink-0 items-center gap-2">
+                    <StatusPill
+                        v-if="task.status"
+                        :label="task.passed === true ? 'Passed' : task.status_label"
+                        :tone="
+                            task.passed === true
+                                ? 'positive'
+                                : task.passed === false
+                                  ? 'negative'
+                                  : task.status === 'returned'
+                                    ? 'warning'
+                                    : 'primary'
+                        "
+                    />
+                    <span v-if="task.estimated_minutes" class="hidden text-xs text-ink-dis sm:inline">
+                        ~{{ task.estimated_minutes }} min
+                    </span>
+                </span>
+            </Link>
         </div>
 
         <!-- ─── FINAL ASSESSMENT ────────────────────────────── -->

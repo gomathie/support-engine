@@ -20,8 +20,8 @@ Status is what is **merged and tested**, not what is designed.
 | PA-10 | Video module — native upload | **Done, minus transcoding** | Upload + HTML5 player + Range streaming; HLS deferred |
 | PA-11 | Trainer grading interface — cohort scoping | **Partial** | `QuizAttemptResource` scopes by cohort; rubric UI outstanding |
 | PA-12 | Pass/fail override + reason + audit log | **Done** | `grade_override_logs`; see below |
-| PA-13 | Trainee reassignment logic + grading inheritance | **Partial** | Action + log done; no admin UI |
-| PA-14 | Practical task submission + rubric UI | Not started | |
+| PA-13 | Trainee reassignment logic + grading inheritance | **Done** | Assign/reassign UI + read-only audit screen |
+| PA-14 | Practical task submission + rubric UI | **Done** | Both sides: trainee submission and trainer marking |
 | PA-15 | Pilot rollout | Not started | |
 | PA-16 | Verify Section A answer key | **Blocked** | The source document contains no answer key — see §6 risk (g) |
 | PA-17–19 | Phase 3 | Not started | |
@@ -202,6 +202,116 @@ reverting is as consequential as the original decision.
 The admin table gains an Override column, an "Overridden results only" filter for
 audit and calibration review, and a secondary action with a 15-character minimum
 on the reason. It is deliberately not the obvious button on the row.
+
+## PA-14 — Practical tasks and the rubric
+
+The Apply/Analyze end of §4.1's Bloom mapping — what a multiple-choice question
+cannot reach. Five tables: `practical_tasks`, `practical_submissions`,
+`practical_submission_files`, `practical_gradings`, `practical_grading_scores`.
+
+**Kept separate from quizzes on purpose.** §3 puts the practical before the exam
+and marks it differently — not points out of a maximum, but four criteria with
+descriptors and a threshold rule. A `QuizQuestion` type whose scoring shares
+nothing with the other types would have been a worse fit than a separate model.
+
+### The threshold is not a total
+
+`PracticalGrading::passes()` holds the §4.3 rule in one place: **3+ on
+Correctness, 2+ on every other criterion, and 10+ overall.** All three must hold.
+4/4/2/0 sums to 10 and still fails — somebody who cannot explain what they did
+has not met the standard, and a test pins exactly that case. Correctness carries
+the higher bar because a tidy route to the wrong answer is still the wrong
+answer.
+
+### A low score must be explained
+
+Scores of 2 or below require a comment, enforced in the action rather than the
+form so it holds for any caller. "Why did this fail" is the only part of a mark a
+trainee can learn from, and a bare 1 teaches nothing.
+
+### Two markers who disagree are not averaged
+
+`requires_second_marker` is per task, so double-marking can be switched on while
+a task's standard is being calibrated and off once it settles — rather than being
+a permanent burden. With it on:
+
+- one grading does not settle the submission; it stays awaiting marking;
+- if the two markers reach **different verdicts, the submission still does not
+  settle.** It is flagged as a split verdict and waits for the trainers to
+  reconcile.
+
+That last one is the important call. Averaging a pass and a fail would produce a
+false consensus and hide precisely the rubric drift the calibration exercise
+exists to catch. The admin queue has a "Split verdicts only" filter, which is the
+calibration meeting's agenda.
+
+Gradings are stored per grader rather than as columns on the submission, because
+"independent" means neither marker can see the other's scores first — which is
+only possible if they are separate rows.
+
+### Returning is not failing
+
+`Returned` is a distinct status from a graded fail. "You forgot the verification
+screenshot" is a gap in the evidence, not a judgement on the work — and it
+reopens **the same attempt** rather than starting a new one, so the retry
+statistics stay meaningful. A fail is what starts a fresh attempt.
+
+### Authority
+
+Same split PA-4 established: a trainer may read any submission with
+`transcripts.view-all`, but marking is cohort-scoped, and `grade`/`return`/
+`submit`/`update` are excluded from the administrator bypass — nobody marks their
+own practical. The marking queue itself is filtered to what the trainer can act
+on, because a list full of rows you cannot mark is not a queue.
+
+### The trainee's side
+
+`Practical/Show.vue` plus `PracticalTaskController`. Three decisions:
+
+- **The rubric is shown before they start**, collapsible, with all five
+  descriptors per criterion and the minimum marked. Assessing somebody against
+  criteria they never saw is how you get the "I didn't know that counted"
+  conversation.
+- **Marks are released only once the submission has settled.** On a
+  double-marked task that means both trainers agreeing — a trainee must not read
+  one marker's provisional view, still less two that contradict each other. The
+  controller keys feedback off `finalised_at`, and a test covers the withheld
+  case.
+- **Evidence goes to the private disk** with a mime allowlist (images, PDF,
+  plain logs; a `.php` upload is refused) and is reachable only through a route
+  authorised against the submission — so a trainee reaches their own and a
+  trainer reaches what they may read, under one rule. Tested for the
+  cross-trainee case.
+
+Practical tasks are surfaced on the course page alongside the modules rather
+than inside them, because a task may hang off one lesson *or* stand for the whole
+course, and burying it in a module would hide the second kind.
+
+## PA-13 — Reassignment UI and audit
+
+The action and log tables existed from PA-4; this is the screen an administrator
+actually uses, plus one correctness fix.
+
+**The inherited-work count was under-reporting.** `pendingGradingCount()` counted
+ungraded written answers only. Since PA-14 a trainee can also have practical
+submissions awaiting marking, and those move to the incoming trainer exactly the
+same way. A handover number that under-counts is worse than no number, because it
+will be trusted — so it now counts both. Found by reading the action while
+building the UI, not by a failing test.
+
+**Assign / reassign / unassign** is one action on the user row, visible only for
+trainees and only to somebody holding `trainees.assign` — which the Trainer role
+deliberately does not have. Leaving the trainer field empty unassigns.
+
+**The reason is required on a reassignment but not a first assignment.** There is
+nothing to explain about giving a new starter their first trainer; moving
+somebody mid-course is precisely what an audit asks about later.
+
+**`Assignment history` is a read-only resource** — no create, no edit, no delete,
+gated on `trainees.reassign`. §6 asks for an immutable log of reassignments, and
+a screen that could edit it would not be one. It carries a "trainer (either
+side)" filter, because the question when reviewing a handover is everything that
+moved *to or from* one person.
 
 ### RBAC note — "revocable per person" was wrong
 
