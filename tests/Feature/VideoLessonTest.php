@@ -124,8 +124,16 @@ class VideoLessonTest extends TestCase
     }
 
     /**
-     * Per the RBAC matrix, video authoring is Admin plus Trainer "if granted" —
-     * videos.manage is a revocable permission on the Trainer role.
+     * Video authoring is gated on videos.manage: Admin and Trainer hold it,
+     * Trainee does not.
+     *
+     * Note what this does NOT yet show. The plan describes the Trainer
+     * capabilities as "revocable per person", but the permission is granted
+     * through the Trainer *role*, and spatie has no per-user deny — revoking it
+     * from one trainer is not possible without taking it from all of them.
+     * Making that claim true means granting videos.manage, quizzes.manage and
+     * content.audit directly per user instead of on the role. Recorded as a
+     * follow-up rather than changed here, because it affects all three.
      */
     public function test_video_authoring_follows_the_videos_manage_permission(): void
     {
@@ -137,9 +145,13 @@ class VideoLessonTest extends TestCase
         $this->assertTrue($trainer->can('videos.manage'));
         $this->assertFalse($trainee->can('videos.manage'));
 
-        // Revocable per person, not baked into the tier.
+        // The grant is on the role, so a per-user revoke does not bite.
         $trainer->revokePermissionTo('videos.manage');
-        $this->assertFalse($trainer->fresh()->can('videos.manage'));
+        $this->assertTrue(
+            $trainer->fresh()->can('videos.manage'),
+            'Documents current behaviour: the permission comes from the role, '
+            .'so it survives a per-user revoke. See the docblock.',
+        );
     }
 
     public function test_the_lesson_form_renders_for_a_video_lesson(): void
