@@ -20,7 +20,7 @@ return [
             'docs' => 'Account settings → Staff and groups · Privacy → IP filtering · 2FA',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>A customer calls: <em>"Help, I've got an urgent dispatch and none of my operators can log in to PILOT!"</em> Don't panic or guess. Follow the systematic 5-step diagnostic protocol.</p></div>
+<p><strong>A customer calls: <em>"Help, I've got an urgent dispatch and none of my operators can log in to PILOT!"</em> Don't panic or guess. Follow the systematic 5-step diagnostic protocol.</strong></p>
 
 <h2 id="step-1-exact-screen">Step 1: Clarify the exact error on screen</h2>
 
@@ -34,7 +34,7 @@ return [
 <li><strong>Blank white screen</strong> → Browser cache issue or browser extension interference. Instruct them to test in an Incognito window or use the <em>Clean local cache</em> tool.</li>
 </ul>
 
-<div class="note"><p><strong>Support principle:</strong> Never reset a password before confirming the user’s identity. Ensure you are speaking with an authorized contract contact before modifying credentials.</p></div>
+<blockquote><p><strong>Support principle:</strong> Never reset a password before confirming the user’s identity. Ensure you are speaking with an authorized contract contact before modifying credentials.</p></blockquote>
 HTML,
         ],
 
@@ -43,7 +43,7 @@ HTML,
             'docs' => 'User account interface → Top panel · Workspace · Staff and groups → Vehicles',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>A customer calls: <em>"One of our trucks has vanished from the system!"</em> A database record almost never disappears on its own. Walk through the four checks in order.</p></div>
+<p><strong>A customer calls: <em>"One of our trucks has vanished from the system!"</em> A database record almost never disappears on its own. Walk through the four checks in order.</strong></p>
 
 <h2 id="four-checks">The 4-stage diagnostic checklist</h2>
 
@@ -69,7 +69,7 @@ HTML,
             'docs' => 'Account settings → Privacy → Notification settings · Email setup',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>A safety manager calls: <em>"Our drivers are speeding on the highway and I am not receiving email notifications!"</em> Investigate the alert pipeline from device telemetry to mailbox.</p></div>
+<p><strong>A safety manager calls: <em>"Our drivers are speeding on the highway and I am not receiving email notifications!"</em> Investigate the alert pipeline from device telemetry to mailbox.</strong></p>
 
 <h2 id="notification-troubleshooting">The 4-point notification pipeline</h2>
 
@@ -95,7 +95,7 @@ HTML,
             'docs' => 'Account settings → Tokens → Monitor token',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>A fleet client calls: <em>"We are moving high-value cargo for a VIP client today. They want live tracking access on their phones, but our management will not allow us to share our PILOT account login. What can we do?"</em></p></div>
+<p><strong>A fleet client calls: <em>"We are moving high-value cargo for a VIP client today. They want live tracking access on their phones, but our management will not allow us to share our PILOT account login. What can we do?"</em></strong></p>
 
 <h2 id="the-token-solution">The professional solution: A Monitor Token</h2>
 
@@ -113,7 +113,7 @@ HTML,
 <li>The client opens the link in any mobile or desktop browser to watch the delivery move live on the map.</li>
 </ol>
 
-<div class="hint"><p><strong>Outcome:</strong> The VIP client gets real-time visibility without software installation or logins, while the fleet's sensitive company data and credentials remain 100% secure.</p></div>
+<blockquote><p><strong>Outcome:</strong> The VIP client gets real-time visibility without software installation or logins, while the fleet's sensitive company data and credentials remain 100% secure.</p></blockquote>
 HTML,
         ],
     ],

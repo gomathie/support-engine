@@ -20,7 +20,7 @@ return [
             'docs' => 'About the platform → Modules · Account settings → Privacy',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>PILOT is built around a modular core architecture. Features like Advanced Notifications, Video Streaming, and Maintenance Scheduling are modular components that can be activated per contract.</p></div>
+<p><strong>PILOT is built around a modular core architecture. Features like Advanced Notifications, Video Streaming, and Maintenance Scheduling are modular components that can be activated per contract.</strong></p>
 
 <h2 id="modular-architecture">How modules work in PILOT</h2>
 
@@ -36,7 +36,7 @@ return [
 <li><strong>Sensor and Telemetry Preconditions</strong> — the underlying hardware parameters must be reporting. For example, a <em>Low Fuel</em> alert requires a functioning fuel sensor; an <em>Over-speed</em> alert requires reliable GPS speed packets.</li>
 </ol>
 
-<div class="hint"><p><strong>Support tip:</strong> If a customer asks "Why don't I see the Notifications tab in my settings?", don't spend 20 minutes debugging their browser cache. Check the Admin Panel to see if the module was ever activated for their contract.</p></div>
+<blockquote><p><strong>Support tip:</strong> If a customer asks "Why don't I see the Notifications tab in my settings?", don't spend 20 minutes debugging their browser cache. Check the Admin Panel to see if the module was ever activated for their contract.</p></blockquote>
 HTML,
         ],
 
@@ -45,17 +45,15 @@ HTML,
             'docs' => 'Account settings → Tokens',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>Often a logistics company must give a customer, partner, or temporary subcontractor live visibility over specific delivery trucks — without creating a permanent account or exposing credentials. Tokens provide secure, time-bound, scoped access.</p></div>
+<p><strong>Often a logistics company must give a customer, partner, or temporary subcontractor live visibility over specific delivery trucks — without creating a permanent account or exposing credentials. Tokens provide secure, time-bound, scoped access.</strong></p>
 
 <h2 id="two-token-types">The two types of tokens in PILOT</h2>
 
-<dl>
-<dt><strong>1. Monitor Token (Public Live Tracking Link)</strong></dt>
-<dd>Generates a public web link or iframe embed code. Anyone opening the link sees a lightweight map showing only the specific vehicles and sensors selected by the creator. The recipient never receives login credentials and cannot see other fleet assets or account settings. Can have an automatic expiration timestamp.</dd>
+<ul>
+<li><strong>1. Monitor Token (Public Live Tracking Link)</strong> — Generates a public web link or iframe embed code. Anyone opening the link sees a lightweight map showing only the specific vehicles and sensors selected by the creator. The recipient never receives login credentials and cannot see other fleet assets or account settings. Can have an automatic expiration timestamp.</li>
 
-<dt><strong>2. Access Token (Passwordless Auto-Login)</strong></dt>
-<dd>Generates a direct authentication URL tied to a specific user profile. Clicking the link automatically authenticates the user into PILOT without entering a password. Ideal for integrating PILOT dashboards inside third-party internal enterprise portals or automated kiosk screens.</dd>
-</dl>
+<li><strong>2. Access Token (Passwordless Auto-Login)</strong> — Generates a direct authentication URL tied to a specific user profile. Clicking the link automatically authenticates the user into PILOT without entering a password. Ideal for integrating PILOT dashboards inside third-party internal enterprise portals or automated kiosk screens.</li>
+</ul>
 
 <h2 id="token-permissions">Managing token permissions</h2>
 
@@ -86,7 +84,7 @@ HTML,
             'docs' => 'Account settings → Report scheduler',
             'estimated_minutes' => 10,
             'body' => <<<'HTML'
-<div class="lede"><p>Nobody wants to log in at 7:00 AM every Monday morning just to click "Build Report" and email a spreadsheet to the CEO. The Report Scheduler automates report generation and delivery completely.</p></div>
+<p><strong>Nobody wants to log in at 7:00 AM every Monday morning just to click "Build Report" and email a spreadsheet to the CEO. The Report Scheduler automates report generation and delivery completely.</strong></p>
 
 <h2 id="scheduler-capabilities">Core capabilities of the Report Scheduler</h2>
 

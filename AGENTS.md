@@ -280,3 +280,33 @@ Two bugs found by asking whether content was really editable:
 - **The seeded markup could not survive the rich editor.** Callout `div`s and a
   definition list would have been stripped on a trainer's first save. Rewritten
   to blockquotes and lists, with a test to stop it recurring.
+
+### 2026-09-07 — Knowledge checks actually gate the course (Claude)
+
+Each lesson already ended with a module-scoped quiz. **It gated nothing** — only
+the final exam counted, so a trainee could skip every knowledge check and still
+complete the course, earn a certificate and be awarded a level.
+
+- Course completion now requires **passing every published knowledge check**, on
+  top of lessons, practicals and the final exam.
+- Exhausting the attempts on a check marks the course **Failed**, rather than
+  leaving it "in progress" waiting for something that cannot happen.
+- `CourseModule::hasKnowledgeCheck()` drives a **Yes / Missing** column on the
+  modules list, so lessons without one are visible. Fifteen are currently
+  missing; they need their lesson content written first, because questions have
+  to test what the lesson actually taught.
+
+The full completion rule is now: **lessons read · every knowledge check passed ·
+every published practical passed · final exam passed.**
+
+Two mistakes in the test for it, both mine, both worth avoiding:
+
+- The markup assertion queried *every* lesson in the database rather than the
+  ones the seeder wrote. It passed alone and failed in the full suite — the
+  signature of an assertion reaching beyond its subject.
+- `require path(...)['key']` indexes the *path string*: `require` binds looser
+  than array access. Assign the result first.
+
+Also: **do not run `artisan test --filter=...` while a full suite is running.**
+Both use `pilot_lms_testing`, and the collision surfaces as an unrelated-looking
+"select * from permissions" failure.

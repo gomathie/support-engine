@@ -101,10 +101,25 @@ class LessonContentEditableTest extends TestCase
      */
     public function test_seeded_content_uses_only_markup_the_editor_round_trips(): void
     {
+        /*
+         * Scoped to the lessons this seeder wrote.
+         *
+         * An earlier version asserted over every lesson with a body, which made
+         * it a claim about the whole database rather than about the seeded
+         * content — it passed alone and failed in the full suite, which is the
+         * signature of an assertion reaching beyond its subject.
+         */
+        // Parenthesised: `require` binds looser than array access, so without
+        // them this indexes the path string rather than the loaded array.
+        $source = require database_path('seeders/content/track1_lesson_01.php');
+
         $bodies = Lesson::query()
+            ->whereIn('title', array_keys($source['lessons']))
             ->whereNotNull('content')
             ->pluck('content')
             ->implode("\n");
+
+        $this->assertNotSame('', $bodies, 'The seeder should have written something to assert against.');
 
         foreach (['<div', '<dl>', '<dt>', '<dd>', '<figure', '<span'] as $unsupported) {
             $this->assertStringNotContainsString(

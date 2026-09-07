@@ -19,7 +19,7 @@ return [
             'docs' => 'Before you start → Roles and access rights · Glossary',
             'estimated_minutes' => 30,
             'body' => <<<'HTML'
-<div class="lede"><p>You have covered the core functional breadth of PILOT — from basic entity models and user rights to complex sensor calibration, report builders, and live security tokens.</p></div>
+<p><strong>You have covered the core functional breadth of PILOT — from basic entity models and user rights to complex sensor calibration, report builders, and live security tokens.</strong></p>
 
 <h2 id="qa-objectives">Objectives of the Error Review & Q&A Session</h2>
 
@@ -31,7 +31,7 @@ return [
 <li><strong>Support call etiquette:</strong> Rehearse framing technical diagnostic steps clearly without overwhelming the customer with jargon.</li>
 </ul>
 
-<div class="note"><p><strong>Remember:</strong> In PILOT support, <em>"I don't know the answer right now, but let me consult the documentation and get right back to you"</em> is always better than guessing and making confident assertions that prove false. Accuracy builds trust.</p></div>
+<blockquote><p><strong>Remember:</strong> In PILOT support, <em>"I don't know the answer right now, but let me consult the documentation and get right back to you"</em> is always better than guessing and making confident assertions that prove false. Accuracy builds trust.</p></blockquote>
 HTML,
         ],
 
@@ -40,7 +40,7 @@ HTML,
             'docs' => 'docs.pilot-gps.com search and navigation',
             'estimated_minutes' => 30,
             'body' => <<<'HTML'
-<div class="lede"><p>No telematics engineer memorizes every setting of 200 different tracking devices and 50 software modules. The ultimate skill of a 1st-line support agent is navigating the official documentation rapidly under call pressure.</p></div>
+<p><strong>No telematics engineer memorizes every setting of 200 different tracking devices and 50 software modules. The ultimate skill of a 1st-line support agent is navigating the official documentation rapidly under call pressure.</strong></p>
 
 <h2 id="docs-research-strategy">Three strategies for rapid documentation research</h2>
 

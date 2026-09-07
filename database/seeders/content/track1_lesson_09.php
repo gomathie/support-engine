@@ -21,7 +21,7 @@ return [
             'docs' => 'Account settings → Privacy → Email setup',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>Email delivery is the primary channel for scheduled operational reports, security alerts, and system notifications. In PILOT, an email address cannot receive automated data until it has been explicitly confirmed.</p></div>
+<p><strong>Email delivery is the primary channel for scheduled operational reports, security alerts, and system notifications. In PILOT, an email address cannot receive automated data until it has been explicitly confirmed.</strong></p>
 
 <h2 id="why-confirmation">Why email confirmation is enforced</h2>
 
@@ -49,7 +49,7 @@ return [
 <li>Return to PILOT and click the <strong>Refresh email list</strong> icon. The badge turns green.</li>
 </ol>
 
-<div class="note"><p><strong>First-line diagnostic rule:</strong> When a customer reports "I set up automated daily reports but nobody is receiving them!", the very first check is Account Settings → Privacy. In 90% of cases, the email address was entered but never confirmed.</p></div>
+<blockquote><p><strong>First-line diagnostic rule:</strong> When a customer reports "I set up automated daily reports but nobody is receiving them!", the very first check is Account Settings → Privacy. In 90% of cases, the email address was entered but never confirmed.</p></blockquote>
 HTML,
         ],
 
@@ -58,7 +58,7 @@ HTML,
             'docs' => 'Account settings → Privacy → Notification settings',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>Fleet safety and fuel efficiency depend on rapid enforcement of driving policies. The notifications engine monitors incoming GPS speed in real time and sends instant alerts when thresholds are violated.</p></div>
+<p><strong>Fleet safety and fuel efficiency depend on rapid enforcement of driving policies. The notifications engine monitors incoming GPS speed in real time and sends instant alerts when thresholds are violated.</strong></p>
 
 <h2 id="how-notifications-work">The notification processing chain</h2>
 
@@ -91,17 +91,15 @@ HTML,
             'docs' => 'Account settings → Privacy → Two-factor authentication',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>Telematics platforms hold sensitive fleet location data and remote engine immobilization controls. Two-Factor Authentication (2FA) adds a critical security layer against credential theft.</p></div>
+<p><strong>Telematics platforms hold sensitive fleet location data and remote engine immobilization controls. Two-Factor Authentication (2FA) adds a critical security layer against credential theft.</strong></p>
 
 <h2 id="supported-2fa-methods">Two 2FA methods in PILOT</h2>
 
-<dl>
-<dt><strong>TOTP Authentication (Authenticator App)</strong></dt>
-<dd>Industry-standard Time-based One-Time Password using mobile apps like Google Authenticator, Microsoft Authenticator, or Twilio Authy. Generates a 6-digit code refreshing every 30 seconds. Works offline without cellular SMS reception.</dd>
+<ul>
+<li><strong>TOTP Authentication (Authenticator App)</strong> — Industry-standard Time-based One-Time Password using mobile apps like Google Authenticator, Microsoft Authenticator, or Twilio Authy. Generates a 6-digit code refreshing every 30 seconds. Works offline without cellular SMS reception.</li>
 
-<dt><strong>Email Authentication</strong></dt>
-<dd>Sends a temporary 6-digit one-time code to the user’s confirmed email address upon login. Useful for users who do not carry smartphone authenticator apps.</dd>
-</dl>
+<li><strong>Email Authentication</strong> — Sends a temporary 6-digit one-time code to the user’s confirmed email address upon login. Useful for users who do not carry smartphone authenticator apps.</li>
+</ul>
 
 <h2 id="enabling-totp">Step-by-step: Enabling TOTP 2FA</h2>
 
@@ -116,7 +114,7 @@ HTML,
 <li>On next login, after typing username and password, PILOT prompts for the authenticator code.</li>
 </ol>
 
-<div class="hint"><p><strong>Code expiration note:</strong> The 6-digit TOTP code expires every 30 seconds. If an end user reports "My 2FA code is rejected", advise them to wait for the next 30-second cycle and enter the fresh code immediately.</p></div>
+<blockquote><p><strong>Code expiration note:</strong> The 6-digit TOTP code expires every 30 seconds. If an end user reports "My 2FA code is rejected", advise them to wait for the next 30-second cycle and enter the fresh code immediately.</p></blockquote>
 HTML,
         ],
     ],

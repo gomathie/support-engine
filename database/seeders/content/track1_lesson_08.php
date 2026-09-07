@@ -21,7 +21,7 @@ return [
             'docs' => 'History → How to view history · Viewing history',
             'estimated_minutes' => 20,
             'body' => <<<'HTML'
-<div class="lede"><p>While the Online workspace shows where an object is right now, the History section provides a forensic record of everywhere it has been — reconstructed point by point with speed profiles, parking events, and sensor graphs.</p></div>
+<p><strong>While the Online workspace shows where an object is right now, the History section provides a forensic record of everywhere it has been — reconstructed point by point with speed profiles, parking events, and sensor graphs.</strong></p>
 
 <h2 id="building-history">Building movement history</h2>
 
@@ -53,7 +53,7 @@ HTML,
             'docs' => 'Reports → How to generate a report · Report types',
             'estimated_minutes' => 20,
             'body' => <<<'HTML'
-<div class="lede"><p>Reports transform millions of raw coordinates into summarized operational tables that business owners, fleet managers, and auditors rely on for billing and compliance.</p></div>
+<p><strong>Reports transform millions of raw coordinates into summarized operational tables that business owners, fleet managers, and auditors rely on for billing and compliance.</strong></p>
 
 <h2 id="generating-report">Step-by-step: Generating a Mileage and Stops report</h2>
 
@@ -89,7 +89,7 @@ HTML,
             'docs' => 'Reports → How to work with a report → Exporting',
             'estimated_minutes' => 10,
             'body' => <<<'HTML'
-<div class="lede"><p>A report on screen is useful for a support call, but clients need exportable artifacts for accounting, driver payroll, and client invoicing. PILOT supports immediate multi-format export.</p></div>
+<p><strong>A report on screen is useful for a support call, but clients need exportable artifacts for accounting, driver payroll, and client invoicing. PILOT supports immediate multi-format export.</strong></p>
 
 <h2 id="export-formats">Supported export formats</h2>
 
@@ -111,7 +111,7 @@ HTML,
 <li>Open both files locally to verify all columns, totals, and timestamps exported cleanly.</li>
 </ol>
 
-<div class="hint"><p><strong>Support tip:</strong> If an exported PDF cuts off columns on the right, advise the customer to adjust table columns before exporting, or switch orientation to Landscape in their account report settings.</p></div>
+<blockquote><p><strong>Support tip:</strong> If an exported PDF cuts off columns on the right, advise the customer to adjust table columns before exporting, or switch orientation to Landscape in their account report settings.</p></blockquote>
 HTML,
         ],
     ],

@@ -20,7 +20,7 @@ return [
             'docs' => 'Sensors → Sensor types · How to add a sensor',
             'estimated_minutes' => 20,
             'body' => <<<'HTML'
-<div class="lede"><p>Sensors are the bridge between raw hardware signals and meaningful business intelligence. In PILOT, every telemetry metric — from engine ignition to fuel level — is handled by a configured sensor.</p></div>
+<p><strong>Sensors are the bridge between raw hardware signals and meaningful business intelligence. In PILOT, every telemetry metric — from engine ignition to fuel level — is handled by a configured sensor.</strong></p>
 
 <h2 id="sensor-function-vs-type">Function vs Operation Principle (Type)</h2>
 
@@ -75,7 +75,7 @@ HTML,
             'docs' => 'Sensors → Sensor types → Configuring the fuel sensor',
             'estimated_minutes' => 20,
             'body' => <<<'HTML'
-<div class="lede"><p>Fuel monitoring is one of the highest-value services telematics providers deliver. Configuring fuel sensors correctly requires understanding noise filtration, filling detection, and drain thresholds.</p></div>
+<p><strong>Fuel monitoring is one of the highest-value services telematics providers deliver. Configuring fuel sensors correctly requires understanding noise filtration, filling detection, and drain thresholds.</strong></p>
 
 <h2 id="discrete-sensors">What is a Discrete sensor?</h2>
 
@@ -85,19 +85,15 @@ HTML,
 
 <p>In PILOT, fuel algorithms rely on four core parameters to eliminate false alarms caused by fuel sloshing in tanks:</p>
 
-<dl>
-<dt><strong>Refuel threshold (Liters)</strong></dt>
-<dd>The minimum volume jump required to count as a genuine refuel event (e.g. <code>10</code> or <code>15</code> liters). Jumps smaller than this threshold are treated as normal road sloshing and ignored.</dd>
+<ul>
+<li><strong>Refuel threshold (Liters)</strong> — The minimum volume jump required to count as a genuine refuel event (e.g. <code>10</code> or <code>15</code> liters). Jumps smaller than this threshold are treated as normal road sloshing and ignored.</li>
 
-<dt><strong>Drain threshold (Liters)</strong></dt>
-<dd>The minimum sudden volume drop that triggers a fuel theft / drain alert (e.g. <code>10</code> liters).</dd>
+<li><strong>Drain threshold (Liters)</strong> — The minimum sudden volume drop that triggers a fuel theft / drain alert (e.g. <code>10</code> liters).</li>
 
-<dt><strong>Maximum speed for filling detection (km/h)</strong></dt>
-<dd>Vehicles cannot be refueled while driving at highway speed. If the vehicle is moving faster than this value (e.g. <code>5</code> km/h), volume spikes caused by driving up steep hills or sharp braking will <strong>never</strong> be logged as refuels or drains. A value of <code>0</code> disables this essential filter.</dd>
+<li><strong>Maximum speed for filling detection (km/h)</strong> — Vehicles cannot be refueled while driving at highway speed. If the vehicle is moving faster than this value (e.g. <code>5</code> km/h), volume spikes caused by driving up steep hills or sharp braking will <strong>never</strong> be logged as refuels or drains. A value of <code>0</code> disables this essential filter.</li>
 
-<dt><strong>Remove symmetric fillings / drains</strong></dt>
-<dd>When checked, PILOT automatically detects and removes temporary symmetric spikes (e.g. fuel surges 20L uphill, then drops 20L downhill a minute later). This keeps operational consumption metrics clean.</dd>
-</dl>
+<li><strong>Remove symmetric fillings / drains</strong> — When checked, PILOT automatically detects and removes temporary symmetric spikes (e.g. fuel surges 20L uphill, then drops 20L downhill a minute later). This keeps operational consumption metrics clean.</li>
+</ul>
 
 <h2 id="step-by-step-fuel">Step-by-step: Adding a Fuel Level Sensor</h2>
 

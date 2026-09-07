@@ -20,7 +20,7 @@ return [
             'docs' => 'Sensors → How to set up the calibration table of the sensor',
             'estimated_minutes' => 20,
             'body' => <<<'HTML'
-<div class="lede"><p>Vehicle fuel tanks are rarely perfect rectangular boxes. Due to curved bases, wheel-well indentations, and irregular contours, 1 centimeter of fuel depth near the bottom does not equal 1 centimeter near the top. Calibration tables translate raw sensor metrics into exact liters.</p></div>
+<p><strong>Vehicle fuel tanks are rarely perfect rectangular boxes. Due to curved bases, wheel-well indentations, and irregular contours, 1 centimeter of fuel depth near the bottom does not equal 1 centimeter near the top. Calibration tables translate raw sensor metrics into exact liters.</strong></p>
 
 <h2 id="why-calibration">Why calibration is indispensable</h2>
 
@@ -44,7 +44,7 @@ return [
 <li>Click <strong>Save</strong>.</li>
 </ol>
 
-<div class="hint"><p><strong>Support tip:</strong> If a customer complains their fuel chart looks erratic or shows negative values, inspect the calibration table. If points are entered out of numerical order (e.g. X=1000 after X=2500), the interpolation engine calculates erratic slope transitions.</p></div>
+<blockquote><p><strong>Support tip:</strong> If a customer complains their fuel chart looks erratic or shows negative values, inspect the calibration table. If points are entered out of numerical order (e.g. X=1000 after X=2500), the interpolation engine calculates erratic slope transitions.</p></blockquote>
 HTML,
         ],
 
@@ -53,7 +53,7 @@ HTML,
             'docs' => 'Sensors → How to apply formulas',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>Conversion formulas allow you to perform immediate mathematical transformations on raw telemetry data as soon as packets arrive from the tracking device — before calibration or business rules are evaluated.</p></div>
+<p><strong>Conversion formulas allow you to perform immediate mathematical transformations on raw telemetry data as soon as packets arrive from the tracking device — before calibration or business rules are evaluated.</strong></p>
 
 <h2 id="how-formulas-work">How conversion formulas work in PILOT</h2>
 
@@ -68,7 +68,7 @@ HTML,
 <li><code>=12.5</code> — forces a fixed value.</li>
 </ul>
 
-<div class="note"><p><strong>Formatting rule:</strong> Decimal numbers in conversion formulas <strong>must</strong> use a period (dot), never a comma. Write <code>25.4</code>, not <code>25,4</code>.</p></div>
+<blockquote><p><strong>Formatting rule:</strong> Decimal numbers in conversion formulas <strong>must</strong> use a period (dot), never a comma. Write <code>25.4</code>, not <code>25,4</code>.</p></blockquote>
 
 <h2 id="battery-voltage-example">Case study: Battery Voltage (mV to V)</h2>
 
@@ -91,7 +91,7 @@ HTML,
             'docs' => 'Sensors → Sensor templates',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>When onboarding a fleet of 50 identical trucks equipped with identical Teltonika FMB120 trackers and fuel probes, entering ignition thresholds, formulas, and calibration points 50 times manually is unacceptable. Sensor templates solve this completely.</p></div>
+<p><strong>When onboarding a fleet of 50 identical trucks equipped with identical Teltonika FMB120 trackers and fuel probes, entering ignition thresholds, formulas, and calibration points 50 times manually is unacceptable. Sensor templates solve this completely.</strong></p>
 
 <h2 id="hardware-compatibility">The golden rule of sensor templates</h2>
 

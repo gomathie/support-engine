@@ -21,7 +21,7 @@ return [
             'docs' => 'Account settings → Staff and groups → Creating users',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>Administrators create and manage user profiles in PILOT. When creating an account, you enter the user’s login credentials, configure contact details, and assign their user type.</p></div>
+<p><strong>Administrators create and manage user profiles in PILOT. When creating an account, you enter the user’s login credentials, configure contact details, and assign their user type.</strong></p>
 
 <h2 id="access-staff">Opening Staff and Groups</h2>
 
@@ -51,7 +51,7 @@ return [
 <li>Click <strong>Save</strong>.</li>
 </ol>
 
-<div class="note"><p><strong>Support tip:</strong> A caller reporting "I created an account for my colleague but they can't see anything on the map" almost always created a <strong>User</strong> type without assigning any objects on the Vehicles tab. A new User starts with zero visible objects until you explicitly grant access.</p></div>
+<blockquote><p><strong>Support tip:</strong> A caller reporting "I created an account for my colleague but they can't see anything on the map" almost always created a <strong>User</strong> type without assigning any objects on the Vehicles tab. A new User starts with zero visible objects until you explicitly grant access.</p></blockquote>
 
 <h2 id="protection-rules">Account protection rules</h2>
 
@@ -64,7 +64,7 @@ HTML,
             'docs' => 'Account settings → Staff and groups → User card → Vehicles',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>Creating a user account is only half the job. In PILOT, access to objects is completely segregated: a user only sees the vehicles explicitly assigned to their account.</p></div>
+<p><strong>Creating a user account is only half the job. In PILOT, access to objects is completely segregated: a user only sees the vehicles explicitly assigned to their account.</strong></p>
 
 <h2 id="user-card-tabs">The User Card tabs</h2>
 
@@ -90,7 +90,7 @@ HTML,
 <li>Click <strong>Save</strong>.</li>
 </ol>
 
-<div class="hint"><p><strong>Diagnosing missing objects:</strong> When a user complains they cannot find a specific vehicle in the Online list or Reports dropdown, check their User Card → <strong>Vehicles</strong> tab first. If the checkbox next to the vehicle is unchecked, PILOT behaves as if the vehicle does not exist for that user.</p></div>
+<blockquote><p><strong>Diagnosing missing objects:</strong> When a user complains they cannot find a specific vehicle in the Online list or Reports dropdown, check their User Card → <strong>Vehicles</strong> tab first. If the checkbox next to the vehicle is unchecked, PILOT behaves as if the vehicle does not exist for that user.</p></blockquote>
 HTML,
         ],
 
@@ -99,7 +99,7 @@ HTML,
             'docs' => 'Account settings → Staff and groups → Rights → Rights templates',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>Configuring dozens of granular permissions for every new employee is slow and error-prone. Rights templates allow you to save a standard permission profile and apply it in one click.</p></div>
+<p><strong>Configuring dozens of granular permissions for every new employee is slow and error-prone. Rights templates allow you to save a standard permission profile and apply it in one click.</strong></p>
 
 <h2 id="rights-categories">Granular functional permissions</h2>
 
@@ -144,7 +144,7 @@ HTML,
             'docs' => 'Account settings → Staff and groups → Blocking and unblocking a user',
             'estimated_minutes' => 10,
             'body' => <<<'HTML'
-<div class="lede"><p>When an employee is on leave, suspended, or under investigation, you should block their account rather than delete it. Blocking immediately revokes system access while keeping all settings and audit trails intact.</p></div>
+<p><strong>When an employee is on leave, suspended, or under investigation, you should block their account rather than delete it. Blocking immediately revokes system access while keeping all settings and audit trails intact.</strong></p>
 
 <h2 id="status-indicators">Status column indicators</h2>
 
@@ -174,7 +174,7 @@ HTML,
 <li>The icon returns to green, and the employee can sign in immediately using their previous password.</li>
 </ol>
 
-<div class="note"><p><strong>Why block instead of delete?</strong> Deleting a user permanently destroys their personal workspace, custom views, assigned report schedules, and saved token permissions. If the employee returns or access is restored, rebuilding that configuration from scratch wastes hours. Always block first.</p></div>
+<blockquote><p><strong>Why block instead of delete?</strong> Deleting a user permanently destroys their personal workspace, custom views, assigned report schedules, and saved token permissions. If the employee returns or access is restored, rebuilding that configuration from scratch wastes hours. Always block first.</p></blockquote>
 HTML,
         ],
     ],

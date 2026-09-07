@@ -20,7 +20,7 @@ return [
             'docs' => 'User account interface → Top panel · Object list · Personalization',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>At a glance, a dispatcher needs to know which vehicles are actively delivering goods, which are taking mandatory driver rest breaks, and which are offline. PILOT uses a standardized color coding system across the entire interface.</p></div>
+<p><strong>At a glance, a dispatcher needs to know which vehicles are actively delivering goods, which are taking mandatory driver rest breaks, and which are offline. PILOT uses a standardized color coding system across the entire interface.</strong></p>
 
 <h2 id="core-status-colors">The standard status colors</h2>
 
@@ -51,7 +51,7 @@ HTML,
             'docs' => 'User account interface → Workspace → Object list → Groups',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>Grouping objects enables multi-vehicle operations: generating batch reports, applying sensor templates to an entire division, and structuring dispatcher workspaces.</p></div>
+<p><strong>Grouping objects enables multi-vehicle operations: generating batch reports, applying sensor templates to an entire division, and structuring dispatcher workspaces.</strong></p>
 
 <h2 id="creating-groups">Creating an object group</h2>
 
@@ -83,7 +83,7 @@ HTML,
             'docs' => 'User account interface → Workspace → Object list → Column settings',
             'estimated_minutes' => 10,
             'body' => <<<'HTML'
-<div class="lede"><p>The object table can display dozens of telemetry fields. Different teams need different views: dispatchers need speed and driver, while fuel managers need tank volume and consumption.</p></div>
+<p><strong>The object table can display dozens of telemetry fields. Different teams need different views: dispatchers need speed and driver, while fuel managers need tank volume and consumption.</strong></p>
 
 <h2 id="customizing-columns">Configuring table columns</h2>
 
@@ -105,7 +105,7 @@ HTML,
 <li>Click <strong>Apply</strong>.</li>
 </ol>
 
-<div class="hint"><p><strong>Display persistence:</strong> Column configurations are saved automatically in your user account profile in the database. When you log in from another browser or workstation, your custom table layout is preserved.</p></div>
+<blockquote><p><strong>Display persistence:</strong> Column configurations are saved automatically in your user account profile in the database. When you log in from another browser or workstation, your custom table layout is preserved.</p></blockquote>
 HTML,
         ],
 
@@ -114,7 +114,7 @@ HTML,
             'docs' => 'User account interface → Top panel · Object list → Filters',
             'estimated_minutes' => 10,
             'body' => <<<'HTML'
-<div class="lede"><p>During peak business hours, a dispatcher managing 500 vehicles cannot scroll a massive list. Instant status filters allow you to isolate moving vehicles in a single click.</p></div>
+<p><strong>During peak business hours, a dispatcher managing 500 vehicles cannot scroll a massive list. Instant status filters allow you to isolate moving vehicles in a single click.</strong></p>
 
 <h2 id="top-panel-filter">Method 1: The Top Panel quick filter</h2>
 
@@ -132,7 +132,7 @@ HTML,
 
 <p>Inside the object list header, open the <strong>Status filter</strong> dropdown menu and select <em>Moving</em>. You can combine this with the text search filter (e.g. filter to <em>Moving</em> AND type <em>Nairobi</em> in the search box) to find active vehicles in a specific region.</p>
 
-<div class="note"><p><strong>Support troubleshooting:</strong> When a customer calls panicked saying "Half my fleet has vanished from PILOT!", the very first thing to check is whether they inadvertently clicked one of the top panel status buttons. Clicking the "Idling" or "Moving" counter filters out all other vehicles.</p></div>
+<blockquote><p><strong>Support troubleshooting:</strong> When a customer calls panicked saying "Half my fleet has vanished from PILOT!", the very first thing to check is whether they inadvertently clicked one of the top panel status buttons. Clicking the "Idling" or "Moving" counter filters out all other vehicles.</p></blockquote>
 HTML,
         ],
     ],

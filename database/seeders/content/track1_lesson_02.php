@@ -20,8 +20,8 @@ return [
             'docs' => 'Interface overview',
             'estimated_minutes' => 10,
             'body' => <<<'HTML'
-<div class="lede"><p>Before you can help anyone, you need to know how to get in yourself — and what
-to look for the moment the screen loads.</p></div>
+<p><strong>Before you can help anyone, you need to know how to get in yourself — and what
+to look for the moment the screen loads.</strong></p>
 
 <h2 id="login">Logging in</h2>
 
@@ -29,9 +29,9 @@ to look for the moment the screen loads.</p></div>
 Enter your <strong>username</strong> and <strong>password</strong>, then click
 <strong>Sign In</strong>.</p>
 
-<div class="note"><p><strong>Support tip:</strong> if a customer says they cannot log in, the first
+<blockquote><p><strong>Support tip:</strong> if a customer says they cannot log in, the first
 question is always "What exactly do you see?" — a blank page, a credentials error, and a
-blocked-account message all point to different causes.</p></div>
+blocked-account message all point to different causes.</p></blockquote>
 
 <h2 id="first-screen">What you see after login</h2>
 
@@ -50,8 +50,8 @@ other context-specific tools.</li>
 monitored objects on a live map.</li>
 </ul>
 
-<div class="hint"><p><strong>On a call:</strong> knowing the three-area layout lets you guide someone
-without seeing their screen: "Look at the top bar… now click the left sidebar tab…"</p></div>
+<blockquote><p><strong>On a call:</strong> knowing the three-area layout lets you guide someone
+without seeing their screen: "Look at the top bar… now click the left sidebar tab…"</p></blockquote>
 HTML,
         ],
 
@@ -60,26 +60,24 @@ HTML,
             'docs' => 'Top panel',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>The top panel is the horizontal bar that never changes, regardless of which
-section you are in. Learn its elements and you can guide a customer to any part of the system.</p></div>
+<p><strong>The top panel is the horizontal bar that never changes, regardless of which
+section you are in. Learn its elements and you can guide a customer to any part of the system.</strong></p>
 
 <h2 id="nav-menu">Navigation menu</h2>
 
 <p>The navigation menu has two levels:</p>
 
-<dl>
-<dt><strong>Main menu</strong></dt>
-<dd>Located on the top bar. Contains the system's main sections: <strong>Online</strong>,
+<ul>
+<li><strong>Main menu</strong> — Located on the top bar. Contains the system's main sections: <strong>Online</strong>,
 <strong>Reports</strong>, <strong>History</strong>, and others. The set of sections depends on
 the modules enabled for the account. You can reorder sections by dragging them — place
-frequently used sections first for quick access.</dd>
+frequently used sections first for quick access.</li>
 
-<dt><strong>Section menu</strong> (left sidebar)</dt>
-<dd>Displayed on the left side and changes depending on the main section selected. Contains
+<li><strong>Section menu</strong> (left sidebar) — Displayed on the left side and changes depending on the main section selected. Contains
 tabs for working with detailed information and tools. It has two view modes:
 <em>Full view</em> (icons + names) and <em>Compact view</em> (icons only). Click the
-arrow at the bottom of the menu to switch between modes.</dd>
-</dl>
+arrow at the bottom of the menu to switch between modes.</li>
+</ul>
 
 <h2 id="statuses">Object statuses on the top panel</h2>
 
@@ -130,8 +128,8 @@ parameters must be configured in advance.</p>
 top panel to open a chat. It can help with how to use platform features, where to find
 information, and how to solve technical tasks. It is available in all languages.</p>
 
-<div class="note"><p>As with any AI-based system, the bot may sometimes make mistakes. Always
-double-check important details or contact Support for clarification.</p></div>
+<blockquote><p>As with any AI-based system, the bot may sometimes make mistakes. Always
+double-check important details or contact Support for clarification.</p></blockquote>
 
 <h2 id="additional-menu">Additional settings menu</h2>
 
@@ -144,9 +142,9 @@ double-check important details or contact Support for clarification.</p></div>
 <li><strong>Feedback button</strong> — report issues or suggest improvements</li>
 </ul>
 
-<div class="hint"><p><strong>On a call:</strong> "Can you see a row of colored numbers near the top?
+<blockquote><p><strong>On a call:</strong> "Can you see a row of colored numbers near the top?
 Those are your object statuses. What numbers do you see?" — this quickly reveals whether
-objects are present and active, or if something is wrong.</p></div>
+objects are present and active, or if something is wrong.</p></blockquote>
 HTML,
         ],
 
@@ -155,8 +153,8 @@ HTML,
             'docs' => 'Map tools',
             'estimated_minutes' => 5,
             'body' => <<<'HTML'
-<div class="lede"><p>PILOT offers several map types — called basemaps. Different types suit different
-needs: navigation, terrain exploration, or finding infrastructure.</p></div>
+<p><strong>PILOT offers several map types — called basemaps. Different types suit different
+needs: navigation, terrain exploration, or finding infrastructure.</strong></p>
 
 <h2 id="change-map">How to change the map type</h2>
 
@@ -170,9 +168,9 @@ corner of the screen).</li>
 <p>Available map types include street maps, satellite views (including Yandex Sat), and
 hybrid views that overlay street names on satellite imagery.</p>
 
-<div class="hint"><p><strong>On a call:</strong> "Which map are you using?" matters when a customer
+<blockquote><p><strong>On a call:</strong> "Which map are you using?" matters when a customer
 says objects appear in the wrong place. Satellite view makes it easier to verify whether a
-vehicle is parked inside a yard or on the road next to it.</p></div>
+vehicle is parked inside a yard or on the road next to it.</p></blockquote>
 HTML,
         ],
 
@@ -181,8 +179,8 @@ HTML,
             'docs' => 'Map tools',
             'estimated_minutes' => 10,
             'body' => <<<'HTML'
-<div class="lede"><p>The map tools panel sits in the bottom-right corner and groups all tools
-for working with the map in one place.</p></div>
+<p><strong>The map tools panel sits in the bottom-right corner and groups all tools
+for working with the map in one place.</strong></p>
 
 <h2 id="zoom">Zoom</h2>
 
@@ -241,9 +239,9 @@ calculates its area automatically.</li>
 Auto orientation.</li>
 </ul>
 
-<div class="hint"><p><strong>On a call:</strong> "Measure distance along roads" is useful when a
+<blockquote><p><strong>On a call:</strong> "Measure distance along roads" is useful when a
 customer asks "how far is my truck from the delivery point?" — it gives a real driving
-distance, not a straight-line estimate.</p></div>
+distance, not a straight-line estimate.</p></blockquote>
 HTML,
         ],
     ],

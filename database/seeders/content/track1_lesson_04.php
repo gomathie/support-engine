@@ -21,7 +21,7 @@ return [
             'docs' => 'Objects → Adding an object · Object card → Main object settings · Info',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>An object in PILOT represents any vehicle, piece of machinery, stationary asset, or person being monitored. Knowing how to register an object and configure its hardware identifier is foundational support work.</p></div>
+<p><strong>An object in PILOT represents any vehicle, piece of machinery, stationary asset, or person being monitored. Knowing how to register an object and configure its hardware identifier is foundational support work.</strong></p>
 
 <h2 id="required-fields">Mandatory fields when creating an object</h2>
 
@@ -50,7 +50,7 @@ return [
 
 <p>Click <strong>Save</strong> to commit the record. The vehicle appears immediately in the Online workspace tree.</p>
 
-<div class="hint"><p><strong>Support tip on IMEIs:</strong> If a customer enters a device IMEI with spaces or hyphens, the tracker will fail to connect. PILOT expects the raw 15-digit numeric IMEI without punctuation. Always verify the IMEI formatting when a freshly created object stays offline.</p></div>
+<blockquote><p><strong>Support tip on IMEIs:</strong> If a customer enters a device IMEI with spaces or hyphens, the tracker will fail to connect. PILOT expects the raw 15-digit numeric IMEI without punctuation. Always verify the IMEI formatting when a freshly created object stays offline.</p></blockquote>
 HTML,
         ],
 
@@ -59,17 +59,15 @@ HTML,
             'docs' => 'Objects → Object card → Settings · Object tags',
             'estimated_minutes' => 15,
             'body' => <<<'HTML'
-<div class="lede"><p>Fleets with dozens or hundreds of vehicles quickly become unmanageable as a flat list. Tags and groups provide two complementary axes for organizing assets.</p></div>
+<p><strong>Fleets with dozens or hundreds of vehicles quickly become unmanageable as a flat list. Tags and groups provide two complementary axes for organizing assets.</strong></p>
 
 <h2 id="groups-vs-tags">Groups vs Tags: What is the difference?</h2>
 
-<dl>
-<dt><strong>Object Groups</strong> (Structural)</dt>
-<dd>A hierarchical tree structure in the left sidebar. An object belongs primarily to one logical group (e.g. <em>Nairobi Branch</em>, <em>Western Region</em>, or <em>Subcontractors</em>). Groups make it easy for dispatchers to collapse sections of the fleet they are not responsible for.</dd>
+<ul>
+<li><strong>Object Groups</strong> (Structural) — A hierarchical tree structure in the left sidebar. An object belongs primarily to one logical group (e.g. <em>Nairobi Branch</em>, <em>Western Region</em>, or <em>Subcontractors</em>). Groups make it easy for dispatchers to collapse sections of the fleet they are not responsible for.</li>
 
-<dt><strong>Object Tags</strong> (Cross-cutting)</dt>
-<dd>Labels applied across groups. An object in the <em>Nairobi Branch</em> group can carry tags like <em>Refrigerated</em>, <em>VIP Client</em>, and <em>Diesel</em>. Rights can be assigned by tag, allowing a maintenance contractor to see all vehicles tagged <em>Refrigerated</em> across every branch.</dd>
-</dl>
+<li><strong>Object Tags</strong> (Cross-cutting) — Labels applied across groups. An object in the <em>Nairobi Branch</em> group can carry tags like <em>Refrigerated</em>, <em>VIP Client</em>, and <em>Diesel</em>. Rights can be assigned by tag, allowing a maintenance contractor to see all vehicles tagged <em>Refrigerated</em> across every branch.</li>
+</ul>
 
 <h2 id="assigning-tags-and-groups">Assigning tags to an object</h2>
 
@@ -90,7 +88,7 @@ HTML,
             'docs' => 'Objects → Object menu → Current track · Follow object',
             'estimated_minutes' => 10,
             'body' => <<<'HTML'
-<div class="lede"><p>Right-clicking any object in the Online list opens the context menu — the fastest way to inspect live activity without leaving the main monitoring screen.</p></div>
+<p><strong>Right-clicking any object in the Online list opens the context menu — the fastest way to inspect live activity without leaving the main monitoring screen.</strong></p>
 
 <h2 id="current-track">Current Track</h2>
 
@@ -114,7 +112,7 @@ HTML,
 <li>To stop tracking, click the <strong>X</strong> on the Follow banner at the top of the map or click anywhere to drag the map manually.</li>
 </ol>
 
-<div class="note"><p><strong>Call scenario:</strong> A client calls saying "Vehicle KBC 456 was reported stolen 5 minutes ago!" You do not run a report — you right-click the vehicle, click <strong>Follow Object</strong>, and read the live street location and direction of travel directly to the client.</p></div>
+<blockquote><p><strong>Call scenario:</strong> A client calls saying "Vehicle KBC 456 was reported stolen 5 minutes ago!" You do not run a report — you right-click the vehicle, click <strong>Follow Object</strong>, and read the live street location and direction of travel directly to the client.</p></blockquote>
 HTML,
         ],
     ],
