@@ -90,6 +90,12 @@ class DemoCompetencySeeder extends Seeder
 
                 // On by default here so the split-verdict behaviour can be seen.
                 'requires_second_marker' => true,
+
+                'requires_screenshot' => true,
+                'required_evidence' => [
+                    ['key' => 'agent_id', 'label' => 'Agent ID (vehicle ID)', 'hint' => 'Object card → Info tab'],
+                    ['key' => 'sensor_name', 'label' => 'Sensor name as configured', 'hint' => 'Exactly as it appears in the sensors list'],
+                ],
             ],
         );
 

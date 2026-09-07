@@ -53,6 +53,13 @@ class PracticalTaskController extends Controller
 
                 'submission_instructions' => $task->submission_instructions,
                 'expected_evidence' => $task->expected_evidence,
+
+                // The identifiers this task demands. Trainees work in a real
+                // PILOT account, so an object they create has a real agent ID —
+                // asking for it is what makes the submission checkable.
+                'evidence_fields' => $task->evidenceFields(),
+                'requires_screenshot' => (bool) $task->requires_screenshot,
+
                 'estimated_minutes' => $task->estimated_minutes,
                 'lesson_title' => $task->lesson?->title,
             ],
@@ -116,12 +123,16 @@ class PracticalTaskController extends Controller
 
         $data = $request->validate([
             'body' => ['required', 'string', 'min:20', 'max:20000'],
+            'evidence' => ['nullable', 'array'],
+            'evidence.*' => ['nullable', 'string', 'max:255'],
         ], [
             'body.required' => 'Write up what you did before handing it in.',
             'body.min' => 'A sentence or two at minimum — the write-up is scored.',
         ]);
 
-        $submit->submit($submission, $data['body']);
+        // Which fields are required, and whether a screenshot is, is the task's
+        // business — enforced in the action so it holds for any caller.
+        $submit->submit($submission, $data['body'], $data['evidence'] ?? []);
 
         return back()->with('status', 'Handed in. Your trainer will mark it.');
     }
@@ -230,6 +241,7 @@ class PracticalTaskController extends Controller
             'status_label' => $submission->status->label(),
             'attempt_number' => $submission->attempt_number,
             'body' => $submission->body,
+            'evidence' => (object) ($submission->evidence ?? []),
             'is_editable' => $submission->isEditable(),
             'submitted_at' => $submission->submitted_at?->toDayDateTimeString(),
             'returned_reason' => $submission->returned_reason,

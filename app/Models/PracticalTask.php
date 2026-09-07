@@ -26,6 +26,8 @@ use Illuminate\Support\Str;
     'brief',
     'submission_instructions',
     'expected_evidence',
+    'required_evidence',
+    'requires_screenshot',
     'estimated_minutes',
     'position',
     'is_published',
@@ -40,7 +42,36 @@ class PracticalTask extends Model
         return [
             'is_published' => 'boolean',
             'requires_second_marker' => 'boolean',
+            'requires_screenshot' => 'boolean',
+            'required_evidence' => 'array',
         ];
+    }
+
+    /**
+     * The identifiers this task demands, each {key, label, hint}.
+     *
+     * Trainees work in a real PILOT account, so an object they create has a real
+     * agent ID. Asking for it turns "I did it" into something a trainer can go
+     * and verify.
+     *
+     * @return array<int, array{key: string, label: string, hint: ?string}>
+     */
+    public function evidenceFields(): array
+    {
+        return collect($this->required_evidence ?? [])
+            ->filter(fn ($field) => filled($field['key'] ?? null) && filled($field['label'] ?? null))
+            ->map(fn ($field) => [
+                'key' => $field['key'],
+                'label' => $field['label'],
+                'hint' => $field['hint'] ?? null,
+            ])
+            ->values()
+            ->all();
+    }
+
+    public function requiresEvidence(): bool
+    {
+        return $this->evidenceFields() !== [] || $this->requires_screenshot;
     }
 
     protected static function booted(): void

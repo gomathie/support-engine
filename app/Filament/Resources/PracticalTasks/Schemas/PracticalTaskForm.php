@@ -4,6 +4,7 @@ namespace App\Filament\Resources\PracticalTasks\Schemas;
 
 use App\Models\Course;
 use App\Models\Lesson;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -85,6 +86,49 @@ class PracticalTaskForm
                             ->rows(3)
                             ->columnSpanFull()
                             ->helperText('What must be attached or shown. Verification is a scored criterion, so say plainly what counts as proof.'),
+                    ]),
+
+                /*
+                 * Trainees work in a real PILOT account, so a task that says
+                 * "create an object" leaves a real object behind with a real
+                 * agent ID. Asking for it turns the submission from a claim into
+                 * something the marker can go and check.
+                 */
+                Section::make('Verifiable evidence')
+                    ->description('Identifiers the trainee must supply. They work in a live PILOT account, so what they create can be looked up — which is the difference between "I did it" and proof.')
+                    ->schema([
+                        Toggle::make('requires_screenshot')
+                            ->label('Require a screenshot')
+                            ->helperText('The submission cannot be handed in with nothing attached.'),
+
+                        Repeater::make('required_evidence')
+                            ->label('Identifiers to collect')
+                            ->hiddenLabel()
+                            ->columns(3)
+                            ->schema([
+                                TextInput::make('key')
+                                    ->label('Field key')
+                                    ->required()
+                                    ->alphaDash()
+                                    ->maxLength(40)
+                                    ->placeholder('agent_id')
+                                    ->helperText('Stored on the submission. Lower case, no spaces.'),
+
+                                TextInput::make('label')
+                                    ->label('Shown to the trainee')
+                                    ->required()
+                                    ->maxLength(120)
+                                    ->placeholder('Agent ID (vehicle ID)'),
+
+                                TextInput::make('hint')
+                                    ->label('Hint')
+                                    ->maxLength(160)
+                                    ->placeholder('Object card → Info tab'),
+                            ])
+                            ->itemLabel(fn (array $state): ?string => $state['label'] ?? null)
+                            ->addActionLabel('Add an identifier')
+                            ->defaultItems(0)
+                            ->helperText('Common ones: agent ID for a vehicle, account ID for a user, contract ID, sensor name.'),
                     ]),
 
                 Section::make('Marking')

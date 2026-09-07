@@ -173,6 +173,30 @@ class PracticalSubmissionsTable
                         ]),
                 ];
 
+                /*
+                 * The identifiers, shown before the rubric.
+                 *
+                 * These are the point of Verification: the trainee worked in a
+                 * live PILOT account, so the marker can paste the agent ID into
+                 * PILOT and see whether the object is really there. Marking
+                 * Verification without checking them is marking the prose.
+                 */
+                $evidence = $record->task?->evidenceFields() ?? [];
+
+                if ($evidence !== []) {
+                    $sections[] = Section::make('Check these in PILOT')
+                        ->description('Look them up before scoring Verification.')
+                        ->schema(array_map(
+                            fn (array $item) => Text::make(
+                                $item['label'].': '
+                                .(filled($record->evidence[$item['key']] ?? null)
+                                    ? $record->evidence[$item['key']]
+                                    : '— not supplied —')
+                            ),
+                            $evidence,
+                        ));
+                }
+
                 foreach (RubricCriterion::cases() as $criterion) {
                     $sections[] = Section::make($criterion->label())
                         ->description($criterion->isCritical()

@@ -23,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'attempt_number',
     'status',
     'body',
+    'evidence',
     'submitted_at',
     'total_score',
     'passed',
@@ -37,6 +38,7 @@ class PracticalSubmission extends Model
     {
         return [
             'status' => SubmissionStatus::class,
+            'evidence' => 'array',
             'passed' => 'boolean',
             'submitted_at' => 'datetime',
             'finalised_at' => 'datetime',

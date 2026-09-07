@@ -23,7 +23,17 @@ const props = defineProps({
 const rubricOpen = ref(false);
 const evidenceInput = ref(null);
 
-const write = useForm({ body: props.submission?.body ?? '' });
+// Evidence fields are per task, so the form is built from what the task asks
+// for rather than a fixed shape.
+const write = useForm({
+    body: props.submission?.body ?? '',
+    evidence: Object.fromEntries(
+        props.task.evidence_fields.map((field) => [
+            field.key,
+            props.submission?.evidence?.[field.key] ?? '',
+        ]),
+    ),
+});
 
 const isEditable = computed(() => props.submission?.is_editable ?? false);
 
@@ -238,9 +248,44 @@ const buttonQuiet =
                     {{ write.errors.body }}
                 </p>
 
+                <!-- ─── IDENTIFIERS ─── -->
+                <div v-if="task.evidence_fields.length" class="mt-6 border-t border-line pt-5">
+                    <p class="mb-1 text-sm font-medium text-navy">From the system</p>
+                    <p class="mb-3 text-sm text-ink-sec">
+                        You did this in a real PILOT account, so it left a record. Give the
+                        identifiers so your trainer can look it up and verify it.
+                    </p>
+
+                    <div class="grid gap-3 sm:grid-cols-2">
+                        <div v-for="item in task.evidence_fields" :key="item.key">
+                            <label class="mb-1.5 block text-sm font-medium text-navy" :for="item.key">
+                                {{ item.label }}
+                            </label>
+                            <input
+                                :id="item.key"
+                                v-model="write.evidence[item.key]"
+                                type="text"
+                                :class="field"
+                                :placeholder="item.hint || ''"
+                            />
+                        </div>
+                    </div>
+
+                    <p v-if="write.errors.evidence" class="mt-2 text-sm text-negative">
+                        {{ write.errors.evidence }}
+                    </p>
+                </div>
+
                 <!-- ─── EVIDENCE ─── -->
                 <div class="mt-6 border-t border-line pt-5">
-                    <p class="mb-2 text-sm font-medium text-navy">Evidence</p>
+                    <p class="mb-2 text-sm font-medium text-navy">
+                        Evidence
+                        <span v-if="task.requires_screenshot" class="text-negative">*</span>
+                    </p>
+                    <p v-if="task.requires_screenshot" class="mb-2 text-sm text-ink-sec">
+                        A screenshot is required for this task — it is what Verification is
+                        scored on.
+                    </p>
 
                     <ul v-if="submission.files.length" class="mb-3 space-y-2">
                         <li
