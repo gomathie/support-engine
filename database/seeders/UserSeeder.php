@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
             'job_title' => 'Support Team Lead',
             'employee_number' => 'PT-0002',
         ]);
-        $manager->syncRoles([Role::Manager->value]);
+        $manager->syncRoles([Role::Trainer->value]);
 
         // The manager runs the support desk; this is what scopes every report
         // and every employee record they are allowed to see.
@@ -39,7 +39,7 @@ class UserSeeder extends Seeder
             'job_title' => '1st Line Support Engineer',
             'employee_number' => 'PT-0003',
         ]);
-        $employee->syncRoles([Role::Employee->value]);
+        $employee->syncRoles([Role::Trainee->value]);
     }
 
     private function make(string $name, string $email, ?Department $department, array $extra = []): User

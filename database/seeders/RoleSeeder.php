@@ -8,31 +8,90 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
+/**
+ * Three roles, backed by named permissions.
+ *
+ * The roles describe what someone does on the training portal, not where they
+ * sit on an org chart — a Trainer is not necessarily anybody's line manager.
+ *
+ * Every Trainer capability is a separate permission rather than an implied tier,
+ * so "can build quizzes" can be granted without also granting "can assign
+ * trainees". That separation is what prevents the accidental role escalation in
+ * §6(f) of the implementation plan.
+ */
 class RoleSeeder extends Seeder
 {
-    /**
-     * Three roles, as the brief requires, but backed by named permissions so a
-     * fourth (say, a trainer who authors content but manages nobody) is a
-     * configuration change rather than a code change.
-     */
     public function run(): void
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        $permissions = [
+        foreach ($this->permissions() as $permission) {
+            Permission::findOrCreate($permission, 'web');
+        }
+
+        $admin = Role::findOrCreate(RoleEnum::Admin->value, 'web');
+        $admin->syncPermissions($this->permissions());
+
+        /*
+         * A Trainer builds content and grades their own cohort. Two boundaries
+         * matter here:
+         *
+         *  - transcripts.view-all lets them READ every trainee's record, but
+         *    grading stays restricted to their assigned cohort. Those used to
+         *    be one department-shaped rule; they are now separate.
+         *  - trainees.assign is deliberately absent. Only an Admin decides who
+         *    trains whom, otherwise a Trainer could assign themselves work or
+         *    quietly hand a struggling trainee to somebody else.
+         */
+        $trainer = Role::findOrCreate(RoleEnum::Trainer->value, 'web');
+        $trainer->syncPermissions([
+            'courses.view',
+            'lessons.manage',
+            'quizzes.manage',
+            'content.audit',
+            'videos.manage',
+            'employees.view',
+            'transcripts.view-all',
+            'enrollments.view', 'enrollments.create', 'enrollments.delete',
+            'grades.override',
+            'reports.view',
+            'certificates.view',
+        ]);
+
+        // Trainees hold no admin permissions at all. Everything they can do is
+        // decided by the policies on the employee-facing routes.
+        Role::findOrCreate(RoleEnum::Trainee->value, 'web');
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+    }
+
+    /** @return array<int, string> */
+    private function permissions(): array
+    {
+        return [
             // Content authoring
             'courses.view', 'courses.create', 'courses.update', 'courses.delete', 'courses.publish',
             'lessons.manage',
             'quizzes.manage',
+            'videos.manage',
+            'content.audit',
 
             // People
             'employees.view', 'employees.create', 'employees.update', 'employees.deactivate',
             'departments.manage',
             'roles.assign',
 
-            // Assignment
+            // Cohorts — who trains whom
+            'trainees.assign',
+            'trainees.reassign',
+            'transcripts.view-all',
+
+            // Assignment of training
             'enrollments.view', 'enrollments.create', 'enrollments.delete',
             'assignment-rules.manage',
+
+            // Assessment
+            'grades.override',
 
             // Reporting
             'reports.view', 'reports.view-all-departments', 'reports.export',
@@ -43,32 +102,5 @@ class RoleSeeder extends Seeder
             // Support panel content
             'diagnostics.manage',
         ];
-
-        foreach ($permissions as $permission) {
-            Permission::findOrCreate($permission, 'web');
-        }
-
-        $admin = Role::findOrCreate(RoleEnum::Admin->value, 'web');
-        $admin->syncPermissions($permissions);
-
-        // A manager runs people, not the curriculum. They can see their own
-        // departments' data and assign training, but not author or publish it,
-        // and explicitly not reports across the whole company.
-        $manager = Role::findOrCreate(RoleEnum::Manager->value, 'web');
-        $manager->syncPermissions([
-            'courses.view', 'courses.create', 'courses.update', 'courses.delete', 'courses.publish',
-            'lessons.manage',
-            'quizzes.manage',
-            'employees.view',
-            'enrollments.view', 'enrollments.create', 'enrollments.delete',
-            'reports.view',
-            'certificates.view',
-        ]);
-
-        // Employees hold no admin permissions at all. Everything they can do is
-        // decided by the policies on the employee-facing routes.
-        Role::findOrCreate(RoleEnum::Employee->value, 'web');
-
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }

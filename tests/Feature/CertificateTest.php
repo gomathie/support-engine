@@ -37,7 +37,7 @@ class CertificateTest extends TestCase
         Bus::fake();
 
         $course = $this->completableCourse();
-        $user = $this->employee();
+        $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
 
@@ -67,7 +67,7 @@ class CertificateTest extends TestCase
         Bus::fake();
 
         $course = $this->completableCourse();
-        $user = $this->employee();
+        $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
 
@@ -95,7 +95,7 @@ class CertificateTest extends TestCase
         ]);
         $question = QuizQuestion::factory()->for($quiz)->withOptions(2, [0])->create();
 
-        $user = $this->employee();
+        $user = $this->trainee();
         app(EnrollEmployee::class)->handle($user, $course);
 
         foreach ($course->lessons as $lesson) {
@@ -128,7 +128,7 @@ class CertificateTest extends TestCase
         Storage::fake('private');
 
         $course = $this->completableCourse();
-        $user = $this->employee();
+        $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
 
@@ -150,7 +150,7 @@ class CertificateTest extends TestCase
         Storage::fake('private');
 
         $course = $this->completableCourse();
-        $owner = $this->employee();
+        $owner = $this->trainee();
 
         app(EnrollEmployee::class)->handle($owner, $course);
         foreach ($course->lessons as $lesson) {
@@ -159,7 +159,7 @@ class CertificateTest extends TestCase
 
         $certificate = Certificate::query()->where('user_id', $owner->id)->firstOrFail();
 
-        $this->actingAs($this->employee())
+        $this->actingAs($this->trainee())
             ->get(route('certificates.download', $certificate))
             ->assertForbidden();
     }
@@ -169,7 +169,7 @@ class CertificateTest extends TestCase
         Storage::fake('private');
 
         $course = $this->completableCourse();
-        $owner = $this->employee();
+        $owner = $this->trainee();
 
         app(EnrollEmployee::class)->handle($owner, $course);
         foreach ($course->lessons as $lesson) {
@@ -190,7 +190,7 @@ class CertificateTest extends TestCase
         Bus::fake();
 
         $course = $this->completableCourse();
-        $user = $this->employee();
+        $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
         foreach ($course->lessons as $lesson) {
@@ -213,7 +213,7 @@ class CertificateTest extends TestCase
         Bus::fake();
 
         $course = $this->completableCourse();
-        $user = $this->employee();
+        $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
         foreach ($course->lessons as $lesson) {

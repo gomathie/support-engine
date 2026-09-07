@@ -45,7 +45,7 @@ class HandleInertiaRequests extends Middleware
                     // re-checked server-side by a policy before anything
                     // privileged happens.
                     'is_admin' => $user->hasRole(Role::Admin->value),
-                    'is_manager' => $user->hasRole(Role::Manager->value),
+                    'is_trainer' => $user->hasRole(Role::Trainer->value),
                 ] : null,
             ],
 

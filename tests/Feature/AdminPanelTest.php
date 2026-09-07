@@ -55,7 +55,7 @@ class AdminPanelTest extends TestCase
             'is_active' => true,
         ]);
 
-        $employee = $this->employee($department);
+        $employee = $this->trainee($department);
         app(EnrollEmployee::class)->handle($employee, $course);
 
         return compact('department', 'course', 'module', 'lesson', 'quiz', 'employee');
@@ -157,10 +157,10 @@ class AdminPanelTest extends TestCase
         $mine = Department::factory()->create(['name' => 'Technical Support']);
         $theirs = Department::factory()->create(['name' => 'Operations']);
 
-        $manager = $this->manager($mine);
+        $manager = $this->trainer($mine);
 
-        $visible = $this->employee($mine, ['name' => 'Visible Employee']);
-        $hidden = $this->employee($theirs, ['name' => 'Hidden Employee']);
+        $visible = $this->trainee($mine, ['name' => 'Visible Employee']);
+        $hidden = $this->trainee($theirs, ['name' => 'Hidden Employee']);
 
         $this->actingAs($manager)
             ->get(UserResource::getUrl('index'))
@@ -174,12 +174,12 @@ class AdminPanelTest extends TestCase
         $mine = Department::factory()->create();
         $theirs = Department::factory()->create();
 
-        $manager = $this->manager($mine);
+        $manager = $this->trainer($mine);
 
         $course = Course::factory()->create(['title' => 'Shared Course']);
 
-        $visible = $this->employee($mine, ['name' => 'Visible Employee']);
-        $hidden = $this->employee($theirs, ['name' => 'Hidden Employee']);
+        $visible = $this->trainee($mine, ['name' => 'Visible Employee']);
+        $hidden = $this->trainee($theirs, ['name' => 'Hidden Employee']);
 
         app(EnrollEmployee::class)->handle($visible, $course);
         app(EnrollEmployee::class)->handle($hidden, $course);
@@ -195,7 +195,7 @@ class AdminPanelTest extends TestCase
     {
         $this->seedContent();
 
-        $this->actingAs($this->employee());
+        $this->actingAs($this->trainee());
 
         foreach ([UserResource::getUrl('index'), CourseResource::getUrl('index'), Reports::getUrl()] as $url) {
             $this->get($url)->assertForbidden();

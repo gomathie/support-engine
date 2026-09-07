@@ -50,8 +50,11 @@ class QuizAttemptResource extends Resource
     }
 
     /**
-     * Managers see only their own departments' attempts — the same scoping the
-     * employee records and reports use.
+     * The grading queue lists what this trainer can act on — their own cohort.
+     *
+     * Not `transcripts.view-all`: that permission governs *reading* a
+     * transcript, and a queue of work you cannot mark is noise. Reading
+     * somebody else's attempt happens from the employee record, not here.
      */
     public static function getEloquentQuery(): Builder
     {
@@ -68,10 +71,7 @@ class QuizAttemptResource extends Resource
             return $query;
         }
 
-        return $query->whereHas(
-            'user',
-            fn ($q) => $q->whereIn('department_id', $user->visibleDepartmentIds()),
-        );
+        return $query->whereIn('user_id', $user->gradableTraineeIds());
     }
 
     /** How many attempts are sitting unmarked. */

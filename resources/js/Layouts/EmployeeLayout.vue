@@ -123,7 +123,7 @@ function toggleTheme() {
                         iframe rather than the page. This needs a full page load.
                     -->
                     <a
-                        v-if="user?.is_admin || user?.is_manager"
+                        v-if="user?.is_admin || user?.is_trainer"
                         href="/admin"
                         class="hidden rounded-lg px-3 py-1.5 text-sm font-medium text-ink-sec no-underline transition-colors hover:bg-nav-hover hover:text-brand lg:block"
                     >
@@ -177,7 +177,7 @@ function toggleTheme() {
 
                 <!-- Plain anchor: Filament is not an Inertia page. -->
                 <a
-                    v-if="user?.is_admin || user?.is_manager"
+                    v-if="user?.is_admin || user?.is_trainer"
                     href="/admin"
                     class="block rounded-lg px-3 py-2.5 text-sm font-medium text-ink-sec no-underline"
                 >

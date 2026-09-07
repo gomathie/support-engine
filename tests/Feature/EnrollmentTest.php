@@ -20,7 +20,7 @@ class EnrollmentTest extends TestCase
     public function test_enrolling_creates_a_progress_rollup(): void
     {
         $course = Course::factory()->create();
-        $user = $this->employee();
+        $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
 
@@ -39,7 +39,7 @@ class EnrollmentTest extends TestCase
     public function test_enrolling_twice_does_not_duplicate(): void
     {
         $course = Course::factory()->create();
-        $user = $this->employee();
+        $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
         app(EnrollEmployee::class)->handle($user, $course);
@@ -57,7 +57,7 @@ class EnrollmentTest extends TestCase
     public function test_re_enrolling_restores_a_revoked_enrollment(): void
     {
         $course = Course::factory()->create();
-        $user = $this->employee();
+        $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
         app(EnrollEmployee::class)->revoke($user, $course);
@@ -79,7 +79,7 @@ class EnrollmentTest extends TestCase
     public function test_a_due_date_is_derived_from_the_course(): void
     {
         $course = Course::factory()->create(['due_days' => 14]);
-        $user = $this->employee();
+        $user = $this->trainee();
 
         $enrollment = app(EnrollEmployee::class)->handle($user, $course);
 
@@ -102,8 +102,8 @@ class EnrollmentTest extends TestCase
         $department = Department::factory()->create();
         $course = Course::factory()->create();
 
-        $inside = collect(range(1, 3))->map(fn () => $this->employee($department));
-        $outside = $this->employee(Department::factory()->create());
+        $inside = collect(range(1, 3))->map(fn () => $this->trainee($department));
+        $outside = $this->trainee(Department::factory()->create());
 
         AssignmentRule::query()->create([
             'course_id' => $course->id,
@@ -132,13 +132,13 @@ class EnrollmentTest extends TestCase
     {
         $course = Course::factory()->create();
 
-        $employee = $this->employee();
+        $employee = $this->trainee();
         $admin = $this->admin();
 
         AssignmentRule::query()->create([
             'course_id' => $course->id,
             'target_type' => AssignmentRule::TARGET_ROLE,
-            'target_value' => Role::Employee->value,
+            'target_value' => Role::Trainee->value,
             'is_active' => true,
         ]);
 
@@ -171,7 +171,7 @@ class EnrollmentTest extends TestCase
             'is_active' => true,
         ]);
 
-        $user = $this->employee(Department::factory()->create());
+        $user = $this->trainee(Department::factory()->create());
 
         app(SyncAssignmentRules::class)->forUser($user);
         $this->assertDatabaseMissing('course_enrollments', ['user_id' => $user->id]);
@@ -190,7 +190,7 @@ class EnrollmentTest extends TestCase
     {
         $department = Department::factory()->create();
         $course = Course::factory()->create();
-        $user = $this->employee($department);
+        $user = $this->trainee($department);
 
         AssignmentRule::query()->create([
             'course_id' => $course->id,
@@ -208,7 +208,7 @@ class EnrollmentTest extends TestCase
     {
         $department = Department::factory()->create();
         $course = Course::factory()->create(['due_days' => 30]);
-        $user = $this->employee($department);
+        $user = $this->trainee($department);
 
         $rule = AssignmentRule::query()->create([
             'course_id' => $course->id,

@@ -18,7 +18,7 @@ class UserPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(Role::Manager->value);
+        return $user->hasRole(Role::Trainer->value);
     }
 
     /**
@@ -31,7 +31,7 @@ class UserPolicy
             return true;
         }
 
-        if ($user->hasRole(Role::Manager->value)) {
+        if ($user->hasRole(Role::Trainer->value)) {
             return in_array($target->department_id, $user->visibleDepartmentIds(), true);
         }
 

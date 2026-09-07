@@ -37,7 +37,7 @@ class CoursePolicy
             return false;
         }
 
-        if ($user->hasRole(Role::Manager->value)) {
+        if ($user->hasRole(Role::Trainer->value)) {
             return true;
         }
 
@@ -82,6 +82,6 @@ class CoursePolicy
     /** Managers can assign courses, but only to people in departments they run. */
     public function assign(User $user, Course $course): bool
     {
-        return $user->hasRole(Role::Manager->value);
+        return $user->hasRole(Role::Trainer->value);
     }
 }

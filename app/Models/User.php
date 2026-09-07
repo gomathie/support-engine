@@ -57,7 +57,7 @@ class User extends Authenticatable implements FilamentUser
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->is_active && $this->hasAnyRole([Role::Admin->value, Role::Manager->value]);
+        return $this->is_active && $this->hasAnyRole([Role::Admin->value, Role::Trainer->value]);
     }
 
     public function isAdmin(): bool
@@ -65,14 +65,14 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasRole(Role::Admin->value);
     }
 
-    public function isManager(): bool
+    public function isTrainer(): bool
     {
-        return $this->hasRole(Role::Manager->value);
+        return $this->hasRole(Role::Trainer->value);
     }
 
-    public function isEmployee(): bool
+    public function isTrainee(): bool
     {
-        return $this->hasRole(Role::Employee->value);
+        return $this->hasRole(Role::Trainee->value);
     }
 
     /**
@@ -89,7 +89,7 @@ class User extends Authenticatable implements FilamentUser
             return Department::query()->pluck('id')->all();
         }
 
-        if ($this->isManager()) {
+        if ($this->isTrainer()) {
             return $this->managedDepartments()->pluck('departments.id')->all();
         }
 
@@ -106,6 +106,83 @@ class User extends Authenticatable implements FilamentUser
     public function managedDepartments(): BelongsToMany
     {
         return $this->belongsToMany(Department::class, 'department_manager')->withTimestamps();
+    }
+
+    // ------------------------------------------------------------- cohorts
+
+    /**
+     * The trainees this trainer is currently responsible for.
+     *
+     * `ended_at` null is the whole definition of "current" — closed assignments
+     * stay in the table so a historical grade remains attributable to whoever
+     * held the cohort at the time.
+     */
+    public function trainees(): BelongsToMany
+    {
+        return $this->belongsToMany(self::class, 'trainer_trainee', 'trainer_id', 'trainee_id')
+            ->wherePivotNull('ended_at')
+            ->withPivot(['assigned_at', 'assigned_by', 'ended_at'])
+            ->withTimestamps();
+    }
+
+    /** Every trainee this trainer has ever held, including handed-over ones. */
+    public function allTrainees(): BelongsToMany
+    {
+        return $this->belongsToMany(self::class, 'trainer_trainee', 'trainer_id', 'trainee_id')
+            ->withPivot(['assigned_at', 'assigned_by', 'ended_at'])
+            ->withTimestamps();
+    }
+
+    /** The trainer currently responsible for this trainee, if any. */
+    public function trainers(): BelongsToMany
+    {
+        return $this->belongsToMany(self::class, 'trainer_trainee', 'trainee_id', 'trainer_id')
+            ->wherePivotNull('ended_at')
+            ->withPivot(['assigned_at', 'assigned_by', 'ended_at'])
+            ->withTimestamps();
+    }
+
+    public function currentTrainer(): ?self
+    {
+        return $this->trainers()->first();
+    }
+
+    /**
+     * Trainee ids this user may grade.
+     *
+     * Deliberately distinct from visibleDepartmentIds(): a trainer may READ
+     * every trainee's transcript (transcripts.view-all) but may only GRADE
+     * their own cohort. Those were one department-shaped rule before Phase 0
+     * and are now two, because they answer different questions.
+     *
+     * @return array<int, int>
+     */
+    public function gradableTraineeIds(): array
+    {
+        if ($this->isAdmin()) {
+            return self::query()->pluck('id')->all();
+        }
+
+        if ($this->isTrainer()) {
+            return $this->trainees()->pluck('users.id')->all();
+        }
+
+        return [];
+    }
+
+    public function canGrade(self $trainee): bool
+    {
+        // Nobody marks their own paper, whatever their role.
+        if ($this->is($trainee)) {
+            return false;
+        }
+
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return $this->isTrainer()
+            && $this->trainees()->whereKey($trainee->getKey())->exists();
     }
 
     public function enrollments(): HasMany

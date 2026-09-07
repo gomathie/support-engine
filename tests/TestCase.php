@@ -59,7 +59,7 @@ abstract class TestCase extends BaseTestCase
         );
     }
 
-    protected function employee(?Department $department = null, array $attributes = []): User
+    protected function trainee(?Department $department = null, array $attributes = []): User
     {
         $user = User::factory()->create([
             'department_id' => $department?->id,
@@ -67,12 +67,12 @@ abstract class TestCase extends BaseTestCase
             ...$attributes,
         ]);
 
-        $user->assignRole(Role::Employee->value);
+        $user->assignRole(Role::Trainee->value);
 
         return $user;
     }
 
-    protected function manager(?Department $department = null, array $attributes = []): User
+    protected function trainer(?Department $department = null, array $attributes = []): User
     {
         $user = User::factory()->create([
             'department_id' => $department?->id,
@@ -80,7 +80,7 @@ abstract class TestCase extends BaseTestCase
             ...$attributes,
         ]);
 
-        $user->assignRole(Role::Manager->value);
+        $user->assignRole(Role::Trainer->value);
 
         if ($department) {
             $user->managedDepartments()->attach($department);

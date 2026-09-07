@@ -28,7 +28,7 @@ class CertificatePolicy
             return true;
         }
 
-        if ($user->hasRole(Role::Manager->value)) {
+        if ($user->hasRole(Role::Trainer->value)) {
             return in_array(
                 $certificate->user->department_id,
                 $user->visibleDepartmentIds(),

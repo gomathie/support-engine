@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Actions\Cohorts\AssignTrainee;
 use App\Actions\Enrollment\EnrollEmployee;
 use App\Actions\Quiz\GradeQuizAttempt;
 use App\Actions\Quiz\GradeWrittenAnswer;
@@ -34,7 +35,7 @@ class ManualGradingTest extends TestCase
         $course = Course::factory()->create();
         $quiz = Quiz::factory()->create(['course_id' => $course->id, 'passing_score' => 50]);
 
-        $user = $this->employee($department);
+        $user = $this->trainee($department);
         app(EnrollEmployee::class)->handle($user, $course);
 
         return [$course, $quiz, $user];
@@ -228,18 +229,22 @@ class ManualGradingTest extends TestCase
         $this->assertFalse($admin->can('grade', $attempt));
     }
 
-    public function test_a_manager_can_only_grade_their_own_departments(): void
+    /**
+     * Scoped by cohort, not department, since Phase 0. A trainer marks the
+     * trainees assigned to them — being in the same department no longer
+     * grants it, and being in another one no longer withholds it.
+     */
+    public function test_a_trainer_can_only_grade_their_assigned_cohort(): void
     {
-        $mine = Department::factory()->create();
-        $theirs = Department::factory()->create();
+        $trainer = $this->trainer();
 
-        $manager = $this->manager($mine);
+        [, , $mine] = $this->scenario();
+        [, , $theirs] = $this->scenario();
 
-        [, , $inside] = $this->scenario($mine);
-        [, , $outside] = $this->scenario($theirs);
+        app(AssignTrainee::class)->handle($mine, $trainer, $this->admin());
 
-        $insideAttempt = QuizAttempt::query()->create([
-            'user_id' => $inside->id,
+        $attemptFor = fn ($user) => QuizAttempt::query()->create([
+            'user_id' => $user->id,
             'quiz_id' => Quiz::factory()->create()->id,
             'course_id' => Course::factory()->create()->id,
             'attempt_number' => 1,
@@ -247,17 +252,8 @@ class ManualGradingTest extends TestCase
             'started_at' => now(),
         ]);
 
-        $outsideAttempt = QuizAttempt::query()->create([
-            'user_id' => $outside->id,
-            'quiz_id' => Quiz::factory()->create()->id,
-            'course_id' => Course::factory()->create()->id,
-            'attempt_number' => 1,
-            'status' => AttemptStatus::PendingReview,
-            'started_at' => now(),
-        ]);
-
-        $this->assertTrue($manager->can('grade', $insideAttempt));
-        $this->assertFalse($manager->can('grade', $outsideAttempt));
+        $this->assertTrue($trainer->can('grade', $attemptFor($mine)));
+        $this->assertFalse($trainer->can('grade', $attemptFor($theirs)));
     }
 
     public function test_an_employee_cannot_grade_anything(): void
@@ -273,7 +269,7 @@ class ManualGradingTest extends TestCase
             'started_at' => now(),
         ]);
 
-        $this->assertFalse($this->employee()->can('grade', $attempt));
+        $this->assertFalse($this->trainee()->can('grade', $attempt));
     }
 
     // ─── THE HTTP ROUND TRIP ─────────────────────────────────

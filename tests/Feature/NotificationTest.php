@@ -21,7 +21,7 @@ class NotificationTest extends TestCase
     {
         Notification::fake();
 
-        $user = $this->employee();
+        $user = $this->trainee();
         $course = Course::factory()->create();
 
         app(EnrollEmployee::class)->handle($user, $course);
@@ -41,7 +41,7 @@ class NotificationTest extends TestCase
     {
         Notification::fake();
 
-        $user = $this->employee();
+        $user = $this->trainee();
         $course = Course::factory()->create();
 
         app(EnrollEmployee::class)->handle($user, $course);
@@ -57,9 +57,9 @@ class NotificationTest extends TestCase
 
         $course = Course::factory()->create();
 
-        $overdueUser = $this->employee();
-        $dueSoonUser = $this->employee();
-        $notDueUser = $this->employee();
+        $overdueUser = $this->trainee();
+        $dueSoonUser = $this->trainee();
+        $notDueUser = $this->trainee();
 
         app(EnrollEmployee::class)->handle($overdueUser, $course)
             ->update(['due_at' => now()->subDays(3)]);
@@ -86,7 +86,7 @@ class NotificationTest extends TestCase
         $module = CourseModule::factory()->for($course)->create();
         Lesson::factory()->count(2)->for($module, 'module')->create();
 
-        $user = $this->employee();
+        $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course->fresh())
             ->update(['due_at' => now()->subDays(10)]);
@@ -102,7 +102,7 @@ class NotificationTest extends TestCase
 
     public function test_an_employee_can_mark_a_notification_read(): void
     {
-        $user = $this->employee();
+        $user = $this->trainee();
         $course = Course::factory()->create();
 
         app(EnrollEmployee::class)->handle($user, $course);
@@ -121,8 +121,8 @@ class NotificationTest extends TestCase
     /** A guessed id belonging to somebody else must do nothing. */
     public function test_an_employee_cannot_mark_another_persons_notification_read(): void
     {
-        $owner = $this->employee();
-        $intruder = $this->employee();
+        $owner = $this->trainee();
+        $intruder = $this->trainee();
 
         app(EnrollEmployee::class)->handle($owner, Course::factory()->create());
 

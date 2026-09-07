@@ -26,7 +26,7 @@ class QuizEngineTest extends TestCase
             ...$quizAttributes,
         ]);
 
-        $user = $this->employee();
+        $user = $this->trainee();
         app(EnrollEmployee::class)->handle($user, $course);
 
         return [$course, $quiz, $user];
@@ -245,7 +245,7 @@ class QuizEngineTest extends TestCase
         $attempt = app(StartQuizAttempt::class)->handle($owner, $quiz);
         app(GradeQuizAttempt::class)->handle($attempt, []);
 
-        $intruder = $this->employee();
+        $intruder = $this->trainee();
 
         $this->actingAs($intruder)
             ->get(route('attempts.show', $attempt))
@@ -259,7 +259,7 @@ class QuizEngineTest extends TestCase
         $question = QuizQuestion::factory()->for($quiz)->withOptions(2, [0])->create();
         $attempt = app(StartQuizAttempt::class)->handle($owner, $quiz);
 
-        $intruder = $this->employee();
+        $intruder = $this->trainee();
 
         $this->actingAs($intruder)
             ->post(route('quizzes.submit', [$course->slug, $quiz->id]), [

@@ -30,7 +30,7 @@ class LessonProgressTest extends TestCase
     public function test_completing_a_lesson_persists_and_recalculates(): void
     {
         $course = $this->courseWithLessons(4);
-        $user = $this->employee();
+        $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
 
@@ -56,7 +56,7 @@ class LessonProgressTest extends TestCase
     public function test_completing_every_lesson_completes_the_course(): void
     {
         $course = $this->courseWithLessons(3);
-        $user = $this->employee();
+        $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
 
@@ -74,7 +74,7 @@ class LessonProgressTest extends TestCase
     public function test_unticking_a_lesson_reverses_completion(): void
     {
         $course = $this->courseWithLessons(2);
-        $user = $this->employee();
+        $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
 
@@ -111,7 +111,7 @@ class LessonProgressTest extends TestCase
         Lesson::factory()->count(2)->for($module, 'module')->create();
         Lesson::factory()->for($module, 'module')->unpublished()->create();
 
-        $user = $this->employee();
+        $user = $this->trainee();
         app(EnrollEmployee::class)->handle($user, $course);
 
         foreach ($course->lessons()->where('is_published', true)->get() as $lesson) {
@@ -140,7 +140,7 @@ class LessonProgressTest extends TestCase
             'lesson_id' => $lesson->id,
         ]);
 
-        $user = $this->employee();
+        $user = $this->trainee();
         app(EnrollEmployee::class)->handle($user, $course);
 
         $this->expectException(ValidationException::class);
@@ -151,7 +151,7 @@ class LessonProgressTest extends TestCase
     public function test_an_employee_cannot_complete_a_lesson_they_are_not_enrolled_in(): void
     {
         $course = $this->courseWithLessons(2);
-        $user = $this->employee();
+        $user = $this->trainee();
 
         $lesson = $course->lessons()->first();
 
@@ -168,7 +168,7 @@ class LessonProgressTest extends TestCase
     public function test_progress_can_be_reset(): void
     {
         $course = $this->courseWithLessons(2);
-        $user = $this->employee();
+        $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
         app(CompleteLesson::class)->handle($user, $course->lessons()->first());

@@ -23,7 +23,7 @@ class CourseEnrollmentPolicy
             return true;
         }
 
-        if ($user->hasRole(Role::Manager->value)) {
+        if ($user->hasRole(Role::Trainer->value)) {
             return in_array(
                 $enrollment->user->department_id,
                 $user->visibleDepartmentIds(),
@@ -36,12 +36,12 @@ class CourseEnrollmentPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasRole(Role::Manager->value);
+        return $user->hasRole(Role::Trainer->value);
     }
 
     public function delete(User $user, CourseEnrollment $enrollment): bool
     {
-        return $user->hasRole(Role::Manager->value)
+        return $user->hasRole(Role::Trainer->value)
             && in_array($enrollment->user->department_id, $user->visibleDepartmentIds(), true);
     }
 

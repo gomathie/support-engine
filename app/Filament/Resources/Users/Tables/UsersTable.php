@@ -50,7 +50,7 @@ class UsersTable
                     ->badge()
                     ->color(fn (string $state) => match ($state) {
                         Role::Admin->value => 'danger',
-                        Role::Manager->value => 'warning',
+                        Role::Trainer->value => 'warning',
                         default => 'gray',
                     }),
 

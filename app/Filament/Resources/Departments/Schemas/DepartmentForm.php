@@ -36,7 +36,7 @@ class DepartmentForm
                     ->columnSpanFull(),
 
                 Select::make('managers')
-                    ->relationship('managers', 'name', fn ($query) => $query->role(Role::Manager->value))
+                    ->relationship('managers', 'name', fn ($query) => $query->role(Role::Trainer->value))
                     ->multiple()
                     ->preload()
                     ->searchable()

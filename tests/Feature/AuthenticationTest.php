@@ -19,7 +19,7 @@ class AuthenticationTest extends TestCase
 
     public function test_employee_can_sign_in(): void
     {
-        $user = $this->employee();
+        $user = $this->trainee();
 
         $this->post(route('login'), [
             'email' => $user->email,
@@ -31,7 +31,7 @@ class AuthenticationTest extends TestCase
 
     public function test_signing_in_records_the_time(): void
     {
-        $user = $this->employee();
+        $user = $this->trainee();
 
         $this->assertNull($user->last_login_at);
 
@@ -45,7 +45,7 @@ class AuthenticationTest extends TestCase
 
     public function test_wrong_password_is_rejected(): void
     {
-        $user = $this->employee();
+        $user = $this->trainee();
 
         $this->post(route('login'), [
             'email' => $user->email,
@@ -57,7 +57,7 @@ class AuthenticationTest extends TestCase
 
     public function test_deactivated_account_cannot_sign_in(): void
     {
-        $user = $this->employee(attributes: ['is_active' => false]);
+        $user = $this->trainee(attributes: ['is_active' => false]);
 
         $this->post(route('login'), [
             'email' => $user->email,
@@ -74,7 +74,7 @@ class AuthenticationTest extends TestCase
      */
     public function test_deactivating_an_account_ends_the_existing_session(): void
     {
-        $user = $this->employee();
+        $user = $this->trainee();
 
         $this->actingAs($user)->get(route('dashboard'))->assertOk();
 
@@ -97,7 +97,7 @@ class AuthenticationTest extends TestCase
 
     public function test_sign_out_clears_the_session(): void
     {
-        $user = $this->employee();
+        $user = $this->trainee();
 
         $this->actingAs($user)
             ->post(route('logout'))
@@ -112,7 +112,7 @@ class AuthenticationTest extends TestCase
      */
     public function test_unknown_address_and_wrong_password_give_the_same_error(): void
     {
-        $user = $this->employee();
+        $user = $this->trainee();
 
         $unknown = $this->post(route('login'), [
             'email' => 'nobody@pilot.test',

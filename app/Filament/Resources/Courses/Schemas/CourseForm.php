@@ -55,7 +55,7 @@ class CourseForm
                             ->relationship(
                                 'instructor',
                                 'name',
-                                fn ($query) => $query->role([Role::Admin->value, Role::Manager->value]),
+                                fn ($query) => $query->role([Role::Admin->value, Role::Trainer->value]),
                             )
                             ->searchable()
                             ->preload(),

@@ -39,13 +39,16 @@ class QuizAttemptPolicy
     /** Listing attempts in the admin panel. */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(Role::Manager->value);
+        return $user->hasRole(Role::Trainer->value);
     }
 
     /**
-     * An attempt — its answers, its score — belongs to the person who sat it.
-     * A manager sees their own departments; an administrator sees everything
-     * through before().
+     * Reading an attempt — its answers, its score.
+     *
+     * A trainee sees their own. A trainer with `transcripts.view-all` may read
+     * anybody's, which is deliberate: a trainer covering a colleague, or
+     * checking how a topic lands across the intake, needs the whole picture.
+     * Reading is not grading — see grade() below.
      */
     public function view(User $user, QuizAttempt $attempt): bool
     {
@@ -53,15 +56,12 @@ class QuizAttemptPolicy
             return true;
         }
 
-        if (! $user->hasRole(Role::Manager->value)) {
+        if (! $user->hasRole(Role::Trainer->value)) {
             return false;
         }
 
-        return in_array(
-            $attempt->user->department_id,
-            $user->visibleDepartmentIds(),
-            true,
-        );
+        return $user->hasPermissionTo('transcripts.view-all')
+            || $user->canGrade($attempt->user);
     }
 
     public function submit(User $user, QuizAttempt $attempt): bool
@@ -69,26 +69,16 @@ class QuizAttemptPolicy
         return $attempt->user_id === $user->id && $attempt->isInProgress();
     }
 
-    /** Marking written answers. Never your own paper, whatever your role. */
+    /**
+     * Marking written answers.
+     *
+     * Restricted to the trainer's own cohort, unlike view(). A trainer may read
+     * every transcript but may only put a mark on the trainees they are
+     * responsible for — and nobody marks their own paper, whatever their role.
+     */
     public function grade(User $user, QuizAttempt $attempt): bool
     {
-        if ($attempt->user_id === $user->id) {
-            return false;
-        }
-
-        if ($user->hasRole(Role::Admin->value)) {
-            return true;
-        }
-
-        if (! $user->hasRole(Role::Manager->value)) {
-            return false;
-        }
-
-        return in_array(
-            $attempt->user->department_id,
-            $user->visibleDepartmentIds(),
-            true,
-        );
+        return $user->canGrade($attempt->user);
     }
 
     public function create(User $user): bool

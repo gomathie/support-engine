@@ -21,7 +21,7 @@ class AuthorizationTest extends TestCase
 
     public function test_an_employee_cannot_reach_the_admin_panel(): void
     {
-        $this->actingAs($this->employee())
+        $this->actingAs($this->trainee())
             ->get('/admin')
             ->assertForbidden();
     }
@@ -35,7 +35,7 @@ class AuthorizationTest extends TestCase
 
     public function test_a_manager_can_reach_the_admin_panel(): void
     {
-        $this->actingAs($this->manager(Department::factory()->create()))
+        $this->actingAs($this->trainer(Department::factory()->create()))
             ->get('/admin')
             ->assertSuccessful();
     }
@@ -46,7 +46,7 @@ class AuthorizationTest extends TestCase
     {
         $course = Course::factory()->create();
 
-        $this->actingAs($this->employee())
+        $this->actingAs($this->trainee())
             ->get(route('courses.show', $course->slug))
             ->assertForbidden();
     }
@@ -54,7 +54,7 @@ class AuthorizationTest extends TestCase
     public function test_an_employee_can_open_a_course_they_are_enrolled_in(): void
     {
         $course = Course::factory()->create();
-        $user = $this->employee();
+        $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
 
@@ -70,7 +70,7 @@ class AuthorizationTest extends TestCase
     public function test_a_draft_course_is_invisible_even_when_enrolled(): void
     {
         $course = Course::factory()->draft()->create();
-        $user = $this->employee();
+        $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
 
@@ -85,7 +85,7 @@ class AuthorizationTest extends TestCase
         $module = CourseModule::factory()->for($course)->create();
         $lesson = Lesson::factory()->for($module, 'module')->create();
 
-        $outsider = $this->employee();
+        $outsider = $this->trainee();
 
         $this->actingAs($outsider)
             ->get(route('lessons.show', [$course->slug, $lesson->slug]))
@@ -98,7 +98,7 @@ class AuthorizationTest extends TestCase
         $module = CourseModule::factory()->for($course)->create();
         $lesson = Lesson::factory()->for($module, 'module')->unpublished()->create();
 
-        $user = $this->employee();
+        $user = $this->trainee();
         app(EnrollEmployee::class)->handle($user, $course);
 
         $this->actingAs($user)
@@ -134,7 +134,7 @@ class AuthorizationTest extends TestCase
             'is_downloadable' => true,
         ]);
 
-        $this->actingAs($this->employee())
+        $this->actingAs($this->trainee())
             ->get(route('resources.download', $resource))
             ->assertForbidden();
     }
@@ -160,7 +160,7 @@ class AuthorizationTest extends TestCase
             'is_downloadable' => true,
         ]);
 
-        $user = $this->employee();
+        $user = $this->trainee();
         app(EnrollEmployee::class)->handle($user, $course);
 
         $this->actingAs($user)
@@ -175,10 +175,10 @@ class AuthorizationTest extends TestCase
         $mine = Department::factory()->create();
         $theirs = Department::factory()->create();
 
-        $manager = $this->manager($mine);
+        $manager = $this->trainer($mine);
 
-        $inside = $this->employee($mine);
-        $outside = $this->employee($theirs);
+        $inside = $this->trainee($mine);
+        $outside = $this->trainee($theirs);
 
         $this->assertTrue($manager->can('viewProgress', $inside));
         $this->assertFalse($manager->can('viewProgress', $outside));
@@ -188,8 +188,8 @@ class AuthorizationTest extends TestCase
     {
         $department = Department::factory()->create();
 
-        $one = $this->employee($department);
-        $two = $this->employee($department);
+        $one = $this->trainee($department);
+        $two = $this->trainee($department);
 
         $this->assertFalse($one->can('viewProgress', $two));
         $this->assertTrue($one->can('viewProgress', $one));
@@ -198,7 +198,7 @@ class AuthorizationTest extends TestCase
     public function test_an_admin_sees_everybody(): void
     {
         $admin = $this->admin();
-        $employee = $this->employee(Department::factory()->create());
+        $employee = $this->trainee(Department::factory()->create());
 
         $this->assertTrue($admin->can('viewProgress', $employee));
     }
@@ -209,7 +209,7 @@ class AuthorizationTest extends TestCase
     {
         $course = Course::factory()->required()->create();
 
-        $this->actingAs($this->employee())
+        $this->actingAs($this->trainee())
             ->post(route('courses.enroll', $course->slug))
             ->assertForbidden();
     }
@@ -217,7 +217,7 @@ class AuthorizationTest extends TestCase
     public function test_optional_courses_can_be_self_enrolled(): void
     {
         $course = Course::factory()->create();
-        $user = $this->employee();
+        $user = $this->trainee();
 
         $this->actingAs($user)
             ->post(route('courses.enroll', $course->slug))

@@ -47,14 +47,14 @@ class AdminFormSubmissionTest extends TestCase
                 'department_id' => $department->id,
                 'password' => 'a-strong-password',
                 'is_active' => true,
-                'roles' => [$this->roleId(Role::Manager)],
+                'roles' => [$this->roleId(Role::Trainer)],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $created = User::query()->where('email', 'igor@pilot.test')->firstOrFail();
 
-        $this->assertTrue($created->hasRole(Role::Manager->value));
+        $this->assertTrue($created->hasRole(Role::Trainer->value));
         $this->assertSame($department->id, $created->department_id);
         $this->assertTrue($created->is_active);
 
@@ -65,27 +65,27 @@ class AdminFormSubmissionTest extends TestCase
 
     public function test_an_admin_can_change_an_employees_role(): void
     {
-        $employee = $this->employee();
+        $employee = $this->trainee();
 
         $this->actingAs($this->admin());
 
         Livewire::test(EditUser::class, ['record' => $employee->getKey()])
             ->fillForm([
-                'roles' => [$this->roleId(Role::Manager)],
+                'roles' => [$this->roleId(Role::Trainer)],
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $employee->refresh();
 
-        $this->assertTrue($employee->hasRole(Role::Manager->value));
-        $this->assertFalse($employee->hasRole(Role::Employee->value));
+        $this->assertTrue($employee->hasRole(Role::Trainer->value));
+        $this->assertFalse($employee->hasRole(Role::Trainee->value));
     }
 
     /** Blank means "leave it alone", not "set the password to empty". */
     public function test_saving_an_employee_without_a_password_keeps_the_old_one(): void
     {
-        $employee = $this->employee();
+        $employee = $this->trainee();
         $original = $employee->password;
 
         $this->actingAs($this->admin());
@@ -106,7 +106,7 @@ class AdminFormSubmissionTest extends TestCase
 
     public function test_a_duplicate_email_is_rejected_rather_than_saved(): void
     {
-        $existing = $this->employee();
+        $existing = $this->trainee();
 
         $this->actingAs($this->admin());
 
@@ -115,7 +115,7 @@ class AdminFormSubmissionTest extends TestCase
                 'name' => 'Somebody Else',
                 'email' => $existing->email,
                 'password' => 'a-strong-password',
-                'roles' => [$this->roleId(Role::Employee)],
+                'roles' => [$this->roleId(Role::Trainee)],
             ])
             ->call('create')
             ->assertHasFormErrors(['email']);

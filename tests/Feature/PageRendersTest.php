@@ -29,7 +29,7 @@ class PageRendersTest extends TestCase
     public function test_every_employee_page_renders(): void
     {
         $department = Department::factory()->create();
-        $user = $this->employee($department);
+        $user = $this->trainee($department);
 
         $course = Course::factory()->create();
         $module = CourseModule::factory()->for($course)->create();
@@ -67,7 +67,7 @@ class PageRendersTest extends TestCase
 
     public function test_the_course_filters_do_not_break_the_listing(): void
     {
-        $user = $this->employee();
+        $user = $this->trainee();
         $course = Course::factory()->create(['category' => 'TRACK 1']);
 
         app(EnrollEmployee::class)->handle($user, $course);
@@ -83,7 +83,7 @@ class PageRendersTest extends TestCase
 
     public function test_taking_a_quiz_renders_the_questions(): void
     {
-        $user = $this->employee();
+        $user = $this->trainee();
         $course = Course::factory()->create();
         $quiz = Quiz::factory()->create(['course_id' => $course->id]);
 
