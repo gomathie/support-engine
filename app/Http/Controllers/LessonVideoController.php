@@ -30,7 +30,7 @@ class LessonVideoController extends Controller
         // you may see the video on it. Nothing else reaches this route.
         $this->authorize('view', $lesson);
 
-        abort_unless($lesson->type->isUploadedVideo() && $lesson->video_path, 404);
+        abort_unless($lesson->hasUploadedVideo(), 404);
 
         $disk = Storage::disk($lesson->video_disk ?: 'private');
 

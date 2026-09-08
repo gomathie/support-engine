@@ -139,10 +139,22 @@ class Lesson extends Model
         return VideoEmbed::parse($this->video_id, $this->video_provider);
     }
 
-    /** An uploaded video is playable once a file is actually on the disk. */
+    /**
+     * An uploaded video is playable once a file is actually on the disk.
+     *
+     * No longer conditional on a lesson *type*: video is a property any lesson
+     * may carry, shown above the material it belongs with rather than instead
+     * of it.
+     */
     public function hasUploadedVideo(): bool
     {
-        return $this->type->isUploadedVideo() && filled($this->video_path);
+        return filled($this->video_path);
+    }
+
+    /** Whether this lesson has a video at all — embedded or uploaded. */
+    public function hasVideo(): bool
+    {
+        return $this->hasUploadedVideo() || $this->videoEmbed() !== null;
     }
 
     /** "412 MB" — the size as the author needs to see it against the 500 MB cap. */

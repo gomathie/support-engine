@@ -17,7 +17,7 @@ use Tests\TestCase;
  * The parser has its own unit tests; this covers what reaches the browser and
  * who may author it.
  */
-class VideoTopicTest extends TestCase
+class VideoLessonTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -27,7 +27,8 @@ class VideoTopicTest extends TestCase
         $module = Module::factory()->for($course)->create();
 
         return Lesson::factory()->for($module, 'module')->create([
-            'type' => LessonType::VideoEmbed,
+            'type' => LessonType::RichText,
+            'content' => '<p>The write-up that goes with the video.</p>',
             'video_provider' => 'youtube',
             'video_id' => 'dQw4w9WgXcQ',
             'video_duration_seconds' => 390,
@@ -47,7 +48,7 @@ class VideoTopicTest extends TestCase
             ->get(route('lessons.show', [$lesson->course->slug, $lesson->slug]))
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page
-                ->where('lesson.type', 'video_embed')
+                ->where('lesson.type', 'rich_text')
                 ->where('lesson.video.provider', 'youtube')
                 ->where('lesson.video.embed_url', 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1&playsinline=1')
                 ->where('lesson.video_duration', '6:30')
@@ -162,15 +163,38 @@ class VideoTopicTest extends TestCase
             ->assertSuccessful();
     }
 
-    public function test_video_is_an_offered_lesson_type(): void
+    /**
+     * Video is not a lesson type any more.
+     *
+     * It was, and that was the bug: a lesson typed "video" rendered the player
+     * *instead of* its text, so the video stood alone with nothing explaining
+     * it. Any lesson may now carry one, shown above the body it belongs with.
+     */
+    public function test_video_is_not_a_lesson_type(): void
     {
-        $this->assertArrayHasKey('video_embed', LessonType::options());
+        $this->assertArrayNotHasKey('video_embed', LessonType::options());
+        $this->assertArrayNotHasKey('video_upload', LessonType::options());
 
-        // The label names the method, because the author is choosing between
-        // two of them in the same dropdown.
-        $this->assertSame('Video (YouTube / Vimeo)', LessonType::VideoEmbed->label());
+        $this->assertSame('Text (with optional video)', LessonType::RichText->label());
+    }
 
-        $this->assertTrue(LessonType::VideoEmbed->isVideo());
-        $this->assertFalse(LessonType::RichText->isVideo());
+    /** A lesson can carry both, and the text is not displaced by the player. */
+    public function test_a_lesson_keeps_its_text_alongside_its_video(): void
+    {
+        $lesson = $this->videoLesson();
+
+        $this->assertTrue($lesson->hasVideo());
+        $this->assertNotEmpty($lesson->content, 'The write-up must survive alongside the video.');
+
+        $user = $this->trainee();
+        app(EnrollEmployee::class)->handle($user, $lesson->course);
+
+        $this->actingAs($user)
+            ->get(route('lessons.show', [$lesson->course->slug, $lesson->slug]))
+            ->assertSuccessful()
+            ->assertInertia(fn ($page) => $page
+                ->where('lesson.type', 'rich_text')
+                ->where('lesson.video.provider', 'youtube')
+                ->where('lesson.content', '<p>The write-up that goes with the video.</p>'));
     }
 }

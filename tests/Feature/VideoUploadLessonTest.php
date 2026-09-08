@@ -18,7 +18,7 @@ use Tests\TestCase;
  * and the single route to it runs the lesson policy first. An employee who is
  * not enrolled must not be able to pull the bytes by knowing the lesson slug.
  */
-class VideoUploadTopicTest extends TestCase
+class VideoUploadLessonTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -28,7 +28,8 @@ class VideoUploadTopicTest extends TestCase
         $module = Module::factory()->for($course)->create();
 
         $lesson = Lesson::factory()->for($module, 'module')->create([
-            'type' => LessonType::VideoUpload,
+            'type' => LessonType::RichText,
+            'content' => '<p>The write-up that goes with the video.</p>',
             'video_disk' => 'private',
             'video_path' => 'lesson-videos/walkthrough.mp4',
             'video_original_name' => 'sensor walkthrough.mp4',
@@ -168,7 +169,7 @@ class VideoUploadTopicTest extends TestCase
             ->get(route('lessons.show', [$lesson->course->slug, $lesson->slug]))
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page
-                ->where('lesson.type', 'video_upload')
+                ->where('lesson.type', 'rich_text')
                 ->where('lesson.video_src', route('lessons.video', [$lesson->course->slug, $lesson->slug]))
                 ->where('lesson.video_mime', 'video/mp4')
                 ->where('lesson.video_duration', '6:15')
@@ -190,14 +191,31 @@ class VideoUploadTopicTest extends TestCase
         $this->assertFalse($noFile->hasUploadedVideo());
     }
 
-    public function test_uploaded_video_is_an_offered_lesson_type(): void
+    /**
+     * An uploaded video attaches to any lesson rather than defining one.
+     *
+     * `hasUploadedVideo()` used to require the lesson's *type* to be video,
+     * which is what made the player replace the text instead of introducing it.
+     */
+    public function test_an_uploaded_video_attaches_to_any_lesson(): void
     {
-        $this->assertArrayHasKey('video_upload', LessonType::options());
-        $this->assertTrue(LessonType::VideoUpload->isVideo());
-        $this->assertTrue(LessonType::VideoUpload->isUploadedVideo());
+        $this->assertArrayNotHasKey('video_upload', LessonType::options());
+
+        $lesson = $this->uploadedVideoLesson();
+
+        $this->assertSame(LessonType::RichText, $lesson->type);
+        $this->assertTrue($lesson->hasUploadedVideo());
+        $this->assertTrue($lesson->hasVideo());
+        $this->assertNotEmpty($lesson->content, 'The write-up sits under the player.');
 
         // An embed is a video, but not an uploaded one.
-        $this->assertTrue(LessonType::VideoEmbed->isVideo());
-        $this->assertFalse(LessonType::VideoEmbed->isUploadedVideo());
+        $embedded = $this->uploadedVideoLesson([
+            'video_path' => null,
+            'video_provider' => 'youtube',
+            'video_id' => 'dQw4w9WgXcQ',
+        ]);
+
+        $this->assertTrue($embedded->hasVideo());
+        $this->assertFalse($embedded->hasUploadedVideo());
     }
 }

@@ -3,19 +3,22 @@
 namespace App\Enums;
 
 /**
- * Content types a lesson can carry. Adding one means adding a case here and a
+ * What form a lesson's *body* takes. Adding one means adding a case here and a
  * matching branch in resources/js/Pages/Lessons/Show.vue — no migration, because
  * lessons.type is a plain string column.
  *
- * Video was excluded under the original brief. The competency plan reverses
- * that: §4.1 makes short video the default delivery format for re-aligned
- * content. VideoEmbed (PA-9) covers hosted video; native upload follows in PA-10.
+ * **Video is not a type.** It was, briefly, and that was wrong: a lesson whose
+ * type was "video" rendered the player *instead of* its text, so the video stood
+ * alone with nothing explaining it. Video is now a property any lesson may have —
+ * a YouTube/Vimeo link or an uploaded file — shown above the body it belongs
+ * with. See Lesson::hasVideo().
+ *
+ * That is what §4.1 actually asks for: video as the delivery format for the
+ * material, not as a substitute for it.
  */
 enum LessonType: string
 {
     case RichText = 'rich_text';
-    case VideoEmbed = 'video_embed';
-    case VideoUpload = 'video_upload';
     case Pdf = 'pdf';
     case Image = 'image';
     case Document = 'document';
@@ -25,9 +28,7 @@ enum LessonType: string
     public function label(): string
     {
         return match ($this) {
-            self::RichText => 'Rich text',
-            self::VideoEmbed => 'Video (YouTube / Vimeo)',
-            self::VideoUpload => 'Video (uploaded file)',
+            self::RichText => 'Text (with optional video)',
             self::Pdf => 'PDF',
             self::Image => 'Image',
             self::Document => 'Document',
@@ -42,24 +43,10 @@ enum LessonType: string
         return in_array($this, [self::Pdf, self::Image, self::Document, self::Download], true);
     }
 
-    /** Types whose payload is a video, hosted or uploaded. */
-    public function isVideo(): bool
-    {
-        return in_array($this, [self::VideoEmbed, self::VideoUpload], true);
-    }
-
-    /** An uploaded file on the private disk, rather than a third-party embed. */
-    public function isUploadedVideo(): bool
-    {
-        return $this === self::VideoUpload;
-    }
-
     public function icon(): string
     {
         return match ($this) {
             self::RichText => 'heroicon-o-document-text',
-            self::VideoEmbed => 'heroicon-o-play-circle',
-            self::VideoUpload => 'heroicon-o-film',
             self::Pdf => 'heroicon-o-document',
             self::Image => 'heroicon-o-photo',
             self::Document => 'heroicon-o-paper-clip',

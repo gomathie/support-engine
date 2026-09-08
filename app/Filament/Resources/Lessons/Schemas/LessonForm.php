@@ -121,9 +121,10 @@ class LessonForm
                  * Gated on videos.manage, which is grantable per Trainer.
                  */
                 Section::make('Video file')
-                    ->description('Uploaded to the private disk. There is no public URL — playback goes through a route that checks the lesson policy first.')
-                    ->visible(fn ($get) => $get('type') === LessonType::VideoUpload->value
-                        && (Filament::auth()->user()?->can('videos.manage') ?? false))
+                    ->description('Optional, and available on any lesson — the video sits above the lesson text rather than replacing it. Uploaded to the private disk: there is no public URL, and playback goes through a route that checks the lesson policy first.')
+                    ->collapsed(fn (?Lesson $record) => ! $record?->hasUploadedVideo())
+                    ->collapsible()
+                    ->visible(fn () => Filament::auth()->user()?->can('videos.manage') ?? false)
                     ->columns(2)
                     ->schema([
                         FileUpload::make('video_path')
@@ -178,9 +179,11 @@ class LessonForm
                         Hidden::make('video_status'),
                     ]),
 
-                Section::make('Video')
-                    ->visible(fn ($get) => $get('type') === LessonType::VideoEmbed->value
-                        && (Filament::auth()->user()?->can('videos.manage') ?? false))
+                Section::make('Video link')
+                    ->description('Optional, and available on any lesson. Paste a YouTube or Vimeo URL and the player appears above the lesson text. If a file is uploaded above, it is used instead of this link.')
+                    ->collapsed(fn (?Lesson $record) => $record?->videoEmbed() === null)
+                    ->collapsible()
+                    ->visible(fn () => Filament::auth()->user()?->can('videos.manage') ?? false)
                     ->columns(2)
                     ->schema([
                         TextInput::make('video_url')

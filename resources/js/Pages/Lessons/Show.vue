@@ -121,6 +121,67 @@ function toggleComplete() {
                     </span>
                 </div>
 
+                <!-- ═══ VIDEO ═══════════════════════════════════
+                     Part of the lesson, not a lesson of its own. Any lesson may
+                     carry a video, and it sits above the material that explains
+                     it — a player on a page by itself teaches nothing. -->
+                <div v-if="lesson.video || lesson.video_src" class="mb-8">
+                    <!-- Embedded. The src is rebuilt server-side from a stored
+                         provider and id against a fixed template — never from a
+                         URL an author pasted. See App\Support\Video\VideoEmbed. -->
+                    <div
+                        v-if="lesson.video"
+                        class="relative w-full overflow-hidden rounded-xl border border-line bg-black pt-[56.25%]"
+                    >
+                        <iframe
+                            :src="lesson.video.embed_url"
+                            :title="lesson.title"
+                            class="absolute inset-0 h-full w-full"
+                            frameborder="0"
+                            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                            allowfullscreen
+                        ></iframe>
+                    </div>
+
+                    <!-- Uploaded. The src is a route, not a storage URL — the
+                         file has no public address and the route runs the lesson
+                         policy before a byte is served. -->
+                    <video
+                        v-else
+                        controls
+                        preload="metadata"
+                        controlslist="nodownload"
+                        class="w-full rounded-xl border border-line bg-black"
+                    >
+                        <source :src="lesson.video_src" :type="lesson.video_mime || 'video/mp4'" />
+                        Your browser cannot play this video.
+                    </video>
+
+                    <p class="mt-2 flex flex-wrap items-center gap-2 text-xs text-ink-dis">
+                        <span v-if="lesson.video">{{ lesson.video.provider_label }}</span>
+                        <span v-if="lesson.video && lesson.video_duration">·</span>
+                        <span v-if="lesson.video_duration">{{ lesson.video_duration }}</span>
+                    </p>
+
+                    <!-- Adults scan before they watch, so the transcript is a
+                         first-class part of the lesson rather than a download. -->
+                    <div v-if="lesson.video_transcript" class="mt-4">
+                        <button
+                            type="button"
+                            class="flex w-full items-center justify-between rounded-lg border border-line bg-surface-alt px-4 py-3 text-left text-sm font-semibold text-ink-pri"
+                            @click="transcriptOpen = !transcriptOpen"
+                        >
+                            <span>Transcript</span>
+                            <span class="text-ink-dis">{{ transcriptOpen ? '−' : '+' }}</span>
+                        </button>
+
+                        <div
+                            v-show="transcriptOpen"
+                            class="mt-2 max-h-96 overflow-y-auto rounded-lg border border-line p-4 text-sm leading-relaxed whitespace-pre-wrap text-ink-sec"
+                        >{{ lesson.video_transcript }}</div>
+                    </div>
+                </div>
+
                 <!-- ═══ CONTENT BY TYPE ═════════════════════════ -->
 
                 <!-- v-html is safe here: the server ran the body through
@@ -132,80 +193,6 @@ function toggleComplete() {
                     class="lesson-prose prose max-w-none"
                     v-html="lesson.content"
                 ></div>
-
-                <!-- The src comes from the server, rebuilt from a stored
-                     provider and id against a fixed template — never from a
-                     URL an author pasted. See App\Support\Video\VideoEmbed. -->
-                <div v-else-if="lesson.type === 'video_embed' && lesson.video" id="lesson-body">
-                    <div class="relative w-full overflow-hidden rounded-xl border border-line bg-black pt-[56.25%]">
-                        <iframe
-                            :src="lesson.video.embed_url"
-                            :title="lesson.title"
-                            class="absolute inset-0 h-full w-full"
-                            frameborder="0"
-                            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                            allowfullscreen
-                        ></iframe>
-                    </div>
-
-                    <p class="mt-2 flex flex-wrap items-center gap-2 text-xs text-ink-dis">
-                        <span>{{ lesson.video.provider_label }}</span>
-                        <span v-if="lesson.video_duration">· {{ lesson.video_duration }}</span>
-                    </p>
-
-                    <!-- Adults scan before they watch, so the transcript is a
-                         first-class part of the lesson rather than a download. -->
-                    <div v-if="lesson.video_transcript" class="mt-6">
-                        <button
-                            type="button"
-                            class="flex w-full items-center justify-between rounded-lg border border-line bg-surface-alt px-4 py-3 text-left text-sm font-semibold text-ink-pri"
-                            @click="transcriptOpen = !transcriptOpen"
-                        >
-                            <span>Transcript</span>
-                            <span class="text-ink-dis">{{ transcriptOpen ? '−' : '+' }}</span>
-                        </button>
-
-                        <div
-                            v-show="transcriptOpen"
-                            class="mt-2 max-h-96 overflow-y-auto rounded-lg border border-line p-4 text-sm leading-relaxed whitespace-pre-wrap text-ink-sec"
-                        >{{ lesson.video_transcript }}</div>
-                    </div>
-                </div>
-
-                <!-- Uploaded video. The src is a route, not a storage URL —
-                     the file has no public address and the route runs the
-                     lesson policy before a byte is served. -->
-                <div v-else-if="lesson.type === 'video_upload' && lesson.video_src" id="lesson-body">
-                    <video
-                        controls
-                        preload="metadata"
-                        controlslist="nodownload"
-                        class="w-full rounded-xl border border-line bg-black"
-                    >
-                        <source :src="lesson.video_src" :type="lesson.video_mime || 'video/mp4'" />
-                        Your browser cannot play this video.
-                    </video>
-
-                    <p v-if="lesson.video_duration" class="mt-2 text-xs text-ink-dis">
-                        {{ lesson.video_duration }}
-                    </p>
-
-                    <div v-if="lesson.video_transcript" class="mt-6">
-                        <button
-                            type="button"
-                            class="flex w-full items-center justify-between rounded-lg border border-line bg-surface-alt px-4 py-3 text-left text-sm font-semibold text-ink-pri"
-                            @click="transcriptOpen = !transcriptOpen"
-                        >
-                            <span>Transcript</span>
-                            <span class="text-ink-dis">{{ transcriptOpen ? '−' : '+' }}</span>
-                        </button>
-
-                        <div
-                            v-show="transcriptOpen"
-                            class="mt-2 max-h-96 overflow-y-auto rounded-lg border border-line p-4 text-sm leading-relaxed whitespace-pre-wrap text-ink-sec"
-                        >{{ lesson.video_transcript }}</div>
-                    </div>
-                </div>
 
                 <div v-else-if="lesson.type === 'pdf' && primaryResource" id="lesson-body">
                     <iframe
@@ -244,7 +231,13 @@ function toggleComplete() {
                         class="lesson-prose prose max-w-none"
                         v-html="lesson.content"
                     ></div>
-                    <p v-else class="text-sm text-ink-dis italic">
+                    <!-- Silent when the lesson is carried by its video: saying
+                         "no content" under a player the trainee just watched
+                         would be both wrong and rude. -->
+                    <p
+                        v-else-if="!lesson.video && !lesson.video_src"
+                        class="text-sm text-ink-dis italic"
+                    >
                         This lesson has no inline content — see the resources below.
                     </p>
                 </div>
