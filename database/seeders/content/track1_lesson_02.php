@@ -11,9 +11,9 @@
  */
 
 return [
-    'lesson_subtitle' => 'Interface and navigation',
+    'module_subtitle' => 'Interface and navigation',
 
-    'topics' => [
+    'lessons' => [
 
         // ─────────────────────────────────────────────────────────
         'Log in to the system' => [

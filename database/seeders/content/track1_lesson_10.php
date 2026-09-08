@@ -11,9 +11,9 @@
  */
 
 return [
-    'lesson_subtitle' => 'Additional modules and tools',
+    'module_subtitle' => 'Additional modules and tools',
 
-    'topics' => [
+    'lessons' => [
 
         // ─────────────────────────────────────────────────────────
         'Describe the Notifications module and its requirements' => [

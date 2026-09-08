@@ -12,9 +12,9 @@
  */
 
 return [
-    'lesson_subtitle' => 'User and rights management',
+    'module_subtitle' => 'User and rights management',
 
-    'topics' => [
+    'lessons' => [
 
         // ─────────────────────────────────────────────────────────
         'Create a new user with role "User"' => [

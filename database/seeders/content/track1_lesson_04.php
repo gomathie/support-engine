@@ -12,9 +12,9 @@
  */
 
 return [
-    'lesson_subtitle' => 'Working with objects (part 1)',
+    'module_subtitle' => 'Working with objects (part 1)',
 
-    'topics' => [
+    'lessons' => [
 
         // ─────────────────────────────────────────────────────────
         'Manually create a new object (car) with General + Info filled in' => [

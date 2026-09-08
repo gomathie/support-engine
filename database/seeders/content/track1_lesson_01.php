@@ -24,9 +24,9 @@
  */
 
 return [
-    'lesson_subtitle' => 'Introduction to PILOT and basic concepts',
+    'module_subtitle' => 'Introduction to PILOT and basic concepts',
 
-    'topics' => [
+    'lessons' => [
 
         // ─────────────────────────────────────────────────────────
         'Define: Object, Sensor, Contract, Account' => [

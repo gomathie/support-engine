@@ -11,9 +11,9 @@
  */
 
 return [
-    'lesson_subtitle' => 'Sensors (part 2)',
+    'module_subtitle' => 'Sensors (part 2)',
 
-    'topics' => [
+    'lessons' => [
 
         // ─────────────────────────────────────────────────────────
         'Set up a 3–4 point calibration table for the fuel sensor' => [

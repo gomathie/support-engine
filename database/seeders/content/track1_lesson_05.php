@@ -11,9 +11,9 @@
  */
 
 return [
-    'lesson_subtitle' => 'Working with objects (part 2) and object list',
+    'module_subtitle' => 'Working with objects (part 2) and object list',
 
-    'topics' => [
+    'lessons' => [
 
         // ─────────────────────────────────────────────────────────
         'Configure color status indicators' => [

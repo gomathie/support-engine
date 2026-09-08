@@ -26,7 +26,7 @@ use Illuminate\Support\Str;
  * ADDING THE NEXT LESSON
  *
  *   1. Copy `content/track1_lesson_01.php` to the next number.
- *   2. Set `lesson_subtitle` to the subtitle of the module it belongs to —
+ *   2. Set `module_subtitle` to the subtitle of the module it belongs to —
  *      matched on subtitle rather than title, because "Lesson 1" exists in more
  *      than one course.
  *   3. Key each entry by the lesson title already in the curriculum.
@@ -83,11 +83,11 @@ class LessonContentSeeder extends Seeder
     private function apply(array $content): void
     {
         $module = Module::query()
-            ->where('subtitle', $content['lesson_subtitle'])
+            ->where('subtitle', $content['module_subtitle'])
             ->first();
 
         if (! $module) {
-            $this->command?->warn('No module with subtitle: '.$content['lesson_subtitle']);
+            $this->command?->warn('No module with subtitle: '.$content['module_subtitle']);
 
             return;
         }

@@ -10,9 +10,9 @@
  */
 
 return [
-    'lesson_subtitle' => 'Review and consultation',
+    'module_subtitle' => 'Review and consultation',
 
-    'topics' => [
+    'lessons' => [
 
         // ─────────────────────────────────────────────────────────
         'Attend error review / Q&A session' => [

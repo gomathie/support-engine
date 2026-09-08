@@ -12,9 +12,9 @@
  */
 
 return [
-    'lesson_subtitle' => 'Contract settings and notifications',
+    'module_subtitle' => 'Contract settings and notifications',
 
-    'topics' => [
+    'lessons' => [
 
         // ─────────────────────────────────────────────────────────
         'Add a test email in contract settings and send confirmation' => [

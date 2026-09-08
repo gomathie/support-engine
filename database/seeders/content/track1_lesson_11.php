@@ -11,9 +11,9 @@
  */
 
 return [
-    'lesson_subtitle' => 'Comprehensive review and call simulation',
+    'module_subtitle' => 'Comprehensive review and call simulation',
 
-    'topics' => [
+    'lessons' => [
 
         // ─────────────────────────────────────────────────────────
         "Scenario: user can't log in — walk through diagnostic steps" => [

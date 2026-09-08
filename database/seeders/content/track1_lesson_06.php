@@ -11,9 +11,9 @@
  */
 
 return [
-    'lesson_subtitle' => 'Sensors (part 1)',
+    'module_subtitle' => 'Sensors (part 1)',
 
-    'topics' => [
+    'lessons' => [
 
         // ─────────────────────────────────────────────────────────
         'Add an ignition sensor (two-position); verify via Points tab' => [

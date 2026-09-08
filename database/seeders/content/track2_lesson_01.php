@@ -19,9 +19,9 @@
  */
 
 return [
-    'lesson_subtitle' => 'Interface familiarization and basic operations',
+    'module_subtitle' => 'Interface familiarization and basic operations',
 
-    'topics' => [
+    'lessons' => [
 
         // ─────────────────────────────────────────────────────────
         'Log into the Administrative Panel' => [

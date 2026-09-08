@@ -12,9 +12,9 @@
  */
 
 return [
-    'lesson_subtitle' => 'History and reports',
+    'module_subtitle' => 'History and reports',
 
-    'topics' => [
+    'lessons' => [
 
         // ─────────────────────────────────────────────────────────
         'Build 24h movement history for an object; review with the player' => [
