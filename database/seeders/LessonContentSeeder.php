@@ -9,6 +9,7 @@ use App\Models\Module;
 use App\Models\Lesson;
 use App\Models\PracticalTask;
 use App\Models\Quiz;
+use App\Models\QuizAnswer;
 use App\Models\QuizOption;
 use App\Models\QuizQuestion;
 use Illuminate\Database\Seeder;
@@ -200,7 +201,7 @@ class LessonContentSeeder extends Seeder
          */
         $already = Quiz::query()
             ->where('module_id', $module->getKey())
-            ->where('title', $quiz['title'])
+            ->whereNull('lesson_id')
             ->exists();
 
         if ($already && ! $this->overwriting()) {
@@ -209,13 +210,25 @@ class LessonContentSeeder extends Seeder
             return;
         }
 
+        /*
+         * Keyed on the module, not the title.
+         *
+         * A module has exactly one knowledge check — that is what this method
+         * is for. Keying on the title meant a retitle created a second one
+         * beside the first, and every published module-scoped quiz gates the
+         * course, so the duplicate did not sit quietly. It happened twice: the
+         * lesson-to-module rename produced thirteen of them, and then "Final
+         * Assessment" against "Final assessment" produced another. Keying on
+         * the module makes a retitle a rename.
+         */
         $record = Quiz::query()->updateOrCreate(
             [
                 'course_id' => $module->course_id,
                 'module_id' => $module->getKey(),
-                'title' => $quiz['title'],
+                'lesson_id' => null,
             ],
             [
+                'title' => $quiz['title'],
                 'description' => $quiz['description'] ?? null,
                 'passing_score' => $quiz['passing_score'] ?? 70,
                 'max_attempts' => $quiz['max_attempts'] ?? 3,
@@ -224,9 +237,7 @@ class LessonContentSeeder extends Seeder
             ],
         );
 
-        foreach ($quiz['questions'] as $position => $question) {
-            $this->seedQuestion($record, $question, $position + 1);
-        }
+        $this->seedQuestions($record, $quiz['questions']);
     }
 
     /**
@@ -240,21 +251,22 @@ class LessonContentSeeder extends Seeder
 
         $already = Quiz::query()
             ->where('lesson_id', $lesson->getKey())
-            ->where('title', $title)
             ->exists();
 
         if ($already && ! $this->overwriting()) {
             return;
         }
 
+        // Keyed on the lesson rather than the title, for the reason given on
+        // seedQuiz(): a lesson has one check, and a retitle must be a rename.
         $record = Quiz::query()->updateOrCreate(
             [
                 'course_id' => $lesson->course_id,
-                'module_id' => $lesson->module_id,
                 'lesson_id' => $lesson->getKey(),
-                'title' => $title,
             ],
             [
+                'title' => $title,
+                'module_id' => $lesson->module_id,
                 'description' => $quiz['description'] ?? null,
                 'passing_score' => $quiz['passing_score'] ?? 70,
                 'max_attempts' => $quiz['max_attempts'] ?? 3,
@@ -263,8 +275,59 @@ class LessonContentSeeder extends Seeder
             ],
         );
 
-        foreach ($quiz['questions'] as $position => $question) {
-            $this->seedQuestion($record, $question, $position + 1);
+        $this->seedQuestions($record, $quiz['questions']);
+    }
+
+    /**
+     * Write the paper, and take away what is no longer on it.
+     *
+     * Questions are matched by prompt, so rewording one adds a question rather
+     * than changing it. Without the prune, revising a quiz leaves the old
+     * questions in place beside the new ones — which is how a five-question
+     * check came to have nine, four of them asserting things the documentation
+     * does not say.
+     *
+     * A question somebody has answered is never removed.
+     * `quiz_answers.quiz_question_id` is `restrictOnDelete` deliberately:
+     * deleting a question must not rewrite the history of attempts graded
+     * against it. Those are left in place, and the count says so.
+     *
+     * @param  array<int, array<string, mixed>>  $questions
+     */
+    private function seedQuestions(Quiz $quiz, array $questions): void
+    {
+        foreach ($questions as $position => $question) {
+            $this->seedQuestion($quiz, $question, $position + 1);
+        }
+
+        $keep = collect($questions)->pluck('prompt')->all();
+
+        $superseded = QuizQuestion::query()
+            ->where('quiz_id', $quiz->getKey())
+            ->whereNotIn('prompt', $keep)
+            ->get();
+
+        $stranded = 0;
+
+        foreach ($superseded as $question) {
+            $answered = QuizAnswer::query()
+                ->where('quiz_question_id', $question->getKey())
+                ->exists();
+
+            if ($answered) {
+                $stranded++;
+
+                continue;
+            }
+
+            $question->options()->delete();
+            $question->forceDelete();
+        }
+
+        if ($stranded > 0) {
+            $this->command?->warn(
+                "  {$quiz->title}: {$stranded} superseded question(s) kept — they have been answered."
+            );
         }
     }
 
@@ -316,9 +379,26 @@ class LessonContentSeeder extends Seeder
                 continue;
             }
 
+            /*
+             * Matched on the slug, not the title.
+             *
+             * The slug is derived from the title on create and then never
+             * changes, and `practical_tasks.(course_id, slug)` is unique. Match
+             * on the title and a retitle is not an update: either it collides
+             * with the existing row's slug and the seeder dies, or it slips
+             * past and leaves two tasks where there was one. Both have happened
+             * — the same shape of bug as the course-slug duplicates in
+             * `2026_09_08_000420`.
+             *
+             * Matching on the slug means a reworded title updates the row it
+             * belongs to. Changing a task's *meaning* still needs a new title
+             * whose slug differs, which is the honest way to get a new task.
+             */
+            $slug = Str::slug(Str::limit($data['title'], 60, ''));
+
             $already = PracticalTask::query()
                 ->where('course_id', $module->course_id)
-                ->where('title', $data['title'])
+                ->where('slug', $slug)
                 ->exists();
 
             if ($already && ! $this->overwriting()) {
@@ -335,9 +415,10 @@ class LessonContentSeeder extends Seeder
             PracticalTask::query()->updateOrCreate(
                 [
                     'course_id' => $module->course_id,
-                    'title' => $data['title'],
+                    'slug' => $slug,
                 ],
                 [
+                    'title' => $data['title'],
                     'lesson_id' => $lessonId,
                     'brief' => $data['brief'] ?? '',
                     'submission_instructions' => $data['submission_instructions'] ?? null,

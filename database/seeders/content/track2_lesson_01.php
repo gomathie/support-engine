@@ -66,6 +66,37 @@ account, read the dashboard: whose organisation is this, what tariff are they on
 balance? A configuration change made against the wrong contract is difficult to notice and worse to
 undo.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Getting into the admin panel',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'A customer on the phone says "I am an administrator". What have they almost certainly told you?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Almost always they mean administrator in their personal account — full rights in the user portal, and nothing at all in the admin panel. Admin panel credentials are issued separately by the company manager.',
+                        'options' => [
+                            ['text' => 'That they have full rights in their personal account, not the admin panel', 'correct' => true],
+                            ['text' => 'That they can create contracts', 'correct' => false],
+                            ['text' => 'That they hold admin panel credentials', 'correct' => false],
+                            ['text' => 'That they are a partner', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'An object is blocked and the account balance is negative. What kind of problem is that?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The dashboard shows objects and statuses, the organisation, the balance and the tariff. Read together, a blocked object with a negative balance is a billing problem, not a device problem.',
+                        'options' => [
+                            ['text' => 'A billing problem', 'correct' => true],
+                            ['text' => 'A device problem', 'correct' => false],
+                            ['text' => 'A connectivity problem', 'correct' => false],
+                            ['text' => 'A rights problem', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -96,6 +127,25 @@ panel, means you can describe the path rather than guess at it.</p>
 customer's password is a different operation, performed against their user record, and is covered
 under user management.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Your own settings',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'Changing your password in the admin panel\'s personal user settings does what?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'It changes your own password. Resetting a customer\'s password is a different operation, performed against their user record under user management.',
+                        'options' => [
+                            ['text' => 'Changes your own password only', 'correct' => true],
+                            ['text' => 'Changes the password of every user on your contract', 'correct' => false],
+                            ['text' => 'Resets the customer\'s password as well', 'correct' => false],
+                            ['text' => 'Changes your personal account password too', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -142,6 +192,37 @@ on per contract. Video and Drivers are activated the same way as any other.</p>
 usually not a fault. It is a module that has not been activated on that contract, and it is fixed
 here rather than in the customer's account.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Creating a contract',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'In the admin panel, what is a "contract"?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'The documentation defines the contract as the account that is intended for work in the user interface — the workspace holding a customer\'s objects, users and entitlements. It is not a commercial document.',
+                        'options' => [
+                            ['text' => 'The account intended for work in the user interface', 'correct' => true],
+                            ['text' => 'The signed commercial agreement with the customer', 'correct' => false],
+                            ['text' => 'The billing record for a partner', 'correct' => false],
+                            ['text' => 'A group of objects sharing one tariff', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'A customer says the Notifications option is not in their menu. What is the most likely explanation?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'PILOT is modular and modules are switched on per contract. A missing option is usually an inactive module, fixed in the admin panel rather than in the customer\'s account.',
+                        'options' => [
+                            ['text' => 'The module has not been activated on their contract', 'correct' => true],
+                            ['text' => 'Their browser cache needs clearing', 'correct' => false],
+                            ['text' => 'Their objects are offline', 'correct' => false],
+                            ['text' => 'They are not an administrator in their personal account', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -231,6 +312,37 @@ question. Configurations govern, among others:</p>
 configurations rather than faults. Check what is set on the contract before escalating
 anything.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Adding a configuration',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'What are the steps to add a configuration?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Go to the relevant settings area — contract, partner or module — enter the configuration name and its value, and save, which activates it.',
+                        'options' => [
+                            ['text' => 'Go to the contract, partner or module settings; enter the name and value; save', 'correct' => true],
+                            ['text' => 'Raise a request with second line, who add it centrally', 'correct' => false],
+                            ['text' => 'Edit the object and add the key to its sensors', 'correct' => false],
+                            ['text' => 'Activate the matching module, which adds the key automatically', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'A customer complains "it blocked us even though we paid". Before escalating, what should you check?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Several odd-sounding complaints are configurations rather than faults — grace periods and blocking on a negative balance among them. Read what is set on the contract first.',
+                        'options' => [
+                            ['text' => 'What configurations are set on the contract', 'correct' => true],
+                            ['text' => 'Whether the device is reporting', 'correct' => false],
+                            ['text' => 'Whether the customer is using a supported browser', 'correct' => false],
+                            ['text' => 'Whether their partner has SMTP configured', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
 
         // ─────────────────────────────────────────────────────────
@@ -264,6 +376,37 @@ logged in, they may need to sign in again before it appears.</li>
 confirm the module is listed as active. "I clicked save" is not evidence — the same standard applies
 here as to anything you would tell a customer you had fixed.</p></blockquote>
 HTML,
+            'quiz' => [
+                'title' => 'Prepayment contract and the Drivers module',
+                'passing_score' => 70,
+                'max_attempts' => 3,
+                'questions' => [
+                    [
+                        'prompt' => 'You have created the contract and clicked save. What makes it done?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Open the contract again and confirm the module is listed as active. "I clicked save" is not evidence — the same standard applies here as to anything you would tell a customer you had fixed.',
+                        'options' => [
+                            ['text' => 'Reopening the contract and confirming the module is listed as active', 'correct' => true],
+                            ['text' => 'The save confirmation message appearing', 'correct' => false],
+                            ['text' => 'The customer being able to log in', 'correct' => false],
+                            ['text' => 'The contract ID being generated', 'correct' => false],
+                        ],
+                    ],
+                    [
+                        'prompt' => 'A customer is logged in when you activate a module for them, and says they still cannot see it. What do you suggest?',
+                        'type' => 'single_choice',
+                        'points' => 1,
+                        'explanation' => 'Activating a module changes what the customer sees in their personal account. If they are already logged in, they may need to sign in again before it appears.',
+                        'options' => [
+                            ['text' => 'That they sign out and sign in again', 'correct' => true],
+                            ['text' => 'That the module takes 24 hours to appear', 'correct' => false],
+                            ['text' => 'That they need a new contract', 'correct' => false],
+                            ['text' => 'That the module must be paid for first', 'correct' => false],
+                        ],
+                    ],
+                ],
+            ],
         ],
     ],
 

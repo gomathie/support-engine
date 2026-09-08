@@ -91,7 +91,17 @@ panel's views and is registered with `->viteTheme()`. **If you add Blade under a
 new directory in the panel, add an `@source` for it.** `AdminThemeTest` holds
 the three pieces together.
 
+**The content seeder matches by title, and a retitle is therefore a duplicate.**
+This has now bitten four times: course slugs (`2026_09_08_000420`), knowledge
+checks twice (`…000470`, `…000490`), and practical tasks (`…000480`). The
+seeder now keys knowledge checks on the module, lesson quizzes on the lesson,
+and practical tasks on the slug, so a retitle is a rename. **Keep it that way,
+and never add a title to a `updateOrCreate` match array.** A duplicate is not
+cosmetic: every published module-scoped quiz and every published practical task
+gates course completion, so the second copy doubles the requirement in silence.
+
 **Bash eats backslashes.**
+
  Writing PHP namespaces through `echo`/`sed`/heredocs
 in Git Bash has corrupted files repeatedly. Use the Write/Edit tools for PHP.
 
@@ -467,3 +477,62 @@ only ever invisible.
 **One rule added to §4a, from the user:** ignore the documentation's version
 numbers. Take docs.pilot-gps.com as you find it — newer page where there is
 one, the older page where there is not.
+
+### 2026-09-08 — Admin panel content, and the duplicates under it (Claude)
+
+**The course is written.** All 30 lessons of Admin panel now have bodies, and
+26 of them carry a quiz — the four without are the four topics the
+documentation does not support. 4 module knowledge checks, 26 lesson quizzes,
+4 practical tasks.
+
+Modules 2, 3 and 4 were rewritten from the documentation. The drafts they
+replaced averaged about 300 characters a lesson and several of their facts were
+not in the docs at all. What the sources actually say:
+
+| Claim in the draft | What docs.pilot-gps.com says |
+| --- | --- |
+| "Go to the Objects tab, find the object by ID or IMEI, change its contract" | **Vehicles → Edit → the `Account` field**, and the transfer carries all the entered parameters |
+| "Add the speed limit configuration key to the object" | **There is no speed configuration.** Speeding is a *notification*, needing the Notification module |
+| "Activate the Geofences module" | The module is called **Geozone** |
+| "Configure mileage by CAN" as a parameter | **CAN Mileage is a sensor type**, added to the object |
+| "Historical data remains with the object" (a quiz answer) | Not documented anywhere |
+
+Four topics are now `needs_input` rather than answered: *stock account*,
+*account types*, *speed-control configuration* and *which configurations
+control speed limits*. The last two are the same finding — the question has no
+correct answer, and the lesson says so and gives the answer to use instead.
+Two more carry partial content plus a `needs_input` note: the **block date**
+(the two blocks and the grace period are documented; a date field is not) and
+the **low-balance email template** (the `Low Balance Emails` configuration key
+is documented; no template is named).
+
+**Three duplicate-by-retitle bugs, found on the way and all live:**
+
+- **Thirteen duplicate knowledge checks.** The lesson-to-module rename meant
+  "Lesson 7 — knowledge check" no longer matched the content file's "Module 7 —
+  knowledge check", so the next seed created a second one beside it. Both
+  published, both module-scoped, and **every published module-scoped quiz gates
+  the course** — 1st-line support had silently gone from 12 knowledge checks to
+  24, the same questions twice each. `2026_09_08_000470`.
+- **Then a fourteenth**, on "Final Assessment" against "Final assessment".
+  `2026_09_08_000490` clears any module carrying more than one, and the seeder
+  now keys on the module so a retitle is a rename.
+- **Practical tasks the same way.** Retitling one either collided with the
+  existing row's slug and killed the seeder mid-run, or slipped past and left
+  two tasks gating the course. Now keyed on the slug. `2026_09_08_000480`
+  retires the two Admin panel tasks written against the invented speed
+  configuration and the undocumented low-balance template.
+
+**And one that was hiding behind them:** re-seeding a revised quiz *added* its
+questions instead of replacing them, because questions are matched by prompt.
+Two Admin panel checks were sitting at nine questions — five current, four
+superseded. `seedQuestions()` now prunes what the file no longer names, and
+never touches a question somebody has answered.
+
+`KnowledgeCheckUniquenessTest` runs the seeder twice and asserts the second run
+changed nothing — count of checks, count of lesson quizzes, and count of
+questions per quiz. That is the property that actually matters, and it had
+never been asserted.
+
+**Still empty:** Onboarding (12 lessons) and Support skills (23). Neither has a
+single body, a quiz or a docs reference.
