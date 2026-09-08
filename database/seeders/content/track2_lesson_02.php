@@ -10,7 +10,7 @@
  */
 
 return [
-    'module_subtitle' => 'Objects, Partners, and Finances',
+    'module_subtitle' => 'Objects, partners, and finances',
 
     'lessons' => [
         // 1

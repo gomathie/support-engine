@@ -8,7 +8,7 @@
  */
 
 return [
-    'module_subtitle' => 'Combined Assessment',
+    'module_subtitle' => 'Combined assessment',
 
     'lessons' => [
         // 1

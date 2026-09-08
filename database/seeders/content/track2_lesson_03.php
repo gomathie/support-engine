@@ -11,7 +11,7 @@
  */
 
 return [
-    'module_subtitle' => 'Modules, Notifications, Security, Rebranding',
+    'module_subtitle' => 'Modules, notifications, security, rebranding',
 
     'lessons' => [
         // 1

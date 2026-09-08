@@ -85,8 +85,17 @@ class LessonContentSeeder extends Seeder
     /** @param  array<string, mixed>  $content */
     private function apply(array $content): void
     {
+        /*
+         * Matched case-insensitively on purpose.
+         *
+         * A content file naming "Objects, Partners, and Finances" against a
+         * module recorded as "Objects, partners, and finances" is the same
+         * module, and three lessons' worth of writing sat unapplied behind
+         * exactly that. The seeder prints a warning and carries on, so the only
+         * symptom is a course that stays empty.
+         */
         $module = Module::query()
-            ->where('subtitle', $content['module_subtitle'])
+            ->whereRaw('lower(subtitle) = ?', [mb_strtolower(trim($content['module_subtitle']))])
             ->first();
 
         if (! $module) {
