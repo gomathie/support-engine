@@ -24,6 +24,10 @@ use Illuminate\Support\Facades\DB;
  */
 class AwardCompetencyLevel
 {
+    public function __construct(
+        private readonly ScheduleRefreshers $refreshers,
+    ) {}
+
     /**
      * Evaluate every (level, area) pair this course contributes to.
      *
@@ -70,7 +74,7 @@ class AwardCompetencyLevel
                 return null;
             }
 
-            return TraineeLevel::query()->create([
+            $award = TraineeLevel::query()->create([
                 'user_id' => $user->getKey(),
                 'level_id' => $levelId,
                 'competency_area_id' => $areaId,
@@ -81,6 +85,18 @@ class AwardCompetencyLevel
 
                 'quiz_attempt_id' => $this->evidenceAttemptId($user, $levelId, $areaId),
             ]);
+
+            /*
+             * The 30- and 90-day refreshers go in the diary now, while the exam
+             * score that earned the level is still to hand (PA-18).
+             *
+             * Scheduling them here rather than on a nightly sweep means the
+             * baseline is captured at the moment of the award, and a refresher
+             * cannot be missed because a job did not run.
+             */
+            $this->refreshers->handle($award);
+
+            return $award;
         });
     }
 
