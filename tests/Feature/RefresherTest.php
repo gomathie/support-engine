@@ -12,6 +12,7 @@ use App\Actions\Quiz\StartQuizAttempt;
 use App\Actions\Reporting\CalculateKpis;
 use App\Enums\QuestionType;
 use App\Enums\RefresherStatus;
+use App\Filament\Resources\Refreshers\RefresherResource;
 use App\Models\CompetencyArea;
 use App\Models\Course;
 use App\Models\Lesson;
@@ -500,6 +501,33 @@ class RefresherTest extends TestCase
         $kpi = app(CalculateKpis::class)->handle()->firstWhere('number', 6);
 
         $this->assertNull($kpi['value'], 'Only the 90-day refresher feeds the 90-day metric.');
+    }
+
+    // ─── ADMIN VISIBILITY ────────────────────────────────────
+
+    /**
+     * KPI 6 gives one number for the organisation. This is the same data with
+     * names against it, which is the half somebody can act on.
+     */
+    public function test_the_admin_list_renders_and_scopes_to_the_cohort(): void
+    {
+        $user = $this->trainee();
+        $this->awardLevel($user, $this->courseWithBank());
+
+        $this->actingAs($this->admin())
+            ->get(RefresherResource::getUrl('index'))
+            ->assertSuccessful();
+
+        // A trainee has no business in the panel at all.
+        $this->actingAs($user)
+            ->get(RefresherResource::getUrl('index'))
+            ->assertForbidden();
+    }
+
+    /** Refreshers are records of something that happened, not rows to author. */
+    public function test_refreshers_cannot_be_created_by_hand(): void
+    {
+        $this->assertFalse(RefresherResource::canCreate());
     }
 
     // ─── THE THING THAT MUST NOT HAPPEN ──────────────────────

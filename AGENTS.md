@@ -125,7 +125,7 @@ Branch: `main`, with `hub-version2` kept in step with it. (`hub-version2` is the
 old `feat/competency-phase-0-rbac`, renamed 2026-09-08 and fast-forwarded into
 `main` the same day. Nothing has been pushed — `main` is ahead of `gitlab/main`.)
 
-**Suite: 371 passing, 1271 assertions** as of the last full green run.
+**Suite: 374 passing, 1276 assertions** as of the last full green run.
 
 | Ticket | State |
 | --- | --- |
@@ -672,3 +672,13 @@ The trainee sees it on the dashboard — nowhere else would do, since a refreshe
 arrives when they have no reason to be looking at that course at all — and the
 result screen shows every question with its explanation, right or wrong. The
 wrong ones are the entire point.
+
+**Refreshers have an admin list** (`Reporting → Refreshers`), added the same
+day. KPI 6 gives one number for the organisation; this is the same data with
+names against it, which is the half somebody can act on. Read-only on purpose —
+scheduling is done by the award, marking by the trainee sitting it, and editing
+a score afterwards would make the retention figure a matter of opinion. A
+trainer sees their own cohort, an admin sees everybody, which is the line the
+grading queue already draws. The filter worth knowing is **Below the retention
+target**: a cluster in one area is a finding about the material, not about the
+people.
