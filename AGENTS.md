@@ -125,7 +125,7 @@ Branch: `main`, with `hub-version2` kept in step with it. (`hub-version2` is the
 old `feat/competency-phase-0-rbac`, renamed 2026-09-08 and fast-forwarded into
 `main` the same day. Nothing has been pushed — `main` is ahead of `gitlab/main`.)
 
-**Suite: 374 passing, 1276 assertions** as of the last full green run.
+**Suite: 373 passing, 1272 assertions** as of the last full green run.
 
 | Ticket | State |
 | --- | --- |
