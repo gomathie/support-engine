@@ -2,6 +2,7 @@
 
 namespace App\Actions\Reporting;
 
+use App\Enums\RefresherStatus;
 use App\Enums\Role;
 use App\Enums\SubmissionStatus;
 use App\Models\User;
@@ -169,16 +170,67 @@ class CalculateKpis
         ];
     }
 
-    /** KPI 6 — needs the spaced-repetition refreshers from PA-18. */
+    /**
+     * KPI 6 — how much of the original score survives ninety days.
+     *
+     * Reads the 90-day refreshers (PA-18) that have been sat and that have a
+     * baseline to be a percentage of. Two exclusions, both deliberate:
+     *
+     *   · **30-day refreshers are not counted.** The metric is named for ninety
+     *     days, and averaging the earlier one in would flatter it.
+     *   · **Missed refreshers are not scored as zero.** A refresher nobody sat
+     *     measures the process, not the person's retention, and counting it as
+     *     nought would report a collapse that has not been observed. The count
+     *     of missed ones is surfaced in the note instead, because a metric
+     *     computed from half the cohort should say so.
+     */
     private function retentionAt90Days(): array
     {
-        return $this->notMeasurable(
-            6,
-            '90-day retention',
-            'Refresher score at day 90 vs original exam score',
-            'Over 75% of the original',
-            'Refreshers do not exist yet (PA-18). Without a second measurement there is nothing to compare the original score against.',
-        );
+        $label = '90-day retention';
+        $definition = 'Refresher score at day 90 vs original exam score';
+        $target = 'Over 75% of the original';
+
+        $sat = DB::table('refreshers')
+            ->where('interval_days', 90)
+            ->where('status', RefresherStatus::Completed->value)
+            ->whereNotNull('retention');
+
+        $count = (clone $sat)->count();
+
+        if ($count === 0) {
+            $scheduled = DB::table('refreshers')->where('interval_days', 90)->count();
+
+            return $this->awaitingData(
+                6,
+                $label,
+                $definition,
+                $target,
+                $scheduled === 0
+                    ? 'No level has been held long enough for a 90-day refresher to fall due.'
+                    : $scheduled.' are scheduled; none has been sat yet.',
+            );
+        }
+
+        $mean = round((float) (clone $sat)->avg('retention'), 1);
+
+        $missed = DB::table('refreshers')
+            ->where('interval_days', 90)
+            ->where('status', RefresherStatus::Missed->value)
+            ->count();
+
+        return [
+            'number' => 6,
+            'label' => $label,
+            'definition' => $definition,
+            'value' => $mean.'%',
+            'target' => $target,
+            'status' => $mean > 75 ? 'on_target' : 'below',
+            'note' => $mean > 75
+                ? 'What was learned is still held ninety days later.'
+                : 'Knowledge is fading faster than the target allows. That points at the teaching or the spacing, not at the cohort — people forget on a schedule, and the fix is reinforcement rather than a harder exam.',
+            'sample' => $count.' sat'.($missed > 0 ? ', '.$missed.' missed and not counted' : ''),
+            'cadence' => 'Quarterly',
+        ];
     }
 
     /**

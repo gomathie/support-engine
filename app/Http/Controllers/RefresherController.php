@@ -45,12 +45,16 @@ class RefresherController extends Controller
 
             'questions' => $answers
                 ->filter(fn ($answer) => $answer->question !== null)
+                // Shaped exactly like the quiz Take payload, so the same
+                // QuizQuestion component renders both. `multiple` is the key
+                // that component reads.
                 ->map(fn ($answer) => [
                     'id' => $answer->question->id,
                     'position' => $answer->position,
                     'prompt' => $answer->question->prompt,
                     'type' => $answer->question->type->value,
-                    'allows_multiple' => $answer->question->type->allowsMultipleSelections(),
+                    'points' => $answer->question->points,
+                    'multiple' => $answer->question->type->allowsMultipleSelections(),
                     'options' => $answer->question->options
                         ->map(fn ($option) => [
                             'id' => $option->id,

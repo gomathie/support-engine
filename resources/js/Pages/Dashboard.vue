@@ -19,6 +19,7 @@ const props = defineProps({
     stats: { type: Object, required: true },
     courses: { type: Array, default: () => [] },
     due_soon: { type: Array, default: () => [] },
+    refreshers_due: { type: Array, default: () => [] },
     recent_results: { type: Array, default: () => [] },
     recommended: { type: Array, default: () => [] },
     certificates_count: { type: Number, default: 0 },
@@ -119,6 +120,36 @@ const finished = computed(() => props.courses.filter((c) => c.status === 'comple
                 :tone="certificates_count > 0 ? 'positive' : 'default'"
             />
         </div>
+
+        <!-- ─── REFRESHERS ─────────────────────────────────
+             A refresher arrives 30 and 90 days after a course was finished,
+             when the trainee has no reason to be looking at that course at
+             all. If it is not surfaced here it is not surfaced anywhere. -->
+        <section v-if="refreshers_due.length" class="mb-8">
+            <h2 class="mb-1 text-lg font-bold text-navy">Refreshers</h2>
+            <p class="mb-3 text-sm text-ink-sec">
+                Five questions on something you were signed off on. Not an exam — nothing you hold
+                depends on it.
+            </p>
+
+            <div class="card divide-y divide-line overflow-hidden">
+                <a
+                    v-for="item in refreshers_due"
+                    :key="item.id"
+                    :href="item.url"
+                    class="flex items-center gap-3 px-5 py-3.5 no-underline transition-colors hover:bg-surface-alt"
+                >
+                    <span class="min-w-0 flex-1">
+                        <span class="block text-sm font-medium text-ink">{{ item.label }}</span>
+                        <span v-if="item.area" class="block text-xs text-ink-dis">
+                            {{ item.level }} · {{ item.area }}
+                        </span>
+                    </span>
+
+                    <StatusPill :label="`Open to ${formatDate(item.closes_at)}`" tone="warning" />
+                </a>
+            </div>
+        </section>
 
         <!-- ─── DUE SOON ───────────────────────────────────── -->
         <section v-if="due_soon.length" class="mb-8">

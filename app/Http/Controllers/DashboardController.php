@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\CourseProgress;
 use App\Models\Lesson;
 use App\Models\QuizAttempt;
+use App\Models\Refresher;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -76,6 +77,31 @@ class DashboardController extends Controller
                 'due_at' => $enrollment->due_at?->toIso8601String(),
                 'is_overdue' => $enrollment->isOverdue(),
             ])->all(),
+
+            /*
+             * Refreshers that have fallen due and are still inside their
+             * window (PA-18).
+             *
+             * On the dashboard rather than anywhere else because a refresher
+             * is not attached to a course a trainee is working through — it
+             * arrives thirty and ninety days after they finished one, when
+             * they have no reason to be looking at that course at all. If it is
+             * not here, it is nowhere.
+             */
+            'refreshers_due' => Refresher::query()
+                ->where('user_id', $user->id)
+                ->open()
+                ->with('traineeLevel.level', 'traineeLevel.competencyArea')
+                ->orderBy('due_at')
+                ->get()
+                ->map(fn (Refresher $refresher) => [
+                    'id' => $refresher->id,
+                    'label' => $refresher->label(),
+                    'area' => $refresher->traineeLevel?->competencyArea?->name,
+                    'level' => $refresher->traineeLevel?->level?->name,
+                    'closes_at' => $refresher->closesAt()->toIso8601String(),
+                    'url' => route('refreshers.show', $refresher),
+                ])->all(),
 
             'recent_results' => QuizAttempt::query()
                 ->where('user_id', $user->id)

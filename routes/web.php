@@ -11,6 +11,7 @@ use App\Http\Controllers\PracticalTaskController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProgressController;
 use App\Http\Controllers\QuizController;
+use App\Http\Controllers\RefresherController;
 use App\Http\Controllers\ResourceDownloadController;
 use App\Http\Controllers\SupportPanelController;
 use Illuminate\Support\Facades\Route;
@@ -92,6 +93,16 @@ Route::middleware(['auth', 'active'])->group(function (): void {
         ->name('quizzes.submit');
     Route::get('attempts/{attempt}', [QuizController::class, 'result'])
         ->name('attempts.show');
+
+    // ----------------------------------------------------------- refreshers
+    // Spaced repetition (PA-18). Not nested under a course: a refresher is
+    // drawn from every course a level required, so no single course owns it.
+    Route::get('refreshers/{refresher}', [RefresherController::class, 'show'])
+        ->name('refreshers.show');
+    Route::post('refreshers/{refresher}/submit', [RefresherController::class, 'submit'])
+        ->name('refreshers.submit');
+    Route::get('refreshers/{refresher}/result', [RefresherController::class, 'result'])
+        ->name('refreshers.result');
 
     // ------------------------------------------------------------- progress
     Route::get('my-progress', [ProgressController::class, 'index'])->name('progress.index');
