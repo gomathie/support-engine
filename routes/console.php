@@ -1,5 +1,6 @@
 <?php
 
+use App\Console\Commands\CloseLapsedRefreshers;
 use App\Console\Commands\SendTrainingReminders;
 use Illuminate\Support\Facades\Schedule;
 
@@ -21,4 +22,12 @@ Schedule::command(SendTrainingReminders::class)
 // have. Idempotent, so running it often costs nothing.
 Schedule::command('training:sync-assignments')
     ->hourly()
+    ->withoutOverlapping();
+
+// Refreshers that fell due and were never sat. Daily is often enough — the
+// window is three weeks — and leaving them open for ever would both nag the
+// trainee with a stale link and let KPI 6 report a retention figure without
+// saying how much of the cohort it was computed from.
+Schedule::command(CloseLapsedRefreshers::class)
+    ->dailyAt('02:00')
     ->withoutOverlapping();

@@ -121,10 +121,11 @@ docker compose exec app php artisan test --filter=SomeTest
 
 ## 4. Where things stand
 
-Branch: `feat/competency-phase-0-rbac`. The user commits themselves — **do not
-commit unless asked.**
+Branch: `main`, with `hub-version2` kept in step with it. (`hub-version2` is the
+old `feat/competency-phase-0-rbac`, renamed 2026-09-08 and fast-forwarded into
+`main` the same day. Nothing has been pushed — `main` is ahead of `gitlab/main`.)
 
-**Suite: 261 passing, 891 assertions** as of the last full green run.
+**Suite: 371 passing, 1271 assertions** as of the last full green run.
 
 | Ticket | State |
 | --- | --- |
@@ -135,8 +136,9 @@ commit unless asked.**
 | PA-13 reassignment UI | Done |
 | PA-14 practical tasks + rubric | Done, both sides |
 | PA-19 KPI dashboard | Done — 5 of 9 metrics reporting |
-| PA-18 spaced repetition | **Not started** — the only remaining dev ticket |
-| PA-5/6/7 content audit | **Not started** — Igor. The real bottleneck. |
+| PA-18 spaced repetition | Done — 30- and 90-day refreshers, and KPI 6 with them |
+| PA-19 KPI dashboard | **6 of 9 metrics reporting**, up from 5 |
+| PA-5/6/7 content audit | **Now possible.** The 105 lessons it audits exist as of 2026-09-08 |
 | PA-1/2 server + queue | **Not started** — Nazih |
 
 ---
@@ -629,3 +631,44 @@ which is real.
 That table is the shopping list. Every row is a fact somebody at the company
 holds and nobody has written down, and every one of them is currently a hole a
 trainee can see.
+
+### 2026-09-08 — Spaced repetition, and the sixth metric (Claude)
+
+PA-18, the last open dev ticket. §2 asks for "a 5-question refresher at 30 and
+90 days, drawn from the passed level's bank" — and KPI 6, *90-day retention*,
+has been reporting **not measurable** since the dashboard was built, because
+nothing produced a second measurement to compare the first against. It reports
+now.
+
+**Refreshers are not `Quiz` rows, and that was the whole design decision.**
+Modelling them as quizzes would have reused the entire engine for free, and it
+would have been a disaster: a course-scoped quiz with no module and no lesson
+*is* the course's final exam as far as `Course::finalQuizzes()`,
+`RecalculateCourseProgress` and `QuizPolicy` are concerned — so every refresher
+would have silently re-opened a course the trainee finished three months
+earlier. Three bugs of exactly that shape were fixed earlier the same day.
+`refreshers` and `refresher_answers` keep them out of every gating query by
+construction, and a test asserts a refresher creates no quiz.
+
+Two decisions that decide whether the metric means anything:
+
+- **The baseline is frozen at the award.** KPI 6 is a percentage *of the
+  original exam score*. Looked up at measurement time, a re-sat exam or a
+  revised paper would move the denominator underneath the comparison, and
+  retention would change without anybody's knowledge changing.
+- **A missed refresher is not a zero.** It measures the process, not the
+  person. Averaging it in as nought would report a collapse nobody has
+  observed. `training:close-lapsed-refreshers` marks them missed after the
+  three-week window, and the KPI's sample line says how many were excluded —
+  a figure computed from half a cohort should say so.
+
+Also: questions are drawn **when the refresher is sat**, not when it was
+scheduled ninety days earlier, so it asks about the material as it stands; and
+only auto-marked questions are eligible, because a written one would put a
+trainer on a marking queue that grows with headcount and never ends. KPI 7
+already watches trainer workload as a burnout signal.
+
+The trainee sees it on the dashboard — nowhere else would do, since a refresher
+arrives when they have no reason to be looking at that course at all — and the
+result screen shows every question with its explanation, right or wrong. The
+wrong ones are the entire point.
