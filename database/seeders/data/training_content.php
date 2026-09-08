@@ -7,8 +7,8 @@
 | The prototype's shape maps straight onto the new hierarchy:
 |
 |   section  ->  Course        (flag becomes the category)
-|   day      ->  Lesson  (n = title, t = subtitle, topics = description)
-|   item     ->  Topic        (completion_requirement = acknowledge)
+|   day      ->  Module  (n = title, t = subtitle, lessons = description)
+|   item     ->  Lesson        (completion_requirement = acknowledge)
 |
 | Content, not code: this file is the seed for a first install. Once it is in
 | the database, trainers edit it in the admin panel and this file is not
@@ -26,12 +26,12 @@ return [
         'difficulty' => 'beginner',
         'is_required' => true,
         'estimated_minutes' => 120,
-        'lessons' => [
+        'modules' => [
             [
                 'title' => 'Ticketing System Basics',
                 'subtitle' => 'Navigating Zendesk and Jira',
                 'description' => 'Learn how to create, update, and manage tickets efficiently.',
-                'topics' => [
+                'lessons' => [
                     'Introduction to the ticketing interface',
                     'Required fields for Sev-1 vs Sev-3 tickets',
                     'How to properly link Jira issues to customer tickets',
@@ -42,7 +42,7 @@ return [
                 'title' => 'Service Level Agreements (SLAs)',
                 'subtitle' => 'Understanding our commitments',
                 'description' => 'How quickly we must respond to and resolve customer issues.',
-                'topics' => [
+                'lessons' => [
                     'Priority definitions: P1, P2, P3, and P4',
                     'First-response time targets by priority',
                     'Resolution time targets and escalation paths',
@@ -53,7 +53,7 @@ return [
                 'title' => 'Data Privacy & Security',
                 'subtitle' => 'Protecting customer information',
                 'description' => 'Best practices for handling sensitive PII (Personally Identifiable Information).',
-                'topics' => [
+                'lessons' => [
                     'GDPR and CCPA basics for support agents',
                     'How to verify a caller\'s identity before sharing account details',
                     'Redacting sensitive data (passwords, credit cards) from tickets',
@@ -73,22 +73,22 @@ return [
         'is_required' => true,
         'estimated_minutes' => 2400,
         'due_days' => 21,
-        'lessons' => [
+        'modules' => [
             [
-                'title' => 'Topic 1',
+                'title' => 'Module 1',
                 'subtitle' => 'Introduction to PILOT and basic concepts',
                 'description' => 'Object, Sensor, Contract, Account, Alert, Geofence; roles (User / Admin / Super Admin).',
-                'topics' => [
+                'lessons' => [
                     'Define: Object, Sensor, Contract, Account',
                     'Explain Personal Account vs Admin Panel',
                     'Explain what a Mapping Contract is and its use case',
                 ],
             ],
             [
-                'title' => 'Topic 2',
+                'title' => 'Module 2',
                 'subtitle' => 'Interface and navigation',
                 'description' => 'Top panel, workspace, map, map tools.',
-                'topics' => [
+                'lessons' => [
                     'Log in to the system',
                     'Describe each element of the top panel',
                     'Change map type to Yandex Sat',
@@ -96,10 +96,10 @@ return [
                 ],
             ],
             [
-                'title' => 'Topic 3',
+                'title' => 'Module 3',
                 'subtitle' => 'User and rights management',
                 'description' => 'Creating users, assigning rights to objects/labels, rights templates.',
-                'topics' => [
+                'lessons' => [
                     'Create a new user with role "User"',
                     'Assign rights to 2 test objects',
                     'Create a rights template for the role',
@@ -107,20 +107,20 @@ return [
                 ],
             ],
             [
-                'title' => 'Topic 4',
+                'title' => 'Module 4',
                 'subtitle' => 'Working with objects (part 1)',
                 'description' => 'Object card, mandatory fields, device IMEI.',
-                'topics' => [
+                'lessons' => [
                     'Manually create a new object (car) with General + Info filled in',
                     'Assign a tag and place it in a group',
                     'Find "Current Track" and "Follow Object" via right-click menu',
                 ],
             ],
             [
-                'title' => 'Topic 5',
+                'title' => 'Module 5',
                 'subtitle' => 'Working with objects (part 2) and object list',
                 'description' => 'Filtering, sorting, columns, groups, color indicators.',
-                'topics' => [
+                'lessons' => [
                     'Configure color status indicators',
                     'Create group "Test Vehicles" and move objects into it',
                     'Configure columns: Name, Speed, Status, Driver',
@@ -128,59 +128,59 @@ return [
                 ],
             ],
             [
-                'title' => 'Topic 6',
+                'title' => 'Module 6',
                 'subtitle' => 'Sensors (part 1)',
                 'description' => 'Sensor types by purpose and by principle of operation.',
-                'topics' => [
+                'lessons' => [
                     'Add an ignition sensor (two-position); verify via Points tab',
                     'Add a fuel level sensor (discrete) and fill main parameters',
                 ],
             ],
             [
-                'title' => 'Topic 7',
+                'title' => 'Module 7',
                 'subtitle' => 'Sensors (part 2)',
                 'description' => 'Calibration tables, formulas, sensor templates.',
-                'topics' => [
+                'lessons' => [
                     'Set up a 3–4 point calibration table for the fuel sensor',
                     'Apply formula /1000 to the battery voltage sensor',
                     'Save sensor config as a template and apply it to another object',
                 ],
             ],
             [
-                'title' => 'Topic 8',
+                'title' => 'Module 8',
                 'subtitle' => 'History and reports',
                 'description' => 'Track/player/events/graph, report types and parameters.',
-                'topics' => [
+                'lessons' => [
                     'Build 24h movement history for an object; review with the player',
                     'Create a "Mileage and Stops" report for yesterday',
                     'Save the report in PDF and Excel formats',
                 ],
             ],
             [
-                'title' => 'Topic 9',
+                'title' => 'Module 9',
                 'subtitle' => 'Contract settings and notifications',
                 'description' => 'Password/email settings, 2FA, notification types.',
-                'topics' => [
+                'lessons' => [
                     'Add a test email in contract settings and send confirmation',
                     'Activate "Speed Limit Exceeded" email notifications',
                     'Enable and configure 2FA for the test user (if available)',
                 ],
             ],
             [
-                'title' => 'Topic 10',
+                'title' => 'Module 10',
                 'subtitle' => 'Additional modules and tools',
                 'description' => 'Modular architecture, report scheduler, tokens.',
-                'topics' => [
+                'lessons' => [
                     'Describe the Notifications module and its requirements',
                     "Explain what a Token is and when it's used",
                     'Describe what a user can do with the Report Scheduler',
                 ],
             ],
             [
-                'title' => 'Topic 11',
+                'title' => 'Module 11',
                 'subtitle' => 'Comprehensive review and call simulation',
                 'description' => 'Applying knowledge to realistic support scenarios.',
-                'topics' => [
+                'lessons' => [
                     "Scenario: user can't log in — walk through diagnostic steps",
                     'Scenario: object missing from list — walk through diagnostic steps',
                     'Scenario: speed notifications not received — walk through diagnostic steps',
@@ -188,12 +188,33 @@ return [
                 ],
             ],
             [
-                'title' => 'Topic 12',
-                'subtitle' => 'Final testing and consultation',
-                'description' => 'Assessment and open Q&A.',
-                'topics' => [
+                'title' => 'Module 12',
+                'subtitle' => 'Review and consultation',
+                'description' => 'Open Q&A and working a non-standard case end to end.',
+                'lessons' => [
                     'Attend error review / Q&A session',
                     'Resolve one non-standard case using documentation',
+                ],
+            ],
+
+            /*
+             * The examination is its own module.
+             *
+             * It previously shared "Final testing and consultation" with the
+             * review lessons, which put four separate sittings behind one
+             * heading — the two lesson quizzes, the module's knowledge check and
+             * Section A, with B and C waiting behind them. Sitting an exam and
+             * reviewing your mistakes are different activities and read badly
+             * when stacked in one unit.
+             */
+            [
+                'title' => 'Final examination',
+                'subtitle' => 'PILOT Technical Support Employee Examination',
+                'description' => 'The official examination. Section A is live; '
+                    .'Sections B and C are authored and awaiting a decision on whether '
+                    .'Level 1 requires them.',
+                'lessons' => [
+                    'Before you sit the examination',
                 ],
             ],
         ],
@@ -207,12 +228,12 @@ return [
         'difficulty' => 'intermediate',
         'is_required' => false,
         'estimated_minutes' => 1440,
-        'lessons' => [
+        'modules' => [
             [
-                'title' => 'Topic 1',
+                'title' => 'Module 1',
                 'subtitle' => 'Interface familiarization and basic operations',
                 'description' => 'Panel structure, personal settings, contracts.',
-                'topics' => [
+                'lessons' => [
                     'Log into the Administrative Panel',
                     'Update personal settings (name, password, photo)',
                     'Create a new contract, activate modules (e.g. Video, Drivers), save',
@@ -223,10 +244,10 @@ return [
                 ],
             ],
             [
-                'title' => 'Topic 2',
+                'title' => 'Module 2',
                 'subtitle' => 'Objects, partners, and finances',
                 'description' => 'Object transfer/configuration, partner setup, payments.',
-                'topics' => [
+                'lessons' => [
                     'Transfer an object into the created contract',
                     'Add a tariff to the object',
                     'Configure blocking with a block date',
@@ -241,10 +262,10 @@ return [
                 ],
             ],
             [
-                'title' => 'Topic 3',
+                'title' => 'Module 3',
                 'subtitle' => 'Modules, notifications, security, rebranding',
                 'description' => 'Geofences, email templates, 2FA, white-labeling.',
-                'topics' => [
+                'lessons' => [
                     'Activate the Geofences module for a contract',
                     'Configure an email template for low balance notifications',
                     'Enable 2FA for a partner (TOTP or email)',
@@ -259,7 +280,7 @@ return [
                 'title' => 'Final assessment',
                 'subtitle' => 'Combined assessment',
                 'description' => 'End-to-end tasks covering all three days.',
-                'topics' => [
+                'lessons' => [
                     'Create a prepaid contract, add an object, configure mileage by CAN',
                     'Create a partner, assign a contract, configure SMTP',
                     'Activate the Video module, configure streaming in a new tab',
@@ -279,12 +300,12 @@ return [
         'is_required' => true,
         'estimated_minutes' => 1200,
         'due_days' => 30,
-        'lessons' => [
+        'modules' => [
             [
                 'title' => 'Module A',
                 'subtitle' => 'Communication with customers',
                 'description' => 'Acknowledge → Diagnose → Act → Close. The question ladder, difficult conversations, ticket notes.',
-                'topics' => [
+                'lessons' => [
                     'Question drill: 5 questions before proposing a cause (×5 symptoms)',
                     'Rewrite 5 manual sentences for a non-technical fleet manager',
                     'Role-play: angry customer, vehicle dark all weekend — full cycle',
@@ -297,7 +318,7 @@ return [
                 'subtitle' => 'Troubleshooting methodology',
                 'description' => 'Three instruments (Sensors tracing, Audit history, Admin reports). '
                     .'The 7-layer model. Master-status trap. Recalculate.',
-                'topics' => [
+                'lessons' => [
                     'Instrument drill: Sensors tracing — last reception, satellites, sensor value, under a minute',
                     "Instrument drill: find an object's last settings change in Audit history",
                     'Layer sorting: 15 symptoms → layer + first check',
@@ -313,7 +334,7 @@ return [
                 'subtitle' => 'Support workflows and escalation',
                 'description' => 'Ticket lifecycle, team map, escalation triggers, special cases. '
                     .'Mostly company-specific — needs filling first.',
-                'topics' => [
+                'lessons' => [
                     'Route the ticket: 10 real past requests → owning team + justification',
                     'Write an escalation handover; 2nd line grades whether they could start cold',
                     'Shadowing: listen to live calls',
@@ -325,7 +346,7 @@ return [
                 'subtitle' => 'Industry standard practice',
                 'description' => 'ITIL ticket types and priority matrix, KCS knowledge capture, '
                     .'support metrics, driver data as personal data.',
-                'topics' => [
+                'lessons' => [
                     'Sort the queue: 12 tickets → Incident / Service request / Problem + priority, impact and urgency justified separately',
                     'Find the problem: spot the recurring symptom in a month of tickets',
                     "Write a KCS article titled in the customer's words — then find it by searching as a customer would",

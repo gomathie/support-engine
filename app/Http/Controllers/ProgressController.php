@@ -26,27 +26,27 @@ class ProgressController extends Controller
             ->whereHas('course', fn ($q) => $q->visible())
             ->with([
                 'course:id,title,slug,category,summary',
-                'course.lessons' => fn ($q) => $q->where('is_published', true),
-                'course.lessons.topics' => fn ($q) => $q->where('is_published', true),
+                'course.modules' => fn ($q) => $q->where('is_published', true),
+                'course.modules.lessons' => fn ($q) => $q->where('is_published', true),
             ])
             ->get();
 
-        // One query for every completed topic across every course, rather than
-        // one per lesson.
-        $completed = $user->topicProgress()
+        // One query for every completed lesson across every course, rather than
+        // one per module.
+        $completed = $user->lessonProgress()
             ->whereNotNull('completed_at')
-            ->pluck('topic_id')
+            ->pluck('lesson_id')
             ->flip();
 
         $totals = [
-            'completed' => $progress->sum('completed_topics'),
-            'total' => $progress->sum('total_topics'),
+            'completed' => $progress->sum('completed_lessons'),
+            'total' => $progress->sum('total_lessons'),
         ];
 
         return Inertia::render('Progress/Index', [
             'overall' => [
-                'completed_topics' => $totals['completed'],
-                'total_topics' => $totals['total'],
+                'completed_lessons' => $totals['completed'],
+                'total_lessons' => $totals['total'],
                 'percentage' => $totals['total'] > 0
                     ? round($totals['completed'] / $totals['total'] * 100)
                     : 0,
@@ -63,27 +63,27 @@ class ProgressController extends Controller
                     'slug' => $p->course->slug,
                     'flag' => $p->course->category,
                     'percentage' => (float) $p->percentage,
-                    'completed_topics' => $p->completed_topics,
-                    'total_topics' => $p->total_topics,
+                    'completed_lessons' => $p->completed_lessons,
+                    'total_lessons' => $p->total_lessons,
                     'status' => $p->status->value,
                     'status_label' => $p->status->label(),
                     'can_reset' => $this->canReset($request, $p->course),
 
-                    'lessons' => $p->course->lessons->map(fn ($lesson) => [
-                        'id' => $lesson->id,
-                        'label' => $lesson->title,
-                        'title' => $lesson->subtitle ?: $lesson->title,
-                        'topics' => $lesson->description,
-                        'items' => $lesson->topics->map(fn ($topic) => [
-                            'id' => $topic->id,
-                            'title' => $topic->title,
-                            'slug' => $topic->slug,
-                            'completed' => $completed->has($topic->id),
-                            'url' => route('topics.show', [$p->course->slug, $topic->slug]),
+                    'modules' => $p->course->modules->map(fn ($module) => [
+                        'id' => $module->id,
+                        'label' => $module->title,
+                        'title' => $module->subtitle ?: $module->title,
+                        'lessons' => $module->description,
+                        'items' => $module->lessons->map(fn ($lesson) => [
+                            'id' => $lesson->id,
+                            'title' => $lesson->title,
+                            'slug' => $lesson->slug,
+                            'completed' => $completed->has($lesson->id),
+                            'url' => route('lessons.show', [$p->course->slug, $lesson->slug]),
                         ])->all(),
-                        'completed_count' => $lesson->topics
+                        'completed_count' => $module->lessons
                             ->filter(fn ($l) => $completed->has($l->id))->count(),
-                        'total_count' => $lesson->topics->count(),
+                        'total_count' => $module->lessons->count(),
                     ])->all(),
                 ])->all(),
         ]);
@@ -101,7 +101,7 @@ class ProgressController extends Controller
 
         $this->authorize('reset', $enrollment);
 
-        $user->topicProgress()
+        $user->lessonProgress()
             ->where('course_id', $course->id)
             ->update(['completed_at' => null]);
 

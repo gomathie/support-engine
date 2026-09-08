@@ -146,8 +146,14 @@ header carries the rules. Three that matter:
    means a second course-scoped exam gates nothing while looking like it does.
    Sections B and C remain unpublished — publishing them is a separate decision
    nobody has taken.
-2. **Does Level 1 require exam Sections A+B+C, or A alone?** Unanswered, so the
-   seeded `level_requirements` use whole courses rather than exam sections.
+2. ~~**Does Level 1 require exam Sections A+B+C, or A alone?**~~ — **DECIDED
+   2026-09-08: all three.** All are published and scoped to the "Final
+   examination" lesson, so all three gate course completion. The cost is
+   deliberate: Sections B and C are **33 hand-marked answers**, so no trainee
+   finishes the course until a trainer has read every one. That is the §6(a)
+   bottleneck — **watch KPI 7 (trainer workload) as the cohort grows**, and
+   revisit if the queue outruns the trainers. `ExaminationGatesLevelOneTest`
+   pins the 33 so the assumption cannot drift unnoticed.
 3. **Are the six competency areas correct?** Access & Rights · Objects & Sensors ·
    Reporting · Notifications · Escalation · Admin Panel. Seeded provisionally,
    awaiting Igor.
@@ -338,3 +344,48 @@ reading the outer loop.
 **Per-topic quizzes** (authored in parallel) are verified end to end by
 `TopicQuizGatesTopicTest`, including an assertion over the real seeded
 curriculum that every topic carrying a quiz is actually gated on it.
+
+### 2026-09-08 — Examination split out, and two silent bugs (Claude)
+
+The examination is now its own lesson rather than sharing "Final testing and
+consultation" with the review topics:
+
+| Lesson 12 | Review and consultation — 2 topics + knowledge check |
+| Final examination | Section A (live) · Sections B and C (draft) |
+
+Sections B and C remain unpublished. Whether Level 1 requires A+B+C or A alone
+is Appendix B item 2 and still undecided — do not publish them on a guess.
+
+Two bugs surfaced, both of the kind that fail without complaining:
+
+- **Renaming a course title without its slug creates duplicate courses.**
+  `2026_09_07_000380` dropped the time caps from course titles and left the
+  slugs. `TrainingContentSeeder` keys on `slug => Str::slug($title)`, so the
+  next seed matched nothing and created a *second* "1st-line support" and
+  "Admin panel" — empty, alongside the real ones. Fixed in
+  `2026_09_08_000420`, which realigns the slugs and deletes a duplicate only
+  after confirming it has no enrolments, progress, attempts or certificates.
+  **If you retitle a course, move its slug too, or accept the old slug forever.**
+- **`WrittenExamSeeder` could not be re-run once anyone had sat the exam.** It
+  force-deleted every question, but `quiz_answers.quiz_question_id` is
+  `restrictOnDelete` deliberately — deleting a question must not rewrite the
+  history of attempts graded against it. Now it clears only unanswered
+  questions and matches the rest by prompt with `updateOrCreate`. Note the trap
+  in the obvious fix: clearing the unanswered ones and then re-creating
+  everything leaves the paper with two of each. Verified idempotent over three
+  consecutive runs.
+
+Also: `WrittenExamSeeder` now finds its lesson **by subtitle**, not by "whichever
+sorts last" — that was only accidentally correct, and adding a lesson after it
+silently relocated Sections B and C.
+
+### 2026-09-08 — What's new redesigned to standard
+
+Redesigned the "What's new" admin page (`app/Filament/Pages/WhatsNew.php` and `resources/views/filament/pages/whats-new.blade.php`) to a modern, interactive, and beautifully categorized changelog timeline:
+
+- **Hero header and KPI metrics:** Radial ambient gradient banner with platform release badge, subtitle, and dynamic KPI stat cards (Total Releases, Total Updates, and Latest Live Release indicator).
+- **Structured section and item parsing:** Upgraded `WhatsNew::releases()` to parse level-3 sections (`### Added`, `### Changed`, `### Fixed`, `### Known limitations`) and individual bullet points, while retaining `heading` and `body` HTML for complete backward compatibility.
+- **Client-side instant search & category filtering:** Powered by Alpine.js with zero network overhead. Trainees and trainers can filter updates in real time by typing keywords (e.g. `video`, `rubric`, `dark mode`) or clicking category pills (`All`, `Added`, `Changed`, `Fixed`, `Limitations`).
+- **Timeline card layout:** Desktop connecting rail with milestone nodes, distinct category color coding (emerald, sky, amber, purple), left accent indicators, and enhanced typography for inline code, strong leads, and links in both light and dark modes.
+- **Cleaned test warnings:** Aligned class names with filenames in `TopicProgressTest`, `VideoTopicTest`, and `VideoUploadTopicTest` so the test suite runs with 0 warnings.
+

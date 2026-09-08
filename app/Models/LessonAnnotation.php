@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
-    'topic_id',
+    'lesson_id',
     'type',
     'anchor',
     'section_label',
@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'is_resolved',
     'position',
 ])]
-class TopicAnnotation extends Model
+class LessonAnnotation extends Model
 {
     use HasFactory;
 
@@ -34,9 +34,9 @@ class TopicAnnotation extends Model
         ];
     }
 
-    public function topic(): BelongsTo
+    public function lesson(): BelongsTo
     {
-        return $this->belongsTo(Topic::class);
+        return $this->belongsTo(Lesson::class);
     }
 
     public function scopeStandardDefaults(Builder $query): Builder

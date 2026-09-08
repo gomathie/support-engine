@@ -130,13 +130,13 @@ class PracticalAdminTest extends TestCase
     public function test_a_task_attached_to_a_lesson_inherits_that_lessons_course(): void
     {
         $course = Course::factory()->create();
-        $lesson = \App\Models\Lesson::factory()->for($course)->create();
-        $topic = \App\Models\Topic::factory()->for($lesson, 'lesson')->create();
+        $module = \App\Models\Module::factory()->for($course)->create();
+        $lesson = \App\Models\Lesson::factory()->for($module, 'module')->create();
 
         $task = PracticalTask::query()->create([
-            // Deliberately wrong — the topic's course must win.
+            // Deliberately wrong — the lesson's course must win.
             'course_id' => Course::factory()->create()->id,
-            'topic_id' => $topic->id,
+            'lesson_id' => $lesson->id,
             'title' => 'Attached task',
             'brief' => '<p>Do the thing.</p>',
         ]);

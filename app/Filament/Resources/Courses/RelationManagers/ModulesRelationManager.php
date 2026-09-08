@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\Courses\RelationManagers;
 
-use App\Filament\Resources\Topics\TopicResource;
-use App\Models\Lesson;
+use App\Filament\Resources\Lessons\LessonResource;
+use App\Models\Module;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -24,9 +24,9 @@ use Filament\Tables\Table;
  * resource and picking the parent from a dropdown. Reordering here is what
  * decides the order an employee works through the course.
  */
-class LessonsRelationManager extends RelationManager
+class ModulesRelationManager extends RelationManager
 {
-    protected static string $relationship = "lessons";
+    protected static string $relationship = "modules";
 
     protected static ?string $title = 'Modules';
 
@@ -47,12 +47,12 @@ class LessonsRelationManager extends RelationManager
                 Textarea::make('description')
                     ->rows(3)
                     ->columnSpanFull()
-                    ->helperText('The topics line under the module heading.'),
+                    ->helperText('The lessons line under the module heading.'),
 
                 Toggle::make('is_published')
                     ->default(true)
                     ->columnSpanFull()
-                    ->helperText('Unpublished modules and their topics do not count toward progress.'),
+                    ->helperText('Unpublished modules and their lessons do not count toward progress.'),
             ]);
     }
 
@@ -63,11 +63,11 @@ class LessonsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('title')
                     ->weight('bold')
-                    ->description(fn (Lesson $record) => $record->subtitle),
+                    ->description(fn (Module $record) => $record->subtitle),
 
                 TextColumn::make('lessons_count')
-                    ->label('Lessons')
-                    ->counts('topics')
+                    ->label('Modules')
+                    ->counts('lessons')
                     ->alignEnd(),
 
                 IconColumn::make('is_published')
@@ -81,14 +81,14 @@ class LessonsRelationManager extends RelationManager
                 CreateAction::make()->label('Add module'),
             ])
             ->recordActions([
-                // Lessons live on the module, so the natural next step from
+                // Modules live on the module, so the natural next step from
                 // here is the module's own edit screen rather than a nested
                 // repeater four levels deep.
-                Action::make('topics')
-                    ->label('Lessons')
+                Action::make('lessons')
+                    ->label('Modules')
                     ->icon('heroicon-o-document-text')
                     ->color('gray')
-                    ->url(fn (Lesson $record) => TopicResource::getUrl('index', [
+                    ->url(fn (Module $record) => LessonResource::getUrl('index', [
                         'tableFilters' => ['course_id' => ['value' => $record->course_id]],
                     ])),
 
@@ -101,6 +101,6 @@ class LessonsRelationManager extends RelationManager
                 ]),
             ])
             ->emptyStateHeading('No modules yet')
-            ->emptyStateDescription('A course is made of modules, and each module holds the topics.');
+            ->emptyStateDescription('A course is made of modules, and each module holds the lessons.');
     }
 }

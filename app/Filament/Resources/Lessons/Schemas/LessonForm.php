@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Topics\Schemas;
+namespace App\Filament\Resources\Lessons\Schemas;
 
 use App\Enums\CompletionRequirement;
-use App\Enums\TopicType;
+use App\Enums\LessonType;
+use App\Models\Module;
 use App\Models\Lesson;
-use App\Models\Topic;
 use App\Support\Video\VideoEmbed;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\FileUpload;
@@ -20,7 +20,7 @@ use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
-class TopicForm
+class LessonForm
 {
     public static function configure(Schema $schema): Schema
     {
@@ -29,14 +29,14 @@ class TopicForm
                 Section::make('Placement')
                     ->columns(2)
                     ->schema([
-                        Select::make('lesson_id')
+                        Select::make('module_id')
                             ->label('Module')
-                            ->options(fn () => Lesson::query()
+                            ->options(fn () => Module::query()
                                 ->with('course:id,title')
                                 ->orderBy('course_id')
                                 ->orderBy('position')
                                 ->get()
-                                ->mapWithKeys(fn (Lesson $m) => [
+                                ->mapWithKeys(fn (Module $m) => [
                                     $m->id => $m->course->title.' — '.$m->title,
                                 ])
                                 ->all())
@@ -70,8 +70,8 @@ class TopicForm
                     ->columns(2)
                     ->schema([
                         Select::make('type')
-                            ->options(TopicType::options())
-                            ->default(TopicType::RichText->value)
+                            ->options(LessonType::options())
+                            ->default(LessonType::RichText->value)
                             ->required()
                             ->live()
                             ->helperText('Adding a new type is an enum case plus a branch in the viewer.'),
@@ -86,14 +86,14 @@ class TopicForm
                             ->columnSpanFull(),
 
                         // Everything authored here is run through HTMLPurifier's
-                        // `topic` allowlist before it is sent to a browser, so
+                        // `lesson` allowlist before it is sent to a browser, so
                         // a compromised author account cannot become stored XSS
                         // against every employee.
                         RichEditor::make('content')
                             ->columnSpanFull()
                             ->visible(fn ($get) => in_array(
                                 $get('type'),
-                                [TopicType::RichText->value, TopicType::Download->value],
+                                [LessonType::RichText->value, LessonType::Download->value],
                                 true,
                             ))
                             ->helperText('Sanitised on save and again on display.'),
@@ -102,7 +102,7 @@ class TopicForm
                             ->url()
                             ->maxLength(255)
                             ->columnSpanFull()
-                            ->visible(fn ($get) => $get('type') === TopicType::ExternalLink->value),
+                            ->visible(fn ($get) => $get('type') === LessonType::ExternalLink->value),
 
                         TextInput::make('estimated_minutes')
                             ->label('Estimated duration (minutes)')
@@ -121,15 +121,15 @@ class TopicForm
                  * Gated on videos.manage, which is grantable per Trainer.
                  */
                 Section::make('Video file')
-                    ->description('Uploaded to the private disk. There is no public URL — playback goes through a route that checks the topic policy first.')
-                    ->visible(fn ($get) => $get('type') === TopicType::VideoUpload->value
+                    ->description('Uploaded to the private disk. There is no public URL — playback goes through a route that checks the lesson policy first.')
+                    ->visible(fn ($get) => $get('type') === LessonType::VideoUpload->value
                         && (Filament::auth()->user()?->can('videos.manage') ?? false))
                     ->columns(2)
                     ->schema([
                         FileUpload::make('video_path')
                             ->label('Video')
                             ->disk('private')
-                            ->directory('topic-videos')
+                            ->directory('lesson-videos')
                             ->visibility('private')
                             ->columnSpanFull()
 
@@ -179,7 +179,7 @@ class TopicForm
                     ]),
 
                 Section::make('Video')
-                    ->visible(fn ($get) => $get('type') === TopicType::VideoEmbed->value
+                    ->visible(fn ($get) => $get('type') === LessonType::VideoEmbed->value
                         && (Filament::auth()->user()?->can('videos.manage') ?? false))
                     ->columns(2)
                     ->schema([
@@ -193,7 +193,7 @@ class TopicForm
                             // Not a column. The provider and id below are.
                             ->dehydrated(false)
 
-                            ->afterStateHydrated(function ($state, $set, ?Topic $record): void {
+                            ->afterStateHydrated(function ($state, $set, ?Lesson $record): void {
                                 $set('video_url', $record?->videoEmbed()?->canonicalUrl());
                             })
                             ->afterStateUpdated(function ($state, $set): void {

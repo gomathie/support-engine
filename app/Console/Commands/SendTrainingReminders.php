@@ -62,7 +62,7 @@ class SendTrainingReminders extends Command
     /**
      * Enrollments whose course is not finished.
      *
-     * Checked against the course_progress rollup rather than counting topics,
+     * Checked against the course_progress rollup rather than counting lessons,
      * so this stays one query however many enrollments exist.
      */
     private function incomplete(): Builder

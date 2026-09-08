@@ -4,8 +4,8 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\CertificateController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\TopicController;
-use App\Http\Controllers\TopicVideoController;
+use App\Http\Controllers\LessonController;
+use App\Http\Controllers\LessonVideoController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PracticalTaskController;
 use App\Http\Controllers\ProfileController;
@@ -51,18 +51,18 @@ Route::middleware(['auth', 'active'])->group(function (): void {
     Route::post('courses/{course}/enroll', [CourseController::class, 'enroll'])
         ->name('courses.enroll');
 
-    // ------------------------------------------------------------- topics
-    Route::get('courses/{course}/topics/{topic}', [TopicController::class, 'show'])
-        ->name('topics.show');
-    Route::post('courses/{course}/topics/{topic}/complete', [TopicController::class, 'complete'])
-        ->name('topics.complete');
-    Route::delete('courses/{course}/topics/{topic}/complete', [TopicController::class, 'uncomplete'])
-        ->name('topics.uncomplete');
+    // ------------------------------------------------------------- lessons
+    Route::get('courses/{course}/lessons/{lesson}', [LessonController::class, 'show'])
+        ->name('lessons.show');
+    Route::post('courses/{course}/lessons/{lesson}/complete', [LessonController::class, 'complete'])
+        ->name('lessons.complete');
+    Route::delete('courses/{course}/lessons/{lesson}/complete', [LessonController::class, 'uncomplete'])
+        ->name('lessons.uncomplete');
 
     // The only route to an uploaded video's bytes. The file lives on the
-    // private disk; this runs the topic policy first.
-    Route::get('courses/{course}/topics/{topic}/video', [TopicVideoController::class, 'stream'])
-        ->name('topics.video');
+    // private disk; this runs the lesson policy first.
+    Route::get('courses/{course}/lessons/{lesson}/video', [LessonVideoController::class, 'stream'])
+        ->name('lessons.video');
 
     // ----------------------------------------------------- practical tasks
     Route::get('courses/{course}/practical/{task}', [PracticalTaskController::class, 'show'])

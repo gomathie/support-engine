@@ -3,31 +3,31 @@
 namespace Tests\Feature;
 
 use App\Actions\Enrollment\EnrollEmployee;
-use App\Enums\TopicType;
-use App\Filament\Resources\Topics\TopicResource;
+use App\Enums\LessonType;
+use App\Filament\Resources\Lessons\LessonResource;
 use App\Models\Course;
+use App\Models\Module;
 use App\Models\Lesson;
-use App\Models\Topic;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Video topics end to end (PA-9).
+ * Video lessons end to end (PA-9).
  *
  * The parser has its own unit tests; this covers what reaches the browser and
  * who may author it.
  */
-class VideoLessonTest extends TestCase
+class VideoTopicTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function videoLesson(array $attributes = []): Topic
+    private function videoLesson(array $attributes = []): Lesson
     {
         $course = Course::factory()->create();
-        $lesson = Lesson::factory()->for($course)->create();
+        $module = Module::factory()->for($course)->create();
 
-        return Topic::factory()->for($lesson, 'lesson')->create([
-            'type' => TopicType::VideoEmbed,
+        return Lesson::factory()->for($module, 'module')->create([
+            'type' => LessonType::VideoEmbed,
             'video_provider' => 'youtube',
             'video_id' => 'dQw4w9WgXcQ',
             'video_duration_seconds' => 390,
@@ -38,20 +38,20 @@ class VideoLessonTest extends TestCase
 
     public function test_a_video_lesson_renders_for_an_enrolled_employee(): void
     {
-        $topic = $this->videoLesson();
+        $lesson = $this->videoLesson();
         $user = $this->trainee();
 
-        app(EnrollEmployee::class)->handle($user, $topic->course);
+        app(EnrollEmployee::class)->handle($user, $lesson->course);
 
         $this->actingAs($user)
-            ->get(route('topics.show', [$topic->course->slug, $topic->slug]))
+            ->get(route('lessons.show', [$lesson->course->slug, $lesson->slug]))
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page
-                ->where('topic.type', 'video_embed')
-                ->where('topic.video.provider', 'youtube')
-                ->where('topic.video.embed_url', 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1&playsinline=1')
-                ->where('topic.video_duration', '6:30')
-                ->where('topic.video_transcript', 'Open the object card, then the sensors tab.'));
+                ->where('lesson.type', 'video_embed')
+                ->where('lesson.video.provider', 'youtube')
+                ->where('lesson.video.embed_url', 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0&modestbranding=1&playsinline=1')
+                ->where('lesson.video_duration', '6:30')
+                ->where('lesson.video_transcript', 'Open the object card, then the sensors tab.'));
     }
 
     /**
@@ -61,52 +61,52 @@ class VideoLessonTest extends TestCase
      */
     public function test_a_tampered_video_id_produces_no_embed(): void
     {
-        $topic = $this->videoLesson();
+        $lesson = $this->videoLesson();
 
         // Straight to the database, past the form validation.
-        $topic->forceFill(['video_id' => 'x" onload="alert(1)'])->saveQuietly();
+        $lesson->forceFill(['video_id' => 'x" onload="alert(1)'])->saveQuietly();
 
         $user = $this->trainee();
-        app(EnrollEmployee::class)->handle($user, $topic->course);
+        app(EnrollEmployee::class)->handle($user, $lesson->course);
 
         $this->actingAs($user)
-            ->get(route('topics.show', [$topic->course->slug, $topic->slug]))
+            ->get(route('lessons.show', [$lesson->course->slug, $lesson->slug]))
             ->assertSuccessful()
-            ->assertInertia(fn ($page) => $page->where('topic.video', null));
+            ->assertInertia(fn ($page) => $page->where('lesson.video', null));
     }
 
     public function test_a_vimeo_lesson_uses_the_do_not_track_player(): void
     {
-        $topic = $this->videoLesson([
+        $lesson = $this->videoLesson([
             'video_provider' => 'vimeo',
             'video_id' => '347119375',
         ]);
 
         $user = $this->trainee();
-        app(EnrollEmployee::class)->handle($user, $topic->course);
+        app(EnrollEmployee::class)->handle($user, $lesson->course);
 
         $this->actingAs($user)
-            ->get(route('topics.show', [$topic->course->slug, $topic->slug]))
+            ->get(route('lessons.show', [$lesson->course->slug, $lesson->slug]))
             ->assertSuccessful()
             ->assertInertia(fn ($page) => $page
-                ->where('topic.video.embed_url', 'https://player.vimeo.com/video/347119375?dnt=1&title=0&byline=0&portrait=0'));
+                ->where('lesson.video.embed_url', 'https://player.vimeo.com/video/347119375?dnt=1&title=0&byline=0&portrait=0'));
     }
 
     public function test_a_lesson_with_no_video_set_still_renders(): void
     {
-        $topic = $this->videoLesson([
+        $lesson = $this->videoLesson([
             'video_provider' => null,
             'video_id' => null,
             'video_transcript' => null,
         ]);
 
         $user = $this->trainee();
-        app(EnrollEmployee::class)->handle($user, $topic->course);
+        app(EnrollEmployee::class)->handle($user, $lesson->course);
 
         $this->actingAs($user)
-            ->get(route('topics.show', [$topic->course->slug, $topic->slug]))
+            ->get(route('lessons.show', [$lesson->course->slug, $lesson->slug]))
             ->assertSuccessful()
-            ->assertInertia(fn ($page) => $page->where('topic.video', null));
+            ->assertInertia(fn ($page) => $page->where('lesson.video', null));
     }
 
     public function test_duration_is_formatted_and_the_length_ceiling_is_flagged(): void
@@ -155,22 +155,22 @@ class VideoLessonTest extends TestCase
 
     public function test_the_lesson_form_renders_for_a_video_lesson(): void
     {
-        $topic = $this->videoLesson();
+        $lesson = $this->videoLesson();
 
         $this->actingAs($this->admin())
-            ->get(TopicResource::getUrl('edit', ['record' => $topic]))
+            ->get(LessonResource::getUrl('edit', ['record' => $lesson]))
             ->assertSuccessful();
     }
 
     public function test_video_is_an_offered_lesson_type(): void
     {
-        $this->assertArrayHasKey('video_embed', TopicType::options());
+        $this->assertArrayHasKey('video_embed', LessonType::options());
 
         // The label names the method, because the author is choosing between
         // two of them in the same dropdown.
-        $this->assertSame('Video (YouTube / Vimeo)', TopicType::VideoEmbed->label());
+        $this->assertSame('Video (YouTube / Vimeo)', LessonType::VideoEmbed->label());
 
-        $this->assertTrue(TopicType::VideoEmbed->isVideo());
-        $this->assertFalse(TopicType::RichText->isVideo());
+        $this->assertTrue(LessonType::VideoEmbed->isVideo());
+        $this->assertFalse(LessonType::RichText->isVideo());
     }
 }

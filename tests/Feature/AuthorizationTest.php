@@ -4,10 +4,10 @@ namespace Tests\Feature;
 
 use App\Actions\Enrollment\EnrollEmployee;
 use App\Models\Course;
-use App\Models\Lesson;
+use App\Models\Module;
 use App\Models\Department;
-use App\Models\Topic;
-use App\Models\TopicResource;
+use App\Models\Lesson;
+use App\Models\LessonResource;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -82,27 +82,27 @@ class AuthorizationTest extends TestCase
     public function test_lesson_access_derives_from_course_access(): void
     {
         $course = Course::factory()->create();
-        $lesson = Lesson::factory()->for($course)->create();
-        $topic = Topic::factory()->for($lesson, 'lesson')->create();
+        $module = Module::factory()->for($course)->create();
+        $lesson = Lesson::factory()->for($module, 'module')->create();
 
         $outsider = $this->trainee();
 
         $this->actingAs($outsider)
-            ->get(route('topics.show', [$course->slug, $topic->slug]))
+            ->get(route('lessons.show', [$course->slug, $lesson->slug]))
             ->assertForbidden();
     }
 
     public function test_an_unpublished_lesson_cannot_be_opened(): void
     {
         $course = Course::factory()->create();
-        $lesson = Lesson::factory()->for($course)->create();
-        $topic = Topic::factory()->for($lesson, 'lesson')->unpublished()->create();
+        $module = Module::factory()->for($course)->create();
+        $lesson = Lesson::factory()->for($module, 'module')->unpublished()->create();
 
         $user = $this->trainee();
         app(EnrollEmployee::class)->handle($user, $course);
 
         $this->actingAs($user)
-            ->get(route('topics.show', [$course->slug, $topic->slug]))
+            ->get(route('lessons.show', [$course->slug, $lesson->slug]))
             ->assertForbidden();
     }
 
@@ -117,15 +117,15 @@ class AuthorizationTest extends TestCase
         Storage::fake('private');
 
         $course = Course::factory()->create();
-        $lesson = Lesson::factory()->for($course)->create();
-        $topic = Topic::factory()->for($lesson, 'lesson')->create();
+        $module = Module::factory()->for($course)->create();
+        $lesson = Lesson::factory()->for($module, 'module')->create();
 
         $path = UploadedFile::fake()
             ->create('internal-policy.pdf', 100, 'application/pdf')
-            ->store('topic-resources', 'private');
+            ->store('lesson-resources', 'private');
 
-        $resource = TopicResource::query()->create([
-            'topic_id' => $topic->id,
+        $resource = LessonResource::query()->create([
+            'lesson_id' => $lesson->id,
             'name' => 'Internal policy',
             'disk' => 'private',
             'path' => $path,
@@ -144,15 +144,15 @@ class AuthorizationTest extends TestCase
         Storage::fake('private');
 
         $course = Course::factory()->create();
-        $lesson = Lesson::factory()->for($course)->create();
-        $topic = Topic::factory()->for($lesson, 'lesson')->create();
+        $module = Module::factory()->for($course)->create();
+        $lesson = Lesson::factory()->for($module, 'module')->create();
 
         $path = UploadedFile::fake()
             ->create('handbook.pdf', 100, 'application/pdf')
-            ->store('topic-resources', 'private');
+            ->store('lesson-resources', 'private');
 
-        $resource = TopicResource::query()->create([
-            'topic_id' => $topic->id,
+        $resource = LessonResource::query()->create([
+            'lesson_id' => $lesson->id,
             'name' => 'Handbook',
             'disk' => 'private',
             'path' => $path,

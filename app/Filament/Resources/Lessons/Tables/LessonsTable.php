@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\Topics\Tables;
+namespace App\Filament\Resources\Lessons\Tables;
 
 use App\Enums\CompletionRequirement;
-use App\Enums\TopicType;
+use App\Enums\LessonType;
 use App\Models\Course;
-use App\Models\Topic;
+use App\Models\Lesson;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -15,7 +15,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
-class TopicsTable
+class LessonsTable
 {
     public static function configure(Table $table): Table
     {
@@ -25,7 +25,7 @@ class TopicsTable
                     ->searchable()
                     ->weight('bold')
                     ->wrap()
-                    ->description(fn (Topic $record) => $record->lesson?->title),
+                    ->description(fn (Lesson $record) => $record->module?->title),
 
                 TextColumn::make('course.title')
                     ->label('Course')
@@ -35,7 +35,7 @@ class TopicsTable
 
                 TextColumn::make('type')
                     ->badge()
-                    ->formatStateUsing(fn (TopicType $state) => $state->label())
+                    ->formatStateUsing(fn (LessonType $state) => $state->label())
                     ->color('gray'),
 
                 TextColumn::make('completion_requirement')
@@ -64,7 +64,7 @@ class TopicsTable
                     ->options(fn () => Course::query()->orderBy('title')->pluck('title', 'id')->all())
                     ->searchable(),
 
-                SelectFilter::make('type')->options(TopicType::options()),
+                SelectFilter::make('type')->options(LessonType::options()),
 
                 TernaryFilter::make('is_published'),
             ])

@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Topics\TopicResource;
+use App\Filament\Resources\Lessons\LessonResource;
 use App\Filament\Resources\Quizzes\QuizResource;
-use App\Models\Topic;
+use App\Models\Lesson;
 use App\Models\Quiz;
 use Database\Seeders\LessonContentSeeder;
 use Database\Seeders\TrainingContentSeeder;
@@ -12,7 +12,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Seeded topic content belongs to the trainers, not to the seeder.
+ * Seeded lesson content belongs to the trainers, not to the seeder.
  *
  * Two things have to hold or the "content is editable" promise is hollow: a
  * trainer must be able to change it, and nothing must quietly change it back.
@@ -29,9 +29,9 @@ class LessonContentEditableTest extends TestCase
         $this->seed(LessonContentSeeder::class);
     }
 
-    private function writtenLesson(): Topic
+    private function writtenLesson(): Lesson
     {
-        return Topic::query()
+        return Lesson::query()
             ->where('title', 'Define: Object, Sensor, Contract, Account')
             ->firstOrFail();
     }
@@ -43,19 +43,19 @@ class LessonContentEditableTest extends TestCase
 
     public function test_a_trainer_can_open_and_edit_a_seeded_lesson(): void
     {
-        $topic = $this->writtenLesson();
+        $lesson = $this->writtenLesson();
         $trainer = $this->trainer();
 
-        $this->assertTrue($trainer->can('update', $topic));
+        $this->assertTrue($trainer->can('update', $lesson));
 
         $this->actingAs($trainer)
-            ->get(TopicResource::getUrl('edit', ['record' => $topic]))
+            ->get(LessonResource::getUrl('edit', ['record' => $lesson]))
             ->assertSuccessful();
     }
 
     public function test_a_trainer_can_open_the_knowledge_check(): void
     {
-        $quiz = Quiz::query()->where('title', 'Lesson 1 — knowledge check')->firstOrFail();
+        $quiz = Quiz::query()->where('title', 'Module 1 — knowledge check')->firstOrFail();
 
         $this->actingAs($this->trainer())
             ->get(QuizResource::getUrl('edit', ['record' => $quiz]))
@@ -63,27 +63,27 @@ class LessonContentEditableTest extends TestCase
     }
 
     /**
-     * The one that matters. A trainer edits a topic; somebody re-runs the
+     * The one that matters. A trainer edits a lesson; somebody re-runs the
      * seeders during a deployment; the trainer's work must still be there.
      */
     public function test_re_running_the_seeder_does_not_overwrite_an_edit(): void
     {
-        $topic = $this->writtenLesson();
+        $lesson = $this->writtenLesson();
 
-        $topic->forceFill(['content' => '<p>Rewritten by Marcus after the calibration meeting.</p>'])->save();
+        $lesson->forceFill(['content' => '<p>Rewritten by Marcus after the calibration meeting.</p>'])->save();
 
         $this->seed(LessonContentSeeder::class);
 
         $this->assertSame(
             '<p>Rewritten by Marcus after the calibration meeting.</p>',
-            $topic->fresh()->content,
+            $lesson->fresh()->content,
             'A trainer\'s edit must survive a re-seed.',
         );
     }
 
     public function test_re_running_the_seeder_does_not_rewrite_an_edited_question(): void
     {
-        $quiz = Quiz::query()->where('title', 'Lesson 1 — knowledge check')->firstOrFail();
+        $quiz = Quiz::query()->where('title', 'Module 1 — knowledge check')->firstOrFail();
 
         $question = $quiz->questions()->first();
         $question->forceFill(['prompt' => 'A question Marcus rewrote.'])->save();
@@ -102,9 +102,9 @@ class LessonContentEditableTest extends TestCase
     public function test_seeded_content_uses_only_markup_the_editor_round_trips(): void
     {
         /*
-         * Scoped to the topics this seeder wrote.
+         * Scoped to the lessons this seeder wrote.
          *
-         * An earlier version asserted over every topic with a body, which made
+         * An earlier version asserted over every lesson with a body, which made
          * it a claim about the whole database rather than about the seeded
          * content — it passed alone and failed in the full suite, which is the
          * signature of an assertion reaching beyond its subject.
@@ -113,8 +113,8 @@ class LessonContentEditableTest extends TestCase
         // them this indexes the path string rather than the loaded array.
         $source = require database_path('seeders/content/track1_lesson_01.php');
 
-        $bodies = Topic::query()
-            ->whereIn('title', array_keys($source['topics']))
+        $bodies = Lesson::query()
+            ->whereIn('title', array_keys($source['lessons']))
             ->whereNotNull('content')
             ->pluck('content')
             ->implode("\n");
@@ -129,30 +129,30 @@ class LessonContentEditableTest extends TestCase
             );
         }
 
-        // What it does support, and what the topics are built from.
+        // What it does support, and what the lessons are built from.
         $this->assertStringContainsString('<blockquote>', $bodies);
         $this->assertStringContainsString('<ul>', $bodies);
         $this->assertStringContainsString('<h2', $bodies);
     }
 
-    /** A topic with no source in the docs is left visibly open, not invented. */
+    /** A lesson with no source in the docs is left visibly open, not invented. */
     public function test_an_unsourced_topic_is_marked_as_needing_input(): void
     {
-        $topic = Topic::query()
+        $lesson = Lesson::query()
             ->where('title', 'Explain what a Mapping Contract is and its use case')
             ->firstOrFail();
 
-        $this->assertStringContainsString('not written yet', $topic->content);
-        $this->assertStringContainsString('does not appear', $topic->content);
+        $this->assertStringContainsString('not written yet', $lesson->content);
+        $this->assertStringContainsString('does not appear', $lesson->content);
     }
 
     public function test_the_knowledge_check_is_published_and_scoped_to_the_lesson(): void
     {
-        $quiz = Quiz::query()->where('title', 'Lesson 1 — knowledge check')->firstOrFail();
+        $quiz = Quiz::query()->where('title', 'Module 1 — knowledge check')->firstOrFail();
 
         $this->assertTrue($quiz->is_published);
         $this->assertSame(70, $quiz->passing_score);
-        $this->assertNotNull($quiz->lesson_id, 'It is a topic check, not the course final exam.');
+        $this->assertNotNull($quiz->module_id, 'It is a lesson check, not the course final exam.');
         $this->assertCount(4, $quiz->questions);
 
         foreach ($quiz->questions as $question) {

@@ -4,11 +4,11 @@ namespace Tests\Feature;
 
 use App\Actions\Competency\AwardCompetencyLevel;
 use App\Actions\Enrollment\EnrollEmployee;
-use App\Actions\Progress\CompleteTopic;
+use App\Actions\Progress\CompleteLesson;
 use App\Models\CompetencyArea;
 use App\Models\Course;
+use App\Models\Module;
 use App\Models\Lesson;
-use App\Models\Topic;
 use App\Models\Level;
 use App\Models\LevelRequirement;
 use App\Models\TraineeLevel;
@@ -37,12 +37,12 @@ class CompetencyLevelTest extends TestCase
         Bus::fake();
     }
 
-    private function completableCourse(int $topics = 2): Course
+    private function completableCourse(int $lessons = 2): Course
     {
         $course = Course::factory()->create();
-        $lesson = Lesson::factory()->for($course)->create();
+        $module = Module::factory()->for($course)->create();
 
-        Topic::factory()->count($topics)->for($lesson, 'lesson')->create();
+        Lesson::factory()->count($lessons)->for($module, 'module')->create();
 
         return $course->fresh();
     }
@@ -51,8 +51,8 @@ class CompetencyLevelTest extends TestCase
     {
         app(EnrollEmployee::class)->handle($user, $course);
 
-        foreach ($course->topics as $topic) {
-            app(CompleteTopic::class)->handle($user, $topic);
+        foreach ($course->lessons as $lesson) {
+            app(CompleteLesson::class)->handle($user, $lesson);
         }
     }
 
@@ -104,7 +104,7 @@ class CompetencyLevelTest extends TestCase
         $this->assertTrue($user->holdsLevel($level, $area));
     }
 
-    /** Awarding runs on every topic tick, so it has to be safe to repeat. */
+    /** Awarding runs on every lesson tick, so it has to be safe to repeat. */
     public function test_awards_are_not_duplicated(): void
     {
         $level = Level::factory()->at(1)->create();
@@ -233,7 +233,7 @@ class CompetencyLevelTest extends TestCase
 
     /**
      * Withdrawn, not deleted — "she held Level 1 until March" stays true, and a
-     * revoked award is not silently re-granted by the next topic tick.
+     * revoked award is not silently re-granted by the next lesson tick.
      */
     public function test_a_revoked_award_is_kept_and_not_silently_restored(): void
     {

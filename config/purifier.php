@@ -32,23 +32,23 @@ return [
         ],
         /*
         |----------------------------------------------------------------------
-        | Topic bodies
+        | Lesson bodies
         |----------------------------------------------------------------------
         |
-        | Rich-text topics are authored by trainers in the admin panel, so this
+        | Rich-text lessons are authored by trainers in the admin panel, so this
         | is more permissive than `default` — headings, tables, code and figures
         | all appear in the real curriculum. It is still an allowlist: no script,
         | no iframe, no style blocks, no event handlers, no javascript: URIs.
         |
         | Attr.EnableID is on because the annotation drawer scrolls to anchors
-        | inside the topic body, and the table of contents is built from
+        | inside the lesson body, and the table of contents is built from
         | heading ids. Attr.IDPrefix namespaces them so authored content cannot
         | collide with the application's own element ids.
         |
         | `class` is allowed on span so the .std / .fill markers carried over
         | from the prototype's skills module keep working.
         */
-        'topic' => [
+        'lesson' => [
             'HTML.Doctype' => 'HTML 4.01 Transitional',
             'HTML.Allowed' => implode(',', [
                 'p[id]', 'br', 'hr',
@@ -69,7 +69,7 @@ return [
             // HTMLPurifier directive and makes it throw on first use.
             'Attr.AllowedClasses' => 'std,fill,box,good,note,k,hint,lede,eyebrow,tw',
             'Attr.EnableID' => true,
-            'Attr.IDPrefix' => 'topic-',
+            'Attr.IDPrefix' => 'lesson-',
             'AutoFormat.AutoParagraph' => false,
             'AutoFormat.RemoveEmpty' => true,
             'URI.AllowedSchemes' => ['http' => true, 'https' => true, 'mailto' => true],

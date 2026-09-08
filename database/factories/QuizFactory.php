@@ -17,8 +17,8 @@ class QuizFactory extends Factory
     {
         return [
             'course_id' => Course::factory(),
+            'module_id' => null,
             'lesson_id' => null,
-            'topic_id' => null,
             'title' => fake()->sentence(3),
             'description' => fake()->sentence(),
             'passing_score' => 70,

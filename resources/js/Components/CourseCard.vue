@@ -23,9 +23,9 @@ const difficultyLabel = computed(() =>
         : null,
 );
 
-const lessonsDone = computed(() => props.course.completed_topics ?? 0);
+const lessonsDone = computed(() => props.course.completed_lessons ?? 0);
 const lessonsTotal = computed(
-    () => props.course.total_topics ?? props.course.lesson_count ?? 0,
+    () => props.course.total_lessons ?? props.course.lesson_count ?? 0,
 );
 </script>
 
@@ -78,7 +78,7 @@ const lessonsTotal = computed(
                     :tone="isComplete ? 'positive' : 'primary'"
                 />
                 <div class="mt-1.5 flex justify-between text-xs text-ink-sec">
-                    <span>{{ lessonsDone }} of {{ lessonsTotal }} topics</span>
+                    <span>{{ lessonsDone }} of {{ lessonsTotal }} lessons</span>
                     <span class="font-semibold">{{ Math.round(course.percentage) }}%</span>
                 </div>
             </div>

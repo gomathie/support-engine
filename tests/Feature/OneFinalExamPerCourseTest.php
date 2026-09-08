@@ -35,28 +35,53 @@ class OneFinalExamPerCourseTest extends TestCase
         $this->seed(WrittenExamSeeder::class);
     }
 
-    public function test_no_course_has_more_than_one_published_final_exam(): void
+    /**
+     * Superseded, and kept as the record of why.
+     *
+     * A course used to be limited to one final exam because
+     * `RecalculateCourseProgress` read `finalQuiz()->first()` — a second one was
+     * sittable and counted for nothing. Completion now requires *every*
+     * published final exam, so several is a legitimate design and the PILOT
+     * examination uses it: three papers, all required.
+     *
+     * What still has to hold is that none of them is ignored.
+     */
+    public function test_every_published_final_exam_actually_gates_completion(): void
     {
         foreach (Course::query()->get() as $course) {
             $finals = $course->finalQuiz()->where('is_published', true)->get();
 
-            $this->assertLessThanOrEqual(
-                1,
-                $finals->count(),
-                "\"{$course->title}\" has ".$finals->count().' published final exams: '
-                .$finals->pluck('title')->implode(' · ')
-                .'. Only the first gates completion; the rest are sittable but count for nothing.',
+            if ($finals->isEmpty()) {
+                continue;
+            }
+
+            $trainee = $this->trainee();
+            app(\App\Actions\Enrollment\EnrollEmployee::class)->handle($trainee, $course);
+
+            // Nothing has been sat, so no final can read as satisfied.
+            foreach ($finals as $final) {
+                $this->assertFalse(
+                    $final->passedBy($trainee),
+                    "\"{$final->title}\" should be outstanding for a new trainee.",
+                );
+            }
+
+            app(\App\Actions\Progress\RecalculateCourseProgress::class)->handle($trainee, $course);
+
+            $this->assertNotSame(
+                \App\Enums\ProgressStatus::Completed,
+                $trainee->courseProgress()->where('course_id', $course->id)->first()?->status,
+                "\"{$course->title}\" completed with every final exam unsat.",
             );
         }
     }
 
     /**
-     * Section A is live and gates the final lesson.
+     * Section A is live and is a final exam.
      *
-     * Its answer key was confirmed on 2026-09-08, closing PA-16. It is scoped
-     * to the final lesson rather than the course, because the course already
-     * has a final exam — leaving it course-scoped made it a second one, and
-     * only the first of those gates anything.
+     * Its answer key was confirmed on 2026-09-08, closing PA-16. It was briefly
+     * moved to module scope as a workaround while a course could only have one
+     * final exam — that limit is gone, and it is classified correctly again.
      */
     public function test_the_official_examination_is_live_and_actually_gates(): void
     {
@@ -70,23 +95,28 @@ class OneFinalExamPerCourseTest extends TestCase
 
         $this->assertTrue((bool) $sectionA->is_published);
 
-        $this->assertNotNull(
-            $sectionA->lesson_id,
-            'Section A must be lesson-scoped. Course-scoped would make it a second final exam, '
-            .'which RecalculateCourseProgress ignores.',
-        );
+        $this->assertNull($sectionA->module_id, 'Section A is a final exam, not a module quiz.');
+        $this->assertNull($sectionA->lesson_id);
 
-        $this->assertNull($sectionA->topic_id);
+        $course = Course::query()->where('slug', '1st-line-support')->firstOrFail();
+
+        $this->assertTrue(
+            $course->finalQuiz()->where('is_published', true)
+                ->pluck('id')->contains($sectionA->id),
+            'Section A must be among the final exams that gate completion.',
+        );
     }
 
-    /** Whatever does gate the course should be the one with authored answers. */
-    public function test_the_gating_exam_is_the_one_with_verified_answers(): void
+    /** The internally authored assessment is still one of the papers. */
+    public function test_the_internal_assessment_remains_a_final_exam(): void
     {
-        $course = Course::query()->where('title', '1st-line support')->firstOrFail();
+        $course = Course::query()->where('slug', '1st-line-support')->firstOrFail();
 
-        $final = $course->finalQuiz()->where('is_published', true)->first();
+        $titles = $course->finalQuiz()->where('is_published', true)->pluck('title');
 
-        $this->assertNotNull($final, 'The course needs a final exam to gate on.');
-        $this->assertSame('PILOT 1st-line final assessment', $final->title);
+        $this->assertTrue(
+            $titles->contains('PILOT 1st-line final assessment'),
+            'Retiring it is a content decision; until then it gates like the rest.',
+        );
     }
 }

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
 #[Fillable([
-    'topic_id',
+    'lesson_id',
     'name',
     'description',
     'disk',
@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Storage;
     'position',
     'uploaded_by',
 ])]
-class TopicResource extends Model
+class LessonResource extends Model
 {
     use HasFactory;
 
@@ -42,9 +42,9 @@ class TopicResource extends Model
         });
     }
 
-    public function topic(): BelongsTo
+    public function lesson(): BelongsTo
     {
-        return $this->belongsTo(Topic::class);
+        return $this->belongsTo(Lesson::class);
     }
 
     public function uploader(): BelongsTo

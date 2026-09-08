@@ -21,7 +21,7 @@ class CourseController extends Controller
             ->visible()
             ->whereHas('enrollments', fn ($q) => $q->where('user_id', $user->id))
             ->with(['instructor:id,name'])
-            ->withCount(['topics as lesson_count' => fn ($q) => $q->where('is_published', true)])
+            ->withCount(['lessons as lesson_count' => fn ($q) => $q->where('is_published', true)])
             // Filters are applied in SQL, not by loading everything and
             // filtering in Vue — the list grows with the training catalogue.
             ->when($request->string('search')->trim()->value(), function ($query, string $search): void {
@@ -93,17 +93,17 @@ class CourseController extends Controller
         $user = $request->user();
 
         $course->load([
-            'lessons' => fn ($q) => $q->where('is_published', true),
-            'lessons.topics' => fn ($q) => $q->where('is_published', true),
-            'lessons.topics.quiz',
+            'modules' => fn ($q) => $q->where('is_published', true),
+            'modules.lessons' => fn ($q) => $q->where('is_published', true),
+            'modules.lessons.quiz',
             'instructor:id,name',
         ]);
 
-        // One query for the whole tree rather than one per topic.
-        $completed = $user->topicProgress()
+        // One query for the whole tree rather than one per lesson.
+        $completed = $user->lessonProgress()
             ->where('course_id', $course->id)
             ->whereNotNull('completed_at')
-            ->pluck('topic_id')
+            ->pluck('lesson_id')
             ->flip();
 
         $progress = CourseProgress::query()
@@ -111,7 +111,12 @@ class CourseController extends Controller
             ->where('course_id', $course->id)
             ->first();
 
-        $finalQuiz = $course->finalQuiz()->where('is_published', true)->first();
+        // Several, in general: the PILOT examination is three papers, and all
+        // of them have to be passed.
+        $finalExams = $course->finalQuiz()
+            ->where('is_published', true)
+            ->orderBy('title')
+            ->get();
 
         return Inertia::render('Courses/Show', [
             'course' => [
@@ -127,32 +132,32 @@ class CourseController extends Controller
                 'instructor' => $course->instructor?->name,
             ],
 
-            'lessons' => $course->lessons->map(fn ($lesson) => [
-                'id' => $lesson->id,
-                'title' => $lesson->title,
-                'subtitle' => $lesson->subtitle,
-                'description' => $lesson->description,
-                'docs_reference' => $lesson->docs_reference,
-                'topics' => $lesson->topics->map(fn ($topic) => [
-                    'id' => $topic->id,
-                    'title' => $topic->title,
-                    'slug' => $topic->slug,
-                    'type' => $topic->type->value,
-                    'type_label' => $topic->type->label(),
-                    'estimated_minutes' => $topic->estimated_minutes,
-                    'completion_requirement' => $topic->completion_requirement->value,
-                    'has_quiz' => $topic->quiz !== null,
-                    'completed' => $completed->has($topic->id),
+            'modules' => $course->modules->map(fn ($module) => [
+                'id' => $module->id,
+                'title' => $module->title,
+                'subtitle' => $module->subtitle,
+                'description' => $module->description,
+                'docs_reference' => $module->docs_reference,
+                'lessons' => $module->lessons->map(fn ($lesson) => [
+                    'id' => $lesson->id,
+                    'title' => $lesson->title,
+                    'slug' => $lesson->slug,
+                    'type' => $lesson->type->value,
+                    'type_label' => $lesson->type->label(),
+                    'estimated_minutes' => $lesson->estimated_minutes,
+                    'completion_requirement' => $lesson->completion_requirement->value,
+                    'has_quiz' => $lesson->quiz !== null,
+                    'completed' => $completed->has($lesson->id),
                 ])->all(),
-                'completed_count' => $lesson->topics
+                'completed_count' => $module->lessons
                     ->filter(fn ($l) => $completed->has($l->id))
                     ->count(),
-                'lesson_count' => $lesson->topics->count(),
+                'lesson_count' => $module->lessons->count(),
 
-                // The knowledge check at the end of the topic. Passing it is
+                // The knowledge check at the end of the lesson. Passing it is
                 // required to finish the course, so it belongs on the card
                 // rather than being something they discover at the end.
-                'knowledge_check' => ($check = $lesson->knowledgeCheck()) && $check->is_published
+                'knowledge_check' => ($check = $module->knowledgeCheck()) && $check->is_published
                     ? [
                         'id' => $check->id,
                         'title' => $check->title,
@@ -165,8 +170,8 @@ class CourseController extends Controller
             ])->all(),
 
             /*
-             * Practical tasks sit alongside the lessons rather than inside
-             * them: a task may hang off one topic or stand for the whole
+             * Practical tasks sit alongside the modules rather than inside
+             * them: a task may hang off one lesson or stand for the whole
              * course, and burying it in a module would hide the second kind.
              */
             'practical_tasks' => $course->practicalTasks()
@@ -177,7 +182,7 @@ class CourseController extends Controller
                     'title' => $task->title,
                     'slug' => $task->slug,
                     'estimated_minutes' => $task->estimated_minutes,
-                    'lesson_title' => $task->topic?->title,
+                    'lesson_title' => $task->lesson?->title,
                     'status' => $task->latestSubmissionFor($user)?->status->value,
                     'status_label' => $task->latestSubmissionFor($user)?->status->label(),
                     'passed' => $task->latestSubmissionFor($user)?->passed,
@@ -185,29 +190,34 @@ class CourseController extends Controller
 
             'progress' => [
                 'percentage' => (float) ($progress?->percentage ?? 0),
-                'completed_topics' => $progress?->completed_topics ?? 0,
-                'total_topics' => $progress?->total_topics ?? 0,
+                'completed_lessons' => $progress?->completed_lessons ?? 0,
+                'total_lessons' => $progress?->total_lessons ?? 0,
                 'status' => $progress?->status->value ?? 'not_started',
                 'status_label' => $progress?->status->label() ?? 'Not started',
                 'status_tone' => $progress?->status->tone() ?? 'neutral',
                 'completed_at' => $progress?->completed_at?->toIso8601String(),
             ],
 
-            'final_quiz' => $finalQuiz ? [
-                'id' => $finalQuiz->id,
-                'title' => $finalQuiz->title,
-                'description' => $finalQuiz->description,
-                'passing_score' => $finalQuiz->passing_score,
-                'max_attempts' => $finalQuiz->max_attempts,
-                'attempts_used' => $finalQuiz->attemptsUsedBy($user),
-                'passed' => $finalQuiz->passedBy($user),
-                'best_score' => (float) ($finalQuiz->bestAttemptFor($user)?->score ?? 0),
+            'final_exams' => $finalExams->map(fn ($exam) => [
+                'id' => $exam->id,
+                'title' => $exam->title,
+                'description' => $exam->description,
+                'passing_score' => $exam->passing_score,
+                'max_attempts' => $exam->max_attempts,
+                'attempts_used' => $exam->attemptsUsedBy($user),
+                'passed' => $exam->passedBy($user),
+                'best_score' => (float) ($exam->bestAttemptFor($user)?->score ?? 0),
+                'awaiting_marking' => $exam->attempts()
+                    ->where('user_id', $user->id)
+                    ->where('status', \App\Enums\AttemptStatus::PendingReview->value)
+                    ->exists(),
 
-                // Unlocked only once the topics are done, so the assessment
-                // cannot be skipped ahead to.
-                'unlocked' => ($progress?->total_topics ?? 0) > 0
-                    && ($progress?->completed_topics ?? 0) >= ($progress?->total_topics ?? 0),
-            ] : null,
+                // Asks the policy rather than recomputing the rule, so the
+                // button and the control cannot drift apart. The examination
+                // opens only once every lesson is read and every knowledge
+                // check passed.
+                'unlocked' => $user->can('attempt', $exam),
+            ])->all(),
 
             'can' => [
                 'reset' => $request->user()->can(

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\Lessons\Tables;
+namespace App\Filament\Resources\Modules\Tables;
 
 use App\Models\Course;
-use App\Models\Lesson;
+use App\Models\Module;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -12,7 +12,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
-class LessonsTable
+class ModulesTable
 {
     public static function configure(Table $table): Table
     {
@@ -34,25 +34,25 @@ class LessonsTable
                     ->limit(60),
 
                 TextColumn::make('lessons_count')
-                    ->label('Topics')
-                    ->counts('topics')
+                    ->label('Lessons')
+                    ->counts('lessons')
                     ->alignEnd(),
 
                 /*
-                 * Every topic is meant to end with a knowledge check, and
-                 * passing it is required to finish the course. A topic without
+                 * Every lesson is meant to end with a knowledge check, and
+                 * passing it is required to finish the course. A lesson without
                  * one can be read and left — so the gap is shown here rather
                  * than discovered when somebody completes a course having been
                  * tested on nothing.
                  */
                 TextColumn::make('knowledge_check')
                     ->label('Knowledge check')
-                    ->state(fn (Lesson $record) => $record->hasKnowledgeCheck() ? 'Yes' : 'Missing')
+                    ->state(fn (Module $record) => $record->hasKnowledgeCheck() ? 'Yes' : 'Missing')
                     ->badge()
                     ->color(fn ($state) => $state === 'Yes' ? 'success' : 'warning')
-                    ->tooltip(fn (Lesson $record) => $record->hasKnowledgeCheck()
+                    ->tooltip(fn (Module $record) => $record->hasKnowledgeCheck()
                         ? null
-                        : 'No published quiz at the end of this topic. Trainees can read it and move on.'),
+                        : 'No published quiz at the end of this lesson. Trainees can read it and move on.'),
 
                 IconColumn::make('is_published')
                     ->label('Published')

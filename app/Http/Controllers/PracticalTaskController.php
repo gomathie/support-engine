@@ -48,8 +48,8 @@ class PracticalTaskController extends Controller
                 'title' => $task->title,
                 'slug' => $task->slug,
 
-                // Sanitised on the way out as well as in, same as topic bodies.
-                'brief' => Purifier::clean($task->brief, 'topic'),
+                // Sanitised on the way out as well as in, same as lesson bodies.
+                'brief' => Purifier::clean($task->brief, 'lesson'),
 
                 'submission_instructions' => $task->submission_instructions,
                 'expected_evidence' => $task->expected_evidence,
@@ -61,7 +61,7 @@ class PracticalTaskController extends Controller
                 'requires_screenshot' => (bool) $task->requires_screenshot,
 
                 'estimated_minutes' => $task->estimated_minutes,
-                'lesson_title' => $task->topic?->title,
+                'lesson_title' => $task->lesson?->title,
             ],
 
             // Shown up front. They are entitled to know the standard.

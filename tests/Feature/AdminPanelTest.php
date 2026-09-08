@@ -3,24 +3,24 @@
 namespace Tests\Feature;
 
 use App\Actions\Enrollment\EnrollEmployee;
-use App\Actions\Progress\CompleteTopic;
+use App\Actions\Progress\CompleteLesson;
 use App\Filament\Pages\Reports;
 use App\Filament\Resources\AssignmentRules\AssignmentRuleResource;
 use App\Filament\Resources\Certificates\CertificateResource;
 use App\Filament\Resources\CourseEnrollments\CourseEnrollmentResource;
-use App\Filament\Resources\Lessons\LessonResource;
+use App\Filament\Resources\Modules\ModuleResource;
 use App\Filament\Resources\Courses\CourseResource;
 use App\Filament\Resources\Departments\DepartmentResource;
 use App\Filament\Resources\DiagnosticTrees\DiagnosticTreeResource;
-use App\Filament\Resources\Topics\TopicResource;
+use App\Filament\Resources\Lessons\LessonResource;
 use App\Filament\Resources\Quizzes\QuizResource;
 use App\Filament\Resources\Users\UserResource;
 use App\Models\AssignmentRule;
 use App\Models\Course;
-use App\Models\Lesson;
+use App\Models\Module;
 use App\Models\Department;
 use App\Models\DiagnosticTree;
-use App\Models\Topic;
+use App\Models\Lesson;
 use App\Models\Quiz;
 use App\Models\QuizQuestion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -40,8 +40,8 @@ class AdminPanelTest extends TestCase
         $department = Department::factory()->create();
 
         $course = Course::factory()->create();
-        $lesson = Lesson::factory()->for($course)->create();
-        $topic = Topic::factory()->for($lesson, 'lesson')->create();
+        $module = Module::factory()->for($course)->create();
+        $lesson = Lesson::factory()->for($module, 'module')->create();
 
         $quiz = Quiz::factory()->create(['course_id' => $course->id]);
         QuizQuestion::factory()->for($quiz)->withOptions(4, [0])->create();
@@ -58,7 +58,7 @@ class AdminPanelTest extends TestCase
         $employee = $this->trainee($department);
         app(EnrollEmployee::class)->handle($employee, $course);
 
-        return compact('department', 'course', 'lesson', 'topic', 'quiz', 'employee');
+        return compact('department', 'course', 'module', 'lesson', 'quiz', 'employee');
     }
 
     public function test_every_admin_list_screen_renders_for_an_admin(): void
@@ -69,8 +69,8 @@ class AdminPanelTest extends TestCase
 
         $pages = [
             CourseResource::getUrl('index'),
+            ModuleResource::getUrl('index'),
             LessonResource::getUrl('index'),
-            TopicResource::getUrl('index'),
             QuizResource::getUrl('index'),
             UserResource::getUrl('index'),
             DepartmentResource::getUrl('index'),
@@ -88,15 +88,15 @@ class AdminPanelTest extends TestCase
 
     public function test_every_admin_create_and_edit_screen_renders(): void
     {
-        ['course' => $course, 'lesson' => $lesson, 'topic' => $topic, 'quiz' => $quiz] = $this->seedContent();
+        ['course' => $course, 'module' => $module, 'lesson' => $lesson, 'quiz' => $quiz] = $this->seedContent();
 
         $this->actingAs($this->admin());
 
         $pages = [
             CourseResource::getUrl('create'),
             CourseResource::getUrl('edit', ['record' => $course]),
+            ModuleResource::getUrl('edit', ['record' => $module]),
             LessonResource::getUrl('edit', ['record' => $lesson]),
-            TopicResource::getUrl('edit', ['record' => $topic]),
             QuizResource::getUrl('edit', ['record' => $quiz]),
             UserResource::getUrl('create'),
         ];
@@ -123,12 +123,12 @@ class AdminPanelTest extends TestCase
 
     public function test_the_module_screen_renders_its_lessons(): void
     {
-        ['lesson' => $lesson] = $this->seedContent();
+        ['module' => $module] = $this->seedContent();
 
         $this->actingAs($this->admin())
-            ->get(LessonResource::getUrl('edit', ['record' => $lesson]))
+            ->get(ModuleResource::getUrl('edit', ['record' => $module]))
             ->assertSuccessful()
-            ->assertSee('Lessons');
+            ->assertSee('Modules');
     }
 
     public function test_the_dashboard_widgets_render(): void
@@ -137,8 +137,8 @@ class AdminPanelTest extends TestCase
 
         ['course' => $course, 'employee' => $employee] = $this->seedContent();
 
-        foreach ($course->topics as $topic) {
-            app(CompleteTopic::class)->handle($employee, $topic);
+        foreach ($course->lessons as $lesson) {
+            app(CompleteLesson::class)->handle($employee, $lesson);
         }
 
         $this->actingAs($this->admin())

@@ -1,6 +1,6 @@
 <script setup>
 /**
- * The onboarding tracker: every assigned course broken into its lessons, each
+ * The onboarding tracker: every assigned course broken into its modules, each
  * module a checklist the employee ticks off as they go.
  *
  * Modules read as milestones — a completed one turns green and collapses out of
@@ -26,9 +26,9 @@ const props = defineProps({
 const collapsed = ref(
     Object.fromEntries(
         props.sections.flatMap((section) =>
-            section.lessons.map((module) => [
-                lesson.id,
-                lesson.total_count > 0 && lesson.completed_count === lesson.total_count,
+            section.modules.map((module) => [
+                module.id,
+                module.total_count > 0 && module.completed_count === module.total_count,
             ]),
         ),
     ),
@@ -45,7 +45,7 @@ function reset(slug) {
     });
 }
 
-const remaining = computed(() => props.overall.total_topics - props.overall.completed_topics);
+const remaining = computed(() => props.overall.total_lessons - props.overall.completed_lessons);
 </script>
 
 <template>
@@ -61,10 +61,10 @@ const remaining = computed(() => props.overall.total_topics - props.overall.comp
 
                 <p class="mb-3 text-sm text-ink-sec">
                     <template v-if="remaining > 0">
-                        {{ overall.completed_topics }} of {{ overall.total_topics }} steps done —
+                        {{ overall.completed_lessons }} of {{ overall.total_lessons }} steps done —
                         {{ remaining }} to go.
                     </template>
-                    <template v-else-if="overall.total_topics > 0">
+                    <template v-else-if="overall.total_lessons > 0">
                         Everything assigned to you is complete. Nice work.
                     </template>
                 </p>
@@ -100,7 +100,7 @@ const remaining = computed(() => props.overall.total_topics - props.overall.comp
                     </h2>
 
                     <span class="text-sm font-semibold text-ink-sec">
-                        {{ section.completed_topics }}/{{ section.total_topics }}
+                        {{ section.completed_lessons }}/{{ section.total_lessons }}
                     </span>
                 </div>
 
@@ -112,11 +112,11 @@ const remaining = computed(() => props.overall.total_topics - props.overall.comp
 
                 <div class="flex flex-col gap-3">
                     <div
-                        v-for="lesson in section.lessons"
-                        :key="lesson.id"
+                        v-for="module in section.modules"
+                        :key="module.id"
                         class="card overflow-hidden"
                         :class="
-                            lesson.total_count > 0 && lesson.completed_count === lesson.total_count
+                            module.total_count > 0 && module.completed_count === module.total_count
                                 ? 'border-ok/40'
                                 : ''
                         "
@@ -124,63 +124,63 @@ const remaining = computed(() => props.overall.total_topics - props.overall.comp
                         <button
                             type="button"
                             class="flex w-full cursor-pointer items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-surface-alt"
-                            :aria-expanded="!collapsed[lesson.id]"
-                            @click="toggle(lesson.id)"
+                            :aria-expanded="!collapsed[module.id]"
+                            @click="toggle(module.id)"
                         >
                             <span
                                 class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold"
                                 :class="
-                                    lesson.total_count > 0 &&
-                                    lesson.completed_count === lesson.total_count
+                                    module.total_count > 0 &&
+                                    module.completed_count === module.total_count
                                         ? 'bg-ok text-white'
                                         : 'bg-surface-alt text-ink-sec'
                                 "
                             >
                                 <template
                                     v-if="
-                                        lesson.total_count > 0 &&
-                                        lesson.completed_count === lesson.total_count
+                                        module.total_count > 0 &&
+                                        module.completed_count === module.total_count
                                     "
                                 >
                                     ✓
                                 </template>
                                 <template v-else>
-                                    {{ lesson.completed_count }}
+                                    {{ module.completed_count }}
                                 </template>
                             </span>
 
                             <span class="min-w-0 flex-1">
                                 <span class="block text-sm font-bold text-navy">
-                                    {{ lesson.label }}
+                                    {{ module.label }}
                                 </span>
                                 <span class="block truncate text-sm text-ink-sec">
-                                    {{ lesson.title }}
+                                    {{ module.title }}
                                 </span>
                             </span>
 
                             <span class="shrink-0 text-xs font-medium text-ink-dis">
-                                {{ lesson.completed_count }}/{{ lesson.total_count }}
+                                {{ module.completed_count }}/{{ module.total_count }}
                             </span>
 
                             <svg
                                 class="h-4 w-4 shrink-0 fill-none stroke-current stroke-2 text-ink-dis transition-transform"
-                                :class="collapsed[lesson.id] ? '-rotate-90' : ''"
+                                :class="collapsed[module.id] ? '-rotate-90' : ''"
                                 viewBox="0 0 24 24"
                             >
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
                             </svg>
                         </button>
 
-                        <div v-show="!collapsed[lesson.id]" class="border-t border-line px-3 pt-2 pb-3">
+                        <div v-show="!collapsed[module.id]" class="border-t border-line px-3 pt-2 pb-3">
                             <p
-                                v-if="lesson.topics"
+                                v-if="module.lessons"
                                 class="mb-2 px-2 text-sm leading-relaxed text-ink-sec"
                             >
-                                {{ lesson.topics }}
+                                {{ module.lessons }}
                             </p>
 
                             <ChecklistItem
-                                v-for="item in lesson.items"
+                                v-for="item in module.items"
                                 :key="item.id"
                                 :item="item"
                                 :course-slug="section.slug"
@@ -224,7 +224,7 @@ const remaining = computed(() => props.overall.total_topics - props.overall.comp
         <EmptyState
             v-else
             title="Nothing to track yet"
-            description="Once you are enrolled in a course, every topic in it turns up here as a step you can tick off."
+            description="Once you are enrolled in a course, every lesson in it turns up here as a step you can tick off."
         >
             <Link
                 :href="route('courses.index')"

@@ -13,8 +13,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable([
     'course_id',
+    'module_id',
     'lesson_id',
-    'topic_id',
     'title',
     'description',
     'passing_score',
@@ -30,14 +30,14 @@ class Quiz extends Model
     use HasFactory, SoftDeletes;
 
     /**
-     * What the quiz is attached to. Derived from lesson_id and
-     * topic_id rather than stored, so the two cannot drift apart.
+     * What the quiz is attached to. Derived from module_id and
+     * lesson_id rather than stored, so the two cannot drift apart.
      */
     public const SCOPE_FINAL = 'final';
 
-    public const SCOPE_LESSON = 'lesson';
+    public const SCOPE_LESSON = 'module';
 
-    public const SCOPE_TOPIC = 'topic';
+    public const SCOPE_TOPIC = 'lesson';
 
     protected function casts(): array
     {
@@ -64,14 +64,14 @@ class Quiz extends Model
         return $this->belongsTo(Course::class);
     }
 
-    public function lesson(): BelongsTo
+    public function module(): BelongsTo
     {
-        return $this->belongsTo(Lesson::class, 'lesson_id');
+        return $this->belongsTo(Module::class, 'module_id');
     }
 
-    public function topic(): BelongsTo
+    public function lesson(): BelongsTo
     {
-        return $this->belongsTo(Topic::class);
+        return $this->belongsTo(Lesson::class);
     }
 
     public function questions(): HasMany
@@ -86,17 +86,17 @@ class Quiz extends Model
 
     // ------------------------------------------------------------- helpers
 
-    /** A quiz tied to neither a module nor a topic is the course's final test. */
+    /** A quiz tied to neither a module nor a lesson is the course's final test. */
     public function isFinalAssessment(): bool
     {
-        return $this->lesson_id === null && $this->topic_id === null;
+        return $this->module_id === null && $this->lesson_id === null;
     }
 
     public function scope(): string
     {
         return match (true) {
-            $this->topic_id !== null => self::SCOPE_TOPIC,
-            $this->lesson_id !== null => self::SCOPE_LESSON,
+            $this->lesson_id !== null => self::SCOPE_TOPIC,
+            $this->module_id !== null => self::SCOPE_LESSON,
             default => self::SCOPE_FINAL,
         };
     }
@@ -104,7 +104,7 @@ class Quiz extends Model
     public function scopeLabel(): string
     {
         return match ($this->scope()) {
-            self::SCOPE_TOPIC => 'Topic check',
+            self::SCOPE_TOPIC => 'Lesson check',
             self::SCOPE_LESSON => 'Knowledge check',
             default => 'Final exam',
         };

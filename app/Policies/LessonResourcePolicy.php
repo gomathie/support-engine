@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Enums\Role;
-use App\Models\TopicResource;
+use App\Models\LessonResource;
 use App\Models\User;
 
-class TopicResourcePolicy
+class LessonResourcePolicy
 {
     public function before(User $user, string $ability): ?bool
     {
@@ -22,33 +22,33 @@ class TopicResourcePolicy
      * with no public URL, so if this returns true the bytes are served and if it
      * returns false they are not — there is no other path to the file.
      */
-    public function download(User $user, TopicResource $resource): bool
+    public function download(User $user, LessonResource $resource): bool
     {
         if (! $resource->is_downloadable) {
             return false;
         }
 
-        return $user->can('view', $resource->topic);
+        return $user->can('view', $resource->lesson);
     }
 
     /** Inline rendering (an image in the page, a PDF in the viewer). */
-    public function stream(User $user, TopicResource $resource): bool
+    public function stream(User $user, LessonResource $resource): bool
     {
-        return $user->can('view', $resource->topic);
+        return $user->can('view', $resource->lesson);
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('topics.manage');
+        return $user->hasPermissionTo('lessons.manage');
     }
 
-    public function update(User $user, TopicResource $resource): bool
+    public function update(User $user, LessonResource $resource): bool
     {
-        return $user->hasPermissionTo('topics.manage');
+        return $user->hasPermissionTo('lessons.manage');
     }
 
-    public function delete(User $user, TopicResource $resource): bool
+    public function delete(User $user, LessonResource $resource): bool
     {
-        return $user->hasPermissionTo('topics.manage');
+        return $user->hasPermissionTo('lessons.manage');
     }
 }

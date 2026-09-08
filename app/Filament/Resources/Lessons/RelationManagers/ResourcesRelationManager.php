@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\Topics\RelationManagers;
+namespace App\Filament\Resources\Lessons\RelationManagers;
 
-use App\Models\TopicResource;
+use App\Models\LessonResource;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -22,11 +22,11 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 /**
- * Files attached to a topic: PDFs, documents, images, downloadables.
+ * Files attached to a lesson: PDFs, documents, images, downloadables.
  *
  * Everything lands on the `private` disk, which has no public URL. Employees
  * reach these bytes only through ResourceDownloadController, which runs
- * TopicResourcePolicy first — so an internal document cannot leak by URL the
+ * LessonResourcePolicy first — so an internal document cannot leak by URL the
  * way it would from storage/app/public.
  */
 class ResourcesRelationManager extends RelationManager
@@ -43,7 +43,7 @@ class ResourcesRelationManager extends RelationManager
                 FileUpload::make('path')
                     ->label('File')
                     ->disk('private')
-                    ->directory('topic-resources')
+                    ->directory('lesson-resources')
                     ->visibility('private')
                     ->required(fn (string $operation) => $operation === 'create')
                     ->maxSize(20480)
@@ -69,7 +69,7 @@ class ResourcesRelationManager extends RelationManager
 
                     // Uploads are stored under a generated name. Using the
                     // original would let an author choose the path, and two
-                    // topics with a "notes.pdf" would collide.
+                    // lessons with a "notes.pdf" would collide.
                     ->storeFileNamesIn('original_filename')
 
                     ->columnSpanFull()
@@ -91,7 +91,7 @@ class ResourcesRelationManager extends RelationManager
 
                 Toggle::make('is_downloadable')
                     ->default(true)
-                    ->helperText('Off for files that are only rendered inline, such as a topic image.'),
+                    ->helperText('Off for files that are only rendered inline, such as a lesson image.'),
 
                 Textarea::make('description')
                     ->rows(2)
@@ -110,7 +110,7 @@ class ResourcesRelationManager extends RelationManager
                 TextColumn::make('name')
                     ->searchable()
                     ->weight('bold')
-                    ->description(fn (TopicResource $record) => $record->description),
+                    ->description(fn (LessonResource $record) => $record->description),
 
                 TextColumn::make('original_filename')
                     ->label('File')
@@ -125,7 +125,7 @@ class ResourcesRelationManager extends RelationManager
 
                 TextColumn::make('size')
                     ->label('Size')
-                    ->state(fn (TopicResource $record) => $record->humanSize())
+                    ->state(fn (LessonResource $record) => $record->humanSize())
                     ->alignEnd(),
 
                 IconColumn::make('is_downloadable')
@@ -136,7 +136,7 @@ class ResourcesRelationManager extends RelationManager
                 // rather than discovering when an employee reports a 404.
                 IconColumn::make('present')
                     ->label('On disk')
-                    ->state(fn (TopicResource $record) => $record->exists())
+                    ->state(fn (LessonResource $record) => $record->exists())
                     ->boolean(),
             ])
             ->reorderable('position')
@@ -154,8 +154,8 @@ class ResourcesRelationManager extends RelationManager
             ->recordActions([
                 Action::make('download')
                     ->icon('heroicon-o-arrow-down-tray')
-                    ->visible(fn (TopicResource $record) => $record->exists())
-                    ->action(fn (TopicResource $record) => Storage::disk($record->disk)->download(
+                    ->visible(fn (LessonResource $record) => $record->exists())
+                    ->action(fn (LessonResource $record) => Storage::disk($record->disk)->download(
                         $record->path,
                         $record->original_filename ?: $record->name,
                     )),

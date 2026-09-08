@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\Lessons\Pages;
+namespace App\Filament\Resources\Modules\Pages;
 
-use App\Filament\Resources\Lessons\LessonResource;
+use App\Filament\Resources\Modules\ModuleResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
-class ListLessons extends ListRecords
+class ListModules extends ListRecords
 {
-    protected static string $resource = LessonResource::class;
+    protected static string $resource = ModuleResource::class;
 
     protected function getHeaderActions(): array
     {

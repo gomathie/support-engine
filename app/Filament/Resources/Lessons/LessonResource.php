@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\Topics;
+namespace App\Filament\Resources\Lessons;
 
-use App\Filament\Resources\Topics\Pages\CreateTopic;
-use App\Filament\Resources\Topics\Pages\EditTopic;
-use App\Filament\Resources\Topics\Pages\ListTopics;
-use App\Filament\Resources\Topics\Schemas\TopicForm;
-use App\Filament\Resources\Topics\Tables\TopicsTable;
-use App\Models\Topic;
+use App\Filament\Resources\Lessons\Pages\CreateLesson;
+use App\Filament\Resources\Lessons\Pages\EditLesson;
+use App\Filament\Resources\Lessons\Pages\ListLessons;
+use App\Filament\Resources\Lessons\Schemas\LessonForm;
+use App\Filament\Resources\Lessons\Tables\LessonsTable;
+use App\Models\Lesson;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -17,9 +17,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
-class TopicResource extends Resource
+class LessonResource extends Resource
 {
-    protected static ?string $model = Topic::class;
+    protected static ?string $model = Lesson::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
 
@@ -29,12 +29,12 @@ class TopicResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return TopicForm::configure($schema);
+        return LessonForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return TopicsTable::configure($table);
+        return LessonsTable::configure($table);
     }
 
     public static function getRelations(): array
@@ -54,16 +54,16 @@ class TopicResource extends Resource
     {
         return [
             'Course' => $record->course?->title ?? '—',
-            'Module' => $record->lesson?->title ?? '—',
+            'Module' => $record->module?->title ?? '—',
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ListTopics::route('/'),
-            'create' => CreateTopic::route('/create'),
-            'edit' => EditTopic::route('/{record}/edit'),
+            'index' => ListLessons::route('/'),
+            'create' => CreateLesson::route('/create'),
+            'edit' => EditLesson::route('/{record}/edit'),
         ];
     }
 

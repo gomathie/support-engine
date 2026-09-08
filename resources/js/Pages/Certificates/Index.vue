@@ -106,7 +106,7 @@ const formatDate = (iso) =>
             v-else
             icon="🎓"
             title="No certificates yet"
-            description="Finish a course — every topic plus its final assessment — and a certificate is issued automatically."
+            description="Finish a course — every lesson plus its final assessment — and a certificate is issued automatically."
         >
             <Link
                 :href="route('courses.index')"

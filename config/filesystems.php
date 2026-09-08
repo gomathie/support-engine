@@ -39,7 +39,7 @@ return [
         ],
 
         /*
-         | Everything an employee uploads or is issued — topic resources and
+         | Everything an employee uploads or is issued — lesson resources and
          | certificate PDFs — lands here. No `url`, no `serve`, no public
          | visibility: the only way to these bytes is through a controller that
          | has run a policy first.

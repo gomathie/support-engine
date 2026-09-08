@@ -7,7 +7,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * URL parsing for video topics (PA-9).
+ * URL parsing for video lessons (PA-9).
  *
  * This is the security boundary of the feature: an author pastes a URL, and the
  * only thing standing between that string and an iframe `src` is this parser.

@@ -4,8 +4,8 @@ namespace App\Filament\Resources\Quizzes\Schemas;
 
 use App\Enums\QuestionType;
 use App\Models\Course;
+use App\Models\Module;
 use App\Models\Lesson;
-use App\Models\Topic;
 use App\Models\Quiz;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Radio;
@@ -46,14 +46,14 @@ class QuizForm
                             ->hiddenLabel()
                             ->options([
                                 Quiz::SCOPE_FINAL => 'Final exam for the whole course',
-                                Quiz::SCOPE_LESSON => 'End-of-lesson knowledge check',
-                                Quiz::SCOPE_TOPIC => 'Knowledge check on one topic',
+                                Quiz::SCOPE_LESSON => 'End-of-module knowledge check',
+                                Quiz::SCOPE_TOPIC => 'Knowledge check on one lesson',
                             ])
                             ->descriptions([
-                                Quiz::SCOPE_FINAL => 'Unlocks once every topic is complete. Passing it '
+                                Quiz::SCOPE_FINAL => 'Unlocks once every lesson is complete. Passing it '
                                     .'completes the course and issues the certificate.',
-                                Quiz::SCOPE_LESSON => 'Sits at the end of one lesson.',
-                                Quiz::SCOPE_TOPIC => 'Attached to a single topic. Set that topic\'s '
+                                Quiz::SCOPE_LESSON => 'Sits at the end of one module.',
+                                Quiz::SCOPE_TOPIC => 'Attached to a single lesson. Set that lesson\'s '
                                     .'completion requirement to "quiz" to make it mandatory.',
                             ])
                             ->default(Quiz::SCOPE_FINAL)
@@ -64,10 +64,10 @@ class QuizForm
                                 $component->state($record?->scope() ?? Quiz::SCOPE_FINAL);
                             }),
 
-                        Select::make('lesson_id')
+                        Select::make('module_id')
                             ->label('Module')
                             ->options(fn (Get $get) => $get('course_id')
-                                ? Lesson::query()
+                                ? Module::query()
                                     ->where('course_id', $get('course_id'))
                                     ->orderBy('position')
                                     ->pluck('title', 'id')
@@ -77,10 +77,10 @@ class QuizForm
                             ->required()
                             ->visible(fn (Get $get) => $get('scope') === Quiz::SCOPE_LESSON),
 
-                        Select::make('topic_id')
-                            ->label('Topic')
+                        Select::make('lesson_id')
+                            ->label('Lesson')
                             ->options(fn (Get $get) => $get('course_id')
-                                ? Topic::query()
+                                ? Lesson::query()
                                     ->where('course_id', $get('course_id'))
                                     ->orderBy('position')
                                     ->pluck('title', 'id')
@@ -139,7 +139,7 @@ class QuizForm
                         Toggle::make('is_published')
                             ->columnSpanFull()
                             ->helperText('Unpublished assessments are invisible to employees, and a '
-                                .'course with an unpublished final exam completes on topics alone.'),
+                                .'course with an unpublished final exam completes on lessons alone.'),
                     ]),
 
                 Section::make('Questions')

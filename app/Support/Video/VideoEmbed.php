@@ -31,7 +31,7 @@ final class VideoEmbed
     ) {}
 
     /**
-     * Parse a pasted URL, or a bare id already stored on a topic.
+     * Parse a pasted URL, or a bare id already stored on a lesson.
      *
      * Returns null rather than throwing: the caller is usually a validator or a
      * view, and both want "is this usable" rather than an exception.

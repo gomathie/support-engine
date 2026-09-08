@@ -44,7 +44,53 @@ class QuizPolicy
             return false;
         }
 
+        if ($quiz->isFinalAssessment() && ! $this->courseworkIsFinished($user, $quiz)) {
+            return false;
+        }
+
         return $quiz->hasAttemptsRemainingFor($user);
+    }
+
+    /**
+     * A final exam opens last: every lesson read, every knowledge check passed.
+     *
+     * An examination is a summative test of the whole course. Sitting it with
+     * half the material unread burns an attempt and tells nobody anything —
+     * least of all the trainee, who then has one fewer try at the real thing.
+     *
+     * This was previously only a flag on the course page deciding whether to
+     * render the button. Posting straight at the endpoint started an attempt
+     * regardless, which is the difference between a courtesy and a control.
+     *
+     * The papers of one examination do not gate each other: Sections A, B and C
+     * are peers, and requiring them in sequence would be an invention.
+     */
+    private function courseworkIsFinished(User $user, Quiz $quiz): bool
+    {
+        $course = $quiz->course;
+
+        $publishedTopics = $course->lessons()->where('is_published', true)->pluck('id');
+
+        if ($publishedTopics->isNotEmpty()) {
+            $completed = $user->lessonProgress()
+                ->whereIn('lesson_id', $publishedTopics)
+                ->whereNotNull('completed_at')
+                ->count();
+
+            if ($completed < $publishedTopics->count()) {
+                return false;
+            }
+        }
+
+        // Module-scoped checks only. Lesson quizzes are already accounted for:
+        // a lesson gated on one is not complete until it is passed.
+        $checks = $course->quizzes()
+            ->whereNotNull('module_id')
+            ->whereNull('lesson_id')
+            ->where('is_published', true)
+            ->get();
+
+        return $checks->every(fn (Quiz $check) => $check->passedBy($user));
     }
 
     /*

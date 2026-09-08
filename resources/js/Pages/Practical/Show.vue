@@ -128,8 +128,8 @@ const buttonQuiet =
                     </span>
                 </div>
 
-                <!-- Safe: sanitised server-side through the topic allowlist. -->
-                <div class="topic-prose prose max-w-none" v-html="task.brief"></div>
+                <!-- Safe: sanitised server-side through the lesson allowlist. -->
+                <div class="lesson-prose prose max-w-none" v-html="task.brief"></div>
 
                 <div v-if="task.submission_instructions" class="mt-6 rounded-lg bg-surface-alt p-4">
                     <p class="mb-1 text-xs font-semibold tracking-wide text-ink-dis uppercase">

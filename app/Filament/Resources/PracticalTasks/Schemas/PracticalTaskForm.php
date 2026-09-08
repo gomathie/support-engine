@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\PracticalTasks\Schemas;
 
 use App\Models\Course;
-use App\Models\Topic;
+use App\Models\Lesson;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -30,17 +30,17 @@ class PracticalTaskForm
                             ->required()
                             ->live(),
 
-                        Select::make('topic_id')
-                            ->label('Topic (optional)')
+                        Select::make('lesson_id')
+                            ->label('Lesson (optional)')
                             ->options(fn ($get) => $get('course_id')
-                                ? Topic::query()
+                                ? Lesson::query()
                                     ->where('course_id', $get('course_id'))
                                     ->orderBy('position')
                                     ->pluck('title', 'id')
                                 : [])
                             ->searchable()
                             ->placeholder('Stands for the whole course')
-                            ->helperText('Attaching it to a topic puts it directly after that topic.'),
+                            ->helperText('Attaching it to a lesson puts it directly after that lesson.'),
 
                         TextInput::make('title')
                             ->required()

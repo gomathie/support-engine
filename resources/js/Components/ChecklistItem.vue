@@ -31,7 +31,7 @@ function toggle() {
     saving.value = true;
 
     router.visit(
-        route(previous ? 'topics.uncomplete' : 'topics.complete', [
+        route(previous ? 'lessons.uncomplete' : 'lessons.complete', [
             props.courseSlug,
             props.item.slug,
         ]),

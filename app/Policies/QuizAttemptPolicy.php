@@ -49,7 +49,7 @@ class QuizAttemptPolicy
      *
      * A trainee sees their own. A trainer with `transcripts.view-all` may read
      * anybody's, which is deliberate: a trainer covering a colleague, or
-     * checking how a topic lands across the intake, needs the whole picture.
+     * checking how a lesson lands across the intake, needs the whole picture.
      * Reading is not grading — see grade() below.
      */
     public function view(User $user, QuizAttempt $attempt): bool

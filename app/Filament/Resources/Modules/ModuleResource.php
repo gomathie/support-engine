@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\Resources\Lessons;
+namespace App\Filament\Resources\Modules;
 
-use App\Filament\Resources\Lessons\Pages\CreateLesson;
-use App\Filament\Resources\Lessons\Pages\EditLesson;
-use App\Filament\Resources\Lessons\Pages\ListLessons;
-use App\Filament\Resources\Lessons\Schemas\LessonForm;
-use App\Filament\Resources\Lessons\Tables\LessonsTable;
-use App\Models\Lesson;
+use App\Filament\Resources\Modules\Pages\CreateModule;
+use App\Filament\Resources\Modules\Pages\EditModule;
+use App\Filament\Resources\Modules\Pages\ListModules;
+use App\Filament\Resources\Modules\Schemas\ModuleForm;
+use App\Filament\Resources\Modules\Tables\ModulesTable;
+use App\Models\Module;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -17,9 +17,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
 
-class LessonResource extends Resource
+class ModuleResource extends Resource
 {
-    protected static ?string $model = Lesson::class;
+    protected static ?string $model = Module::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSquares2x2;
 
@@ -29,27 +29,27 @@ class LessonResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return LessonForm::configure($schema);
+        return ModuleForm::configure($schema);
     }
 
     public static function table(Table $table): Table
     {
-        return LessonsTable::configure($table);
+        return ModulesTable::configure($table);
     }
 
     public static function getRelations(): array
     {
         return [
-            RelationManagers\TopicsRelationManager::class,
+            RelationManagers\LessonsRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ListLessons::route('/'),
-            'create' => CreateLesson::route('/create'),
-            'edit' => EditLesson::route('/{record}/edit'),
+            'index' => ListModules::route('/'),
+            'create' => CreateModule::route('/create'),
+            'edit' => EditModule::route('/{record}/edit'),
         ];
     }
 

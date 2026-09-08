@@ -28,7 +28,7 @@ class RecalculateCourseProgress
     public function handle(User $user, Course $course): CourseProgress
     {
         return DB::transaction(function () use ($user, $course): CourseProgress {
-            // Lock the rollup so two concurrent topic completions cannot both
+            // Lock the rollup so two concurrent lesson completions cannot both
             // read "9 of 10" and race to write it.
             $progress = CourseProgress::query()
                 ->where('user_id', $user->id)
@@ -40,45 +40,73 @@ class RecalculateCourseProgress
                     'course_id' => $course->id,
                 ]);
 
-            $totalLessons = $course->topics()->where('is_published', true)->count();
+            $totalLessons = $course->lessons()->where('is_published', true)->count();
 
-            $completedLessons = $user->topicProgress()
+            $completedLessons = $user->lessonProgress()
                 ->where('course_id', $course->id)
                 ->whereNotNull('completed_at')
-                ->whereHas('topic', fn ($q) => $q->where('is_published', true))
+                ->whereHas('lesson', fn ($q) => $q->where('is_published', true))
                 ->count();
 
-            $progress->total_topics = $totalLessons;
-            $progress->completed_topics = min($completedLessons, $totalLessons);
+            $progress->total_lessons = $totalLessons;
+            $progress->completed_lessons = min($completedLessons, $totalLessons);
 
             $progress->percentage = $totalLessons > 0
-                ? round($progress->completed_topics / $totalLessons * 100, 2)
+                ? round($progress->completed_lessons / $totalLessons * 100, 2)
                 : 0;
 
-            // ---------------------------------------------------- final quiz
-            $finalQuiz = $course->finalQuiz()->where('is_published', true)->first();
+            // --------------------------------------------------- final exams
+            /*
+             * A course may have several, and every one of them must be passed.
+             *
+             * The PILOT examination is three papers — A, B and C — so a single
+             * final exam was never the right shape. This used to read
+             * `finalQuiz()->first()`, which meant a second course-scoped quiz
+             * was sittable and counted for nothing: the official 40-question
+             * Section A sat in front of trainees deciding precisely nothing
+             * until somebody went looking.
+             */
+            $finalExams = $course->finalQuiz()->where('is_published', true)->get();
 
-            $quizSatisfied = true;
-            if ($finalQuiz) {
-                $best = $finalQuiz->bestAttemptFor($user);
-                $progress->final_score = $best?->score;
-                $progress->quiz_attempts_count = $finalQuiz->attemptsUsedBy($user);
-                $quizSatisfied = $finalQuiz->passedBy($user);
+            $quizSatisfied = $finalExams->every(fn ($exam) => $exam->passedBy($user));
+
+            if ($finalExams->isNotEmpty()) {
+                /*
+                 * One number for the certificate and the report: the mean of
+                 * the best attempt on each paper. Unsat papers count as null
+                 * rather than zero, so a part-finished examination does not
+                 * report a score that looks like a failure.
+                 */
+                $scores = $finalExams
+                    ->map(fn ($exam) => $exam->bestAttemptFor($user)?->score)
+                    ->filter(fn ($score) => $score !== null);
+
+                $progress->final_score = $scores->isEmpty()
+                    ? null
+                    : round($scores->avg(), 2);
+
+                $progress->quiz_attempts_count = $finalExams
+                    ->sum(fn ($exam) => $exam->attemptsUsedBy($user));
             }
+
+            // Out of attempts on *any* paper is terminal, not just the first.
+            $finalExhausted = $finalExams->contains(
+                fn ($exam) => ! $exam->passedBy($user) && ! $exam->hasAttemptsRemainingFor($user)
+            );
 
             // ------------------------------------------ knowledge checks
             /*
-             * Every topic ends with a knowledge check, and every one of them
+             * Every lesson ends with a knowledge check, and every one of them
              * has to be passed.
              *
              * These are module-scoped quizzes. Without this they were
              * decoration: a trainee could skip every check and still finish the
              * course on the final exam alone, which makes "you must pass" untrue
-             * for the thing sitting at the end of each topic.
+             * for the thing sitting at the end of each lesson.
              */
             $knowledgeChecks = $course->quizzes()
-                ->whereNotNull('lesson_id')
-                ->whereNull('topic_id')
+                ->whereNotNull('module_id')
+                ->whereNull('lesson_id')
                 ->where('is_published', true)
                 ->get();
 
@@ -115,8 +143,8 @@ class RecalculateCourseProgress
             $practicalsSatisfied = $practicals->count() === $practicalsPassed;
 
             // ------------------------------------------------------- status
-            $lessonsSatisfied = $totalLessons > 0 && $progress->completed_topics >= $totalLessons;
-            $hasStarted = $progress->completed_topics > 0 || $progress->quiz_attempts_count > 0;
+            $lessonsSatisfied = $totalLessons > 0 && $progress->completed_lessons >= $totalLessons;
+            $hasStarted = $progress->completed_lessons > 0 || $progress->quiz_attempts_count > 0;
 
             $progress->started_at ??= $hasStarted ? now() : null;
             $progress->last_activity_at = now();
@@ -128,10 +156,8 @@ class RecalculateCourseProgress
                 $progress->completed_at = null;
 
                 $progress->status = match (true) {
-                    // Out of attempts on a final assessment they have not passed.
-                    $finalQuiz !== null
-                        && ! $quizSatisfied
-                        && ! $finalQuiz->hasAttemptsRemainingFor($user) => ProgressStatus::Failed,
+                    // Out of attempts on any final paper they have not passed.
+                    $finalExhausted => ProgressStatus::Failed,
 
                     // Same for a knowledge check they can no longer retake:
                     // the course can never be finished, so it must not sit at
@@ -149,7 +175,7 @@ class RecalculateCourseProgress
             $progress->save();
 
             // Certificate issuance hangs off completion rather than off the
-            // controller, so every path that can finish a course — a topic tick,
+            // controller, so every path that can finish a course — a lesson tick,
             // a passing quiz, an admin backfill — issues one.
             if ($progress->status === ProgressStatus::Completed) {
                 $this->issueCertificate->handle($user, $course, $progress);

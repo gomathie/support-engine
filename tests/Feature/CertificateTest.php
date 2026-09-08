@@ -3,14 +3,14 @@
 namespace Tests\Feature;
 
 use App\Actions\Enrollment\EnrollEmployee;
-use App\Actions\Progress\CompleteTopic;
+use App\Actions\Progress\CompleteLesson;
 use App\Actions\Quiz\GradeQuizAttempt;
 use App\Actions\Quiz\StartQuizAttempt;
 use App\Jobs\RenderCertificatePdf;
 use App\Models\Certificate;
 use App\Models\Course;
+use App\Models\Module;
 use App\Models\Lesson;
-use App\Models\Topic;
 use App\Models\Quiz;
 use App\Models\QuizQuestion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -22,12 +22,12 @@ class CertificateTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function completableCourse(int $topics = 2): Course
+    private function completableCourse(int $lessons = 2): Course
     {
         $course = Course::factory()->create();
-        $lesson = Lesson::factory()->for($course)->create();
+        $module = Module::factory()->for($course)->create();
 
-        Topic::factory()->count($topics)->for($lesson, 'lesson')->create();
+        Lesson::factory()->count($lessons)->for($module, 'module')->create();
 
         return $course->fresh();
     }
@@ -41,8 +41,8 @@ class CertificateTest extends TestCase
 
         app(EnrollEmployee::class)->handle($user, $course);
 
-        foreach ($course->topics as $topic) {
-            app(CompleteTopic::class)->handle($user, $topic);
+        foreach ($course->lessons as $lesson) {
+            app(CompleteLesson::class)->handle($user, $lesson);
         }
 
         $certificate = Certificate::query()
@@ -59,7 +59,7 @@ class CertificateTest extends TestCase
     }
 
     /**
-     * Issuance runs from RecalculateCourseProgress, which fires on every topic
+     * Issuance runs from RecalculateCourseProgress, which fires on every lesson
      * tick — so it has to be safe to call repeatedly.
      */
     public function test_certificates_are_not_duplicated(): void
@@ -71,14 +71,14 @@ class CertificateTest extends TestCase
 
         app(EnrollEmployee::class)->handle($user, $course);
 
-        foreach ($course->topics as $topic) {
-            app(CompleteTopic::class)->handle($user, $topic);
+        foreach ($course->lessons as $lesson) {
+            app(CompleteLesson::class)->handle($user, $lesson);
         }
 
         // Tick one off and back on, forcing another recalculation.
-        $first = $course->topics()->first();
-        app(CompleteTopic::class)->undo($user, $first);
-        app(CompleteTopic::class)->handle($user, $first);
+        $first = $course->lessons()->first();
+        app(CompleteLesson::class)->undo($user, $first);
+        app(CompleteLesson::class)->handle($user, $first);
 
         $this->assertSame(1, Certificate::query()->where('user_id', $user->id)->count());
     }
@@ -98,8 +98,8 @@ class CertificateTest extends TestCase
         $user = $this->trainee();
         app(EnrollEmployee::class)->handle($user, $course);
 
-        foreach ($course->topics as $topic) {
-            app(CompleteTopic::class)->handle($user, $topic);
+        foreach ($course->lessons as $lesson) {
+            app(CompleteLesson::class)->handle($user, $lesson);
         }
 
         $this->assertSame(0, Certificate::query()->where('user_id', $user->id)->count());
@@ -132,8 +132,8 @@ class CertificateTest extends TestCase
 
         app(EnrollEmployee::class)->handle($user, $course);
 
-        foreach ($course->topics as $topic) {
-            app(CompleteTopic::class)->handle($user, $topic);
+        foreach ($course->lessons as $lesson) {
+            app(CompleteLesson::class)->handle($user, $lesson);
         }
 
         $certificate = Certificate::query()->where('user_id', $user->id)->firstOrFail();
@@ -153,8 +153,8 @@ class CertificateTest extends TestCase
         $owner = $this->trainee();
 
         app(EnrollEmployee::class)->handle($owner, $course);
-        foreach ($course->topics as $topic) {
-            app(CompleteTopic::class)->handle($owner, $topic);
+        foreach ($course->lessons as $lesson) {
+            app(CompleteLesson::class)->handle($owner, $lesson);
         }
 
         $certificate = Certificate::query()->where('user_id', $owner->id)->firstOrFail();
@@ -172,8 +172,8 @@ class CertificateTest extends TestCase
         $owner = $this->trainee();
 
         app(EnrollEmployee::class)->handle($owner, $course);
-        foreach ($course->topics as $topic) {
-            app(CompleteTopic::class)->handle($owner, $topic);
+        foreach ($course->lessons as $lesson) {
+            app(CompleteLesson::class)->handle($owner, $lesson);
         }
 
         $certificate = Certificate::query()->where('user_id', $owner->id)->firstOrFail();
@@ -193,8 +193,8 @@ class CertificateTest extends TestCase
         $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
-        foreach ($course->topics as $topic) {
-            app(CompleteTopic::class)->handle($user, $topic);
+        foreach ($course->lessons as $lesson) {
+            app(CompleteLesson::class)->handle($user, $lesson);
         }
 
         $certificate = Certificate::query()->where('user_id', $user->id)->firstOrFail();
@@ -216,8 +216,8 @@ class CertificateTest extends TestCase
         $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
-        foreach ($course->topics as $topic) {
-            app(CompleteTopic::class)->handle($user, $topic);
+        foreach ($course->lessons as $lesson) {
+            app(CompleteLesson::class)->handle($user, $lesson);
         }
 
         $certificate = Certificate::query()->where('user_id', $user->id)->firstOrFail();

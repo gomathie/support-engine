@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\DB;
  * completes, so the award happens on the same event that issues a certificate.
  *
  * Idempotent throughout: it runs on every progress recalculation, which happens
- * on every topic tick.
+ * on every lesson tick.
  */
 class AwardCompetencyLevel
 {
@@ -57,7 +57,7 @@ class AwardCompetencyLevel
                 ->first();
 
             // Already held. A revoked award is left revoked — restoring it is a
-            // deliberate act, not something a topic tick should do silently.
+            // deliberate act, not something a lesson tick should do silently.
             if ($existing) {
                 return null;
             }

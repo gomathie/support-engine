@@ -118,14 +118,14 @@ class Course extends Model
 
     // --------------------------------------------------------- relationships
 
-    public function lessons(): HasMany
+    public function modules(): HasMany
     {
-        return $this->hasMany(Lesson::class)->orderBy('position');
+        return $this->hasMany(Module::class)->orderBy('position');
     }
 
-    public function topics(): HasMany
+    public function lessons(): HasMany
     {
-        return $this->hasMany(Topic::class);
+        return $this->hasMany(Lesson::class);
     }
 
     public function quizzes(): HasMany
@@ -135,13 +135,13 @@ class Course extends Model
 
     /**
      * The course-level assessment: a quiz attached to the course but to no
-     * particular module or topic.
+     * particular module or lesson.
      */
     public function finalQuiz(): HasMany
     {
         return $this->hasMany(Quiz::class)
-            ->whereNull('lesson_id')
-            ->whereNull('topic_id');
+            ->whereNull('module_id')
+            ->whereNull('lesson_id');
     }
 
     public function instructor(): BelongsTo
@@ -212,14 +212,14 @@ class Course extends Model
 
     public function resources(): HasManyThrough
     {
-        return $this->hasManyThrough(TopicResource::class, Topic::class);
+        return $this->hasManyThrough(LessonResource::class, Lesson::class);
     }
 
     // ------------------------------------------------------------ accessors
 
     public function publishedLessonCount(): int
     {
-        return $this->topics()->where('is_published', true)->count();
+        return $this->lessons()->where('is_published', true)->count();
     }
 
     /**

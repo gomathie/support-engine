@@ -1,11 +1,11 @@
 <script setup>
 /**
- * The slide-in "standard defaults" drawer from the skills lesson.
+ * The slide-in "standard defaults" drawer from the skills module.
  *
  * The prototype built this list at runtime by scanning the DOM for `.std`
  * elements and inferring each one's section by walking previous siblings until
  * it hit a heading. That worked but was fragile and unauthored — nobody could
- * edit an entry. The list now arrives as rows from topic_annotations.
+ * edit an entry. The list now arrives as rows from lesson_annotations.
  *
  * The interaction is preserved exactly: click to open, click the backdrop or
  * press Escape to close, click an entry to scroll the marker into view and
@@ -25,10 +25,10 @@ const unresolved = computed(() => props.annotations.filter((a) => !a.is_resolved
 function jumpTo(anchor) {
     emit('close');
 
-    // The anchor ids inside topic HTML are namespaced by HTMLPurifier's
+    // The anchor ids inside lesson HTML are namespaced by HTMLPurifier's
     // Attr.IDPrefix, so look for the prefixed id first.
     const el =
-        document.getElementById(`topic-${anchor}`) || document.getElementById(anchor);
+        document.getElementById(`lesson-${anchor}`) || document.getElementById(anchor);
 
     if (!el) return;
 
@@ -103,7 +103,7 @@ onUnmounted(() => document.removeEventListener('keydown', onKeydown));
                     </button>
 
                     <p v-if="!unresolved.length" class="text-sm text-ink-dis italic">
-                        Nothing outstanding in this topic.
+                        Nothing outstanding in this lesson.
                     </p>
                 </div>
             </div>

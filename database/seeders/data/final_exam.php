@@ -735,7 +735,7 @@ Show the completed configuration.',
             'number' => 9,
             'title' => 'Logistics Module',
             'prompt' => '19. Configure the Object for Logistics
-Add the created object to the Logistics lesson.
+Add the created object to the Logistics module.
 Configure it for use in logistics tasks.
 Verify that it is available when creating a task.
 20. Create a Warehouse and Counterparty
@@ -754,7 +754,7 @@ Use the circular logistics geofence for the object.
 Show where the prohibition is configured.
 Explain how the system controls visits to the prohibited area.
 23. DaData Integration
-Enable DaData in the Logistics lesson.
+Enable DaData in the Logistics module.
 Use the provided test key.
 Show where the key is entered.
 Test address search through DaData.

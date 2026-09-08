@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Enums\CompletionRequirement;
-use App\Enums\TopicType;
+use App\Enums\LessonType;
 use App\Support\Video\VideoEmbed;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 
 #[Fillable([
-    'lesson_id',
+    'module_id',
     'course_id',
     'title',
     'slug',
@@ -39,14 +39,14 @@ use Illuminate\Support\Str;
     'position',
     'is_published',
 ])]
-class Topic extends Model
+class Lesson extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected function casts(): array
     {
         return [
-            'type' => TopicType::class,
+            'type' => LessonType::class,
             'completion_requirement' => CompletionRequirement::class,
             'is_published' => 'boolean',
         ];
@@ -54,22 +54,22 @@ class Topic extends Model
 
     protected static function booted(): void
     {
-        static::saving(function (self $topic): void {
-            $topic->slug ??= Str::slug($topic->title);
+        static::saving(function (self $lesson): void {
+            $lesson->slug ??= Str::slug($lesson->title);
 
             // course_id is denormalised for query speed, so it must never be
             // allowed to drift from the module's course.
-            if ($topic->lesson_id) {
-                $topic->course_id = Lesson::withTrashed()
-                    ->whereKey($topic->lesson_id)
+            if ($lesson->module_id) {
+                $lesson->course_id = Module::withTrashed()
+                    ->whereKey($lesson->module_id)
                     ->value('course_id');
             }
         });
 
-        static::creating(function (self $topic): void {
-            if ($topic->position === null || $topic->position === 0) {
-                $topic->position = (int) static::query()
-                    ->where('lesson_id', $topic->lesson_id)
+        static::creating(function (self $lesson): void {
+            if ($lesson->position === null || $lesson->position === 0) {
+                $lesson->position = (int) static::query()
+                    ->where('module_id', $lesson->module_id)
                     ->max('position') + 1;
             }
         });
@@ -87,9 +87,9 @@ class Topic extends Model
 
     // --------------------------------------------------------- relationships
 
-    public function lesson(): BelongsTo
+    public function module(): BelongsTo
     {
-        return $this->belongsTo(Lesson::class, 'lesson_id');
+        return $this->belongsTo(Module::class, 'module_id');
     }
 
     public function course(): BelongsTo
@@ -99,12 +99,12 @@ class Topic extends Model
 
     public function resources(): HasMany
     {
-        return $this->hasMany(TopicResource::class)->orderBy('position');
+        return $this->hasMany(LessonResource::class)->orderBy('position');
     }
 
     public function annotations(): HasMany
     {
-        return $this->hasMany(TopicAnnotation::class)->orderBy('position');
+        return $this->hasMany(LessonAnnotation::class)->orderBy('position');
     }
 
     public function quiz(): HasOne
@@ -114,7 +114,7 @@ class Topic extends Model
 
     public function progress(): HasMany
     {
-        return $this->hasMany(TopicProgress::class);
+        return $this->hasMany(LessonProgress::class);
     }
 
     // ------------------------------------------------------------- helpers

@@ -10,7 +10,7 @@
  */
 
 return [
-    'lesson_subtitle' => 'Final testing and consultation',
+    'lesson_subtitle' => 'Review and consultation',
 
     'topics' => [
 

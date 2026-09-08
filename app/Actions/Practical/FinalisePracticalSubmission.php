@@ -54,7 +54,7 @@ class FinalisePracticalSubmission
         /*
          * A passed practical can be the last thing standing between a trainee
          * and a finished course, so the rollup has to be recomputed here as
-         * well as on a topic tick. Without this the course would sit at
+         * well as on a lesson tick. Without this the course would sit at
          * "in progress" until something else happened to nudge it.
          */
         $course = $submission->task?->course;

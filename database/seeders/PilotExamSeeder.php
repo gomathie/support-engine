@@ -6,7 +6,7 @@ use App\Enums\CourseStatus;
 use App\Enums\QuestionType;
 use App\Enums\Role;
 use App\Models\Course;
-use App\Models\Lesson;
+use App\Models\Module;
 use App\Models\Quiz;
 use App\Models\QuizQuestion;
 use App\Models\User;
@@ -67,20 +67,16 @@ class PilotExamSeeder extends Seeder
             ],
             [
                 /*
-                 * Scoped to the final lesson, alongside Sections B and C.
+                 * A final exam: attached to neither a module nor a lesson.
                  *
-                 * It used to be course-scoped, which made it a *second* final
-                 * exam. `RecalculateCourseProgress` reads `finalQuiz()->first()`,
-                 * so the course already had its gate and this sat in front of
-                 * trainees looking exactly like the exam that counted while
-                 * counting for nothing. The three sections belong together.
+                 * That is safe now only because a course may have several and
+                 * `RecalculateCourseProgress` requires every published one to be
+                 * passed. While it read `finalQuiz()->first()` this same scoping
+                 * made Section A sittable and meaningless — it looked exactly
+                 * like the exam that counted while counting for nothing.
                  */
-                'lesson_id' => Lesson::query()
-                    ->where('course_id', $course->id)
-                    ->where('subtitle', 'Final testing and consultation')
-                    ->value('id'),
-
-                'topic_id' => null,
+                'module_id' => null,
+                'lesson_id' => null,
                 'description' => 'The official PILOT advanced knowledge test. '
                     .'40 questions, one correct answer each. '
                     .'You need 70 % (28 correct) to pass. Time limit: 60 minutes.',
@@ -96,7 +92,7 @@ class PilotExamSeeder extends Seeder
                  * closes PA-16 — the long-standing blocker on this exam
                  * deciding anything. Before that it was published but
                  * course-scoped, so it looked authoritative and counted for
-                 * nothing; now it is lesson-scoped and gates the final lesson.
+                 * nothing; now it is module-scoped and gates the final module.
                  */
                 'is_published' => true,
             ],

@@ -4,12 +4,12 @@ namespace Database\Seeders;
 
 use App\Enums\CompletionRequirement;
 use App\Enums\CourseStatus;
-use App\Enums\TopicType;
+use App\Enums\LessonType;
 use App\Enums\QuestionType;
 use App\Enums\Role;
 use App\Models\Course;
+use App\Models\Module;
 use App\Models\Lesson;
-use App\Models\Topic;
 use App\Models\Quiz;
 use App\Models\QuizQuestion;
 use App\Models\User;
@@ -42,8 +42,8 @@ class TrainingContentSeeder extends Seeder
                 ],
             );
 
-            foreach ($courseData['lessons'] as $lessonPosition => $lessonData) {
-                $lesson = Lesson::query()->updateOrCreate(
+            foreach ($courseData['modules'] as $lessonPosition => $lessonData) {
+                $module = Module::query()->updateOrCreate(
                     [
                         'course_id' => $course->id,
                         'title' => $lessonData['title'],
@@ -56,20 +56,20 @@ class TrainingContentSeeder extends Seeder
                     ],
                 );
 
-                foreach ($lessonData['topics'] as $topicPosition => $title) {
-                    Topic::query()->updateOrCreate(
+                foreach ($lessonData['lessons'] as $topicPosition => $title) {
+                    Lesson::query()->updateOrCreate(
                         [
-                            'lesson_id' => $lesson->id,
+                            'module_id' => $module->id,
                             'slug' => Str::slug(Str::limit($title, 60, '')),
                         ],
                         [
                             'course_id' => $course->id,
                             'title' => $title,
-                            'type' => TopicType::RichText,
+                            'type' => LessonType::RichText,
 
-                            // Reading is recorded on open. A topic makes no
+                            // Reading is recorded on open. A lesson makes no
                             // claim about competence — the knowledge check at
-                            // the end of the lesson does.
+                            // the end of the module does.
                             'completion_requirement' => CompletionRequirement::View,
 
                             'position' => $topicPosition + 1,
@@ -98,8 +98,8 @@ class TrainingContentSeeder extends Seeder
         $quiz = Quiz::query()->updateOrCreate(
             [
                 'course_id' => $course->id,
+                'module_id' => null,
                 'lesson_id' => null,
-                'topic_id' => null,
             ],
             [
                 'title' => 'PILOT 1st-line final assessment',

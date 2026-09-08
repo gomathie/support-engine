@@ -53,6 +53,11 @@ if a change does not alter what somebody can see or do, it is not here.
   be calculated yet; the screen says which, and what each is waiting on, rather
   than leaving them out.
 - **What's new** — this screen.
+- **The full PILOT examination is live.** All three sections now count: Section A
+  (40 multiple-choice, marked instantly), Section B (15 written answers) and
+  Section C (18 practical tasks demonstrated to an examiner). They sit together
+  in their own **Final examination** lesson, separate from the review and
+  consultation that precedes them.
 
 ### Changed
 
@@ -83,6 +88,10 @@ if a change does not alter what somebody can see or do, it is not here.
 
 ### Known limitations
 
+- **Sections B and C are marked by hand — 33 answers between them.** A trainee
+  cannot finish the course until a trainer has read all of them. That is the
+  intended rigour, but it puts a person on every trainee's critical path, and it
+  will be the first thing to strain as intakes grow.
 - **Uploaded video is not yet transcoded.** A large file is served as-is, which
   is hard going on a poor connection. Multiple quality levels need processing
   capacity on the server that is not in place yet.

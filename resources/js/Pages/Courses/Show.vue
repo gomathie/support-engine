@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import EmployeeLayout from '@/Layouts/EmployeeLayout.vue';
 import ProgressBar from '@/Components/ProgressBar.vue';
@@ -7,15 +7,19 @@ import StatusPill from '@/Components/StatusPill.vue';
 
 const props = defineProps({
     course: { type: Object, required: true },
-    lessons: { type: Array, default: () => [] },
+    modules: { type: Array, default: () => [] },
     progress: { type: Object, required: true },
-    final_quiz: { type: Object, default: null },
+    final_exams: { type: Array, default: () => [] },
     practical_tasks: { type: Array, default: () => [] },
     can: { type: Object, default: () => ({}) },
 });
 
 const collapsed = ref({});
 const toggle = (id) => (collapsed.value[id] = !collapsed.value[id]);
+
+// Shown only when there is more than one paper, so a single-exam course reads
+// exactly as it did before.
+const passedExams = computed(() => props.final_exams.filter((e) => e.passed).length);
 </script>
 
 <template>
@@ -55,7 +59,7 @@ const toggle = (id) => (collapsed.value[id] = !collapsed.value[id]);
                     ></div>
                 </div>
                 <p class="mt-2 text-sm text-white/80">
-                    {{ progress.completed_topics }} of {{ progress.total_topics }} topics ·
+                    {{ progress.completed_lessons }} of {{ progress.total_lessons }} lessons ·
                     {{ Math.round(progress.percentage) }}%
                 </p>
             </div>
@@ -70,74 +74,74 @@ const toggle = (id) => (collapsed.value[id] = !collapsed.value[id]);
 
         <!-- ─── MODULES ─────────────────────────────────────── -->
         <div class="mb-8 flex flex-col gap-3">
-            <div v-for="lesson in lessons" :key="lesson.id" class="card overflow-hidden">
+            <div v-for="module in modules" :key="module.id" class="card overflow-hidden">
                 <button
                     type="button"
                     class="flex w-full cursor-pointer items-center gap-3 px-5 py-4 text-left transition-colors hover:bg-surface-alt"
-                    :aria-expanded="!collapsed[lesson.id]"
-                    @click="toggle(lesson.id)"
+                    :aria-expanded="!collapsed[module.id]"
+                    @click="toggle(module.id)"
                 >
                     <span
                         class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold"
                         :class="
-                            lesson.lesson_count > 0 && lesson.completed_count === lesson.lesson_count
+                            module.lesson_count > 0 && module.completed_count === module.lesson_count
                                 ? 'bg-ok text-white'
                                 : 'bg-surface-alt text-ink-sec'
                         "
                     >
                         <template
                             v-if="
-                                lesson.lesson_count > 0 &&
-                                lesson.completed_count === lesson.lesson_count
+                                module.lesson_count > 0 &&
+                                module.completed_count === module.lesson_count
                             "
                         >
                             ✓
                         </template>
-                        <template v-else>{{ lesson.completed_count }}</template>
+                        <template v-else>{{ module.completed_count }}</template>
                     </span>
 
                     <span class="min-w-0 flex-1">
-                        <span class="block text-sm font-bold text-navy">{{ lesson.title }}</span>
-                        <span v-if="lesson.subtitle" class="block truncate text-sm text-ink-sec">
-                            {{ lesson.subtitle }}
+                        <span class="block text-sm font-bold text-navy">{{ module.title }}</span>
+                        <span v-if="module.subtitle" class="block truncate text-sm text-ink-sec">
+                            {{ module.subtitle }}
                         </span>
                     </span>
 
                     <span class="shrink-0 text-xs font-medium text-ink-dis">
-                        {{ lesson.completed_count }}/{{ lesson.lesson_count }}
+                        {{ module.completed_count }}/{{ module.lesson_count }}
                     </span>
 
                     <svg
                         class="h-4 w-4 shrink-0 fill-none stroke-current stroke-2 text-ink-dis transition-transform"
-                        :class="collapsed[lesson.id] ? '-rotate-90' : ''"
+                        :class="collapsed[module.id] ? '-rotate-90' : ''"
                         viewBox="0 0 24 24"
                     >
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
                     </svg>
                 </button>
 
-                <div v-show="!collapsed[lesson.id]" class="divide-y divide-line border-t border-line">
+                <div v-show="!collapsed[module.id]" class="divide-y divide-line border-t border-line">
                     <p
-                        v-if="lesson.description"
+                        v-if="module.description"
                         class="px-5 py-3 text-sm leading-relaxed text-ink-sec"
                     >
-                        {{ lesson.description }}
+                        {{ module.description }}
                     </p>
 
                     <Link
-                        v-for="topic in lesson.topics"
-                        :key="topic.id"
-                        :href="route('topics.show', [course.slug, topic.slug])"
+                        v-for="lesson in module.lessons"
+                        :key="lesson.id"
+                        :href="route('lessons.show', [course.slug, lesson.slug])"
                         class="flex items-center gap-3 px-5 py-3 no-underline transition-colors hover:bg-surface-alt"
                     >
                         <span
                             class="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md border-2"
                             :class="
-                                topic.completed ? 'border-ok bg-ok' : 'border-line-strong'
+                                lesson.completed ? 'border-ok bg-ok' : 'border-line-strong'
                             "
                         >
                             <svg
-                                v-if="topic.completed"
+                                v-if="lesson.completed"
                                 class="h-3 w-3 fill-none stroke-white stroke-[3]"
                                 viewBox="0 0 24 24"
                             >
@@ -147,37 +151,37 @@ const toggle = (id) => (collapsed.value[id] = !collapsed.value[id]);
 
                         <span
                             class="flex-1 text-sm"
-                            :class="topic.completed ? 'text-ink-dis line-through' : 'text-ink'"
+                            :class="lesson.completed ? 'text-ink-dis line-through' : 'text-ink'"
                         >
-                            {{ topic.title }}
+                            {{ lesson.title }}
                         </span>
 
-                        <span v-if="topic.has_quiz" class="chip bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300">
+                        <span v-if="lesson.has_quiz" class="chip bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300">
                             Quiz
                         </span>
                         <span class="chip hidden bg-surface-alt text-ink-sec sm:inline-flex">
-                            {{ topic.type_label }}
+                            {{ lesson.type_label }}
                         </span>
                     </Link>
 
-                    <!-- The knowledge check that closes the topic. Passing it
+                    <!-- The knowledge check that closes the lesson. Passing it
                          is required to finish the course, so it sits here at
                          the end rather than being found later. -->
                     <Link
-                        v-if="lesson.knowledge_check"
-                        :href="route('quizzes.show', [course.slug, lesson.knowledge_check.id])"
+                        v-if="module.knowledge_check"
+                        :href="route('quizzes.show', [course.slug, module.knowledge_check.id])"
                         class="flex items-center gap-3 bg-surface-alt px-5 py-3 no-underline transition-colors hover:bg-surface"
                     >
                         <span
                             class="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-md border-2"
                             :class="
-                                lesson.knowledge_check.passed
+                                module.knowledge_check.passed
                                     ? 'border-ok bg-ok'
                                     : 'border-line-strong'
                             "
                         >
                             <svg
-                                v-if="lesson.knowledge_check.passed"
+                                v-if="module.knowledge_check.passed"
                                 class="h-3 w-3 fill-none stroke-white stroke-[3]"
                                 viewBox="0 0 24 24"
                             >
@@ -186,11 +190,11 @@ const toggle = (id) => (collapsed.value[id] = !collapsed.value[id]);
                         </span>
 
                         <span class="flex-1 text-sm font-medium text-ink">
-                            {{ lesson.knowledge_check.title }}
+                            {{ module.knowledge_check.title }}
                         </span>
 
                         <StatusPill
-                            v-if="lesson.knowledge_check.passed"
+                            v-if="module.knowledge_check.passed"
                             label="Passed"
                             tone="positive"
                         />
@@ -198,7 +202,7 @@ const toggle = (id) => (collapsed.value[id] = !collapsed.value[id]);
                             v-else
                             class="chip bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300"
                         >
-                            {{ lesson.knowledge_check.passing_score }}% to pass
+                            {{ module.knowledge_check.passing_score }}% to pass
                         </span>
                     </Link>
                 </div>
@@ -252,49 +256,64 @@ const toggle = (id) => (collapsed.value[id] = !collapsed.value[id]);
             </Link>
         </div>
 
-        <!-- ─── FINAL ASSESSMENT ────────────────────────────── -->
-        <div
-            v-if="final_quiz"
-            class="card p-6"
-            :class="final_quiz.passed ? 'border-ok/40' : ''"
-        >
-            <div class="mb-2 flex flex-wrap items-center gap-2">
-                <span class="chip bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300">
-                    Final assessment
-                </span>
-                <StatusPill v-if="final_quiz.passed" label="Passed" tone="positive" />
-            </div>
-
-            <h2 class="mb-1 text-lg font-bold text-navy">{{ final_quiz.title }}</h2>
-
-            <p v-if="final_quiz.description" class="mb-4 text-sm text-ink-sec">
-                {{ final_quiz.description }}
+        <!-- ─── FINAL EXAMS ─────────────────────────────────── -->
+        <!-- Several, in general: the PILOT examination is three papers, and
+             every one of them has to be passed to finish the course. -->
+        <div v-if="final_exams.length" class="flex flex-col gap-3">
+            <p v-if="final_exams.length > 1" class="text-sm text-ink-sec">
+                <strong class="text-navy">{{ passedExams }} of {{ final_exams.length }}</strong>
+                papers passed. All of them are required to complete the course.
             </p>
 
-            <div class="mb-5 flex flex-wrap gap-x-6 gap-y-1 text-sm text-ink-sec">
-                <span>Pass mark <strong class="text-navy">{{ final_quiz.passing_score }}%</strong></span>
-                <span v-if="final_quiz.max_attempts">
-                    {{ final_quiz.attempts_used }} of {{ final_quiz.max_attempts }} attempts used
-                </span>
-                <span v-else>{{ final_quiz.attempts_used }} attempts taken</span>
-                <span v-if="final_quiz.best_score > 0">
-                    Best <strong class="text-navy">{{ Math.round(final_quiz.best_score) }}%</strong>
-                </span>
-            </div>
-
-            <Link
-                v-if="final_quiz.unlocked"
-                :href="route('quizzes.show', [course.slug, final_quiz.id])"
-                class="inline-block rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-brand-hover"
+            <div
+                v-for="exam in final_exams"
+                :key="exam.id"
+                class="card p-6"
+                :class="exam.passed ? 'border-ok/40' : ''"
             >
-                {{ final_quiz.passed ? 'Review results' : 'Take the assessment' }}
-            </Link>
+                <div class="mb-2 flex flex-wrap items-center gap-2">
+                    <span class="chip bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300">
+                        Final exam
+                    </span>
+                    <StatusPill v-if="exam.passed" label="Passed" tone="positive" />
+                    <StatusPill
+                        v-else-if="exam.awaiting_marking"
+                        label="Awaiting marking"
+                        tone="primary"
+                    />
+                </div>
 
-            <!-- Locked in the UI *and* by QuizPolicy::attempt — the hidden
-                 button is the courtesy, the policy is the control. -->
-            <p v-else class="text-sm text-ink-dis italic">
-                Complete every topic to unlock the final assessment.
-            </p>
+                <h2 class="mb-1 text-lg font-bold text-navy">{{ exam.title }}</h2>
+
+                <p v-if="exam.description" class="mb-4 text-sm text-ink-sec">
+                    {{ exam.description }}
+                </p>
+
+                <div class="mb-5 flex flex-wrap gap-x-6 gap-y-1 text-sm text-ink-sec">
+                    <span>Pass mark <strong class="text-navy">{{ exam.passing_score }}%</strong></span>
+                    <span v-if="exam.max_attempts">
+                        {{ exam.attempts_used }} of {{ exam.max_attempts }} attempts used
+                    </span>
+                    <span v-else>{{ exam.attempts_used }} attempts taken</span>
+                    <span v-if="exam.best_score > 0">
+                        Best <strong class="text-navy">{{ Math.round(exam.best_score) }}%</strong>
+                    </span>
+                </div>
+
+                <Link
+                    v-if="exam.unlocked"
+                    :href="route('quizzes.show', [course.slug, exam.id])"
+                    class="inline-block rounded-lg bg-brand px-5 py-2.5 text-sm font-semibold text-white no-underline transition-colors hover:bg-brand-hover"
+                >
+                    {{ exam.passed ? 'Review results' : 'Sit this paper' }}
+                </Link>
+
+                <!-- Locked in the UI *and* by QuizPolicy::attempt — the hidden
+                     button is the courtesy, the policy is the control. -->
+                <p v-else class="text-sm text-ink-dis italic">
+                    Finish every lesson and pass every knowledge check to unlock the examination.
+                </p>
+            </div>
         </div>
     </EmployeeLayout>
 </template>

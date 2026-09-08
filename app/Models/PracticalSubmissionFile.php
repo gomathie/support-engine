@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * Evidence attached to a practical submission — usually a screenshot.
  *
- * Same private-disk rule as topic videos and resources: no public URL, reached
+ * Same private-disk rule as lesson videos and resources: no public URL, reached
  * only through a controller that has run a policy first. The disk is recorded
  * per row so a later move to S3 does not strand what is already written.
  */

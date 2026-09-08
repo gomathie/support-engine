@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TopicResource;
+use App\Models\LessonResource;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * The only route to a topic file.
+ * The only route to a lesson file.
  *
  * Resources live on the `private` disk, which has no URL and no public
  * visibility, so there is no way to reach these bytes that skips the policy
@@ -16,21 +16,21 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class ResourceDownloadController extends Controller
 {
-    public function download(TopicResource $resource): StreamedResponse
+    public function download(LessonResource $resource): StreamedResponse
     {
         $this->authorize('download', $resource);
 
         return $this->serve($resource, 'attachment');
     }
 
-    public function stream(TopicResource $resource): StreamedResponse
+    public function stream(LessonResource $resource): StreamedResponse
     {
         $this->authorize('stream', $resource);
 
         return $this->serve($resource, 'inline');
     }
 
-    private function serve(TopicResource $resource, string $disposition): StreamedResponse
+    private function serve(LessonResource $resource, string $disposition): StreamedResponse
     {
         $disk = Storage::disk($resource->disk);
 

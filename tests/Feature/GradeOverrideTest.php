@@ -11,9 +11,9 @@ use App\Enums\ProgressStatus;
 use App\Enums\QuestionType;
 use App\Models\CompetencyArea;
 use App\Models\Course;
-use App\Models\Lesson;
+use App\Models\Module;
 use App\Models\GradeOverrideLog;
-use App\Models\Topic;
+use App\Models\Lesson;
 use App\Models\Level;
 use App\Models\LevelRequirement;
 use App\Models\Quiz;
@@ -47,8 +47,8 @@ class GradeOverrideTest extends TestCase
     private function failedAttempt(?User $trainee = null): QuizAttempt
     {
         $course = Course::factory()->create();
-        $lesson = Lesson::factory()->for($course)->create();
-        Topic::factory()->for($lesson, 'lesson')->create();
+        $module = Module::factory()->for($course)->create();
+        Lesson::factory()->for($module, 'module')->create();
 
         $quiz = Quiz::factory()->create([
             'course_id' => $course->id,
@@ -265,9 +265,9 @@ class GradeOverrideTest extends TestCase
         $attempt = $this->failedAttempt();
         $trainee = $attempt->user;
 
-        // Finish the topics so only the exam stands between them and done.
-        foreach ($attempt->course->topics as $topic) {
-            app(\App\Actions\Progress\CompleteTopic::class)->handle($trainee, $topic);
+        // Finish the lessons so only the exam stands between them and done.
+        foreach ($attempt->course->lessons as $lesson) {
+            app(\App\Actions\Progress\CompleteLesson::class)->handle($trainee, $lesson);
         }
 
         $this->assertNotSame(

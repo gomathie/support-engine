@@ -40,7 +40,7 @@ class QuizzesRelationManager extends RelationManager
                         Quiz::SCOPE_LESSON => 'warning',
                         default => 'gray',
                     })
-                    ->description(fn (Quiz $record) => $record->lesson?->title ?? $record->topic?->title),
+                    ->description(fn (Quiz $record) => $record->module?->title ?? $record->lesson?->title),
 
                 TextColumn::make('questions_count')
                     ->label('Questions')
@@ -66,13 +66,19 @@ class QuizzesRelationManager extends RelationManager
                 Action::make('addFinalExam')
                     ->label('Add final exam')
                     ->icon('heroicon-o-academic-cap')
-                    ->visible(fn () => ! $this->getOwnerRecord()->finalQuiz()->exists())
+
+                    /*
+                     * No longer limited to one. The PILOT examination is three
+                     * papers — A, B and C — and a course now requires every
+                     * published final exam to be passed rather than picking one
+                     * arbitrarily, so more than one is a legitimate design.
+                     */
                     ->action(function () {
                         $course = $this->getOwnerRecord();
 
                         $quiz = $course->quizzes()->create([
+                            'module_id' => null,
                             'lesson_id' => null,
-                            'topic_id' => null,
                             'title' => $course->title.' — final exam',
                             'description' => 'Covers the whole course. Passing it completes the course '
                                 .'and issues your certificate.',
@@ -109,10 +115,10 @@ class QuizzesRelationManager extends RelationManager
 
                 DeleteAction::make(),
             ])
-            ->defaultSort('lesson_id')
+            ->defaultSort('module_id')
             ->emptyStateHeading('No assessments on this course')
             ->emptyStateDescription(
-                'Without a final exam, the course completes as soon as every topic is ticked off.'
+                'Without a final exam, the course completes as soon as every lesson is ticked off.'
             );
     }
 }

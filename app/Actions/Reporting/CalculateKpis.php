@@ -93,17 +93,17 @@ class CalculateKpis
     /**
      * KPI 2 — how much of the back catalogue has been dispositioned.
      *
-     * Needs an audit disposition on each topic (keep / rewrite / merge /
+     * Needs an audit disposition on each lesson (keep / rewrite / merge /
      * retire), which is PA-5's Re-alignment Matrix. Nothing records it yet.
      */
     private function lessonsRealigned(): array
     {
         return $this->notMeasurable(
             2,
-            'Lessons re-aligned',
-            'Dispositioned ÷ '.DB::table('topics')->count(),
+            'Modules re-aligned',
+            'Dispositioned ÷ '.DB::table('lessons')->count(),
             '100% by end of Phase 3',
-            'No topic carries an audit disposition. Needs the Content Re-alignment Matrix (PA-5) to exist as data rather than a spreadsheet.',
+            'No lesson carries an audit disposition. Needs the Content Re-alignment Matrix (PA-5) to exist as data rather than a spreadsheet.',
         );
     }
 
@@ -321,7 +321,7 @@ class CalculateKpis
      * KPI 9 — per-question pass rate, flagging the extremes.
      *
      * A question nobody passes is usually a defective question or an untaught
-     * topic, not a weak cohort. One everybody passes is testing nothing.
+     * lesson, not a weak cohort. One everybody passes is testing nothing.
      */
     private function itemDifficulty(): array
     {
@@ -391,7 +391,7 @@ class CalculateKpis
                     'pass_rate' => $rate,
                     'flagged' => $rate < 30 || $rate > 95,
                     'verdict' => match (true) {
-                        $rate < 30 => 'Almost nobody passes it — likely a defective question or an untaught topic.',
+                        $rate < 30 => 'Almost nobody passes it — likely a defective question or an untaught lesson.',
                         $rate > 95 => 'Almost everybody passes it — it is not discriminating between people.',
                         default => 'Within range.',
                     },

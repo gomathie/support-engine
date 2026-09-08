@@ -10,32 +10,32 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['course_id', 'title', 'subtitle', 'description', 'docs_reference', 'position', 'is_published'])]
-class Lesson extends Model
+class Module extends Model
 {
     /**
-     * The knowledge check at the end of this topic.
+     * The knowledge check at the end of this lesson.
      *
-     * Module-scoped rather than topic-scoped: one check covering the topic's
-     * topics, sat once, rather than a question after every page.
+     * Module-scoped rather than lesson-scoped: one check covering the lesson's
+     * lessons, sat once, rather than a question after every page.
      */
     public function knowledgeCheck(): ?Quiz
     {
         return Quiz::query()
-            ->where('lesson_id', $this->getKey())
-            ->whereNull('topic_id')
+            ->where('module_id', $this->getKey())
+            ->whereNull('lesson_id')
             ->first();
     }
 
     /**
-     * Every topic is supposed to end with one, and passing it is required to
-     * finish the course. A topic without one can be read and left, so the gap
+     * Every lesson is supposed to end with one, and passing it is required to
+     * finish the course. A lesson without one can be read and left, so the gap
      * is worth seeing rather than discovering later.
      */
     public function hasKnowledgeCheck(): bool
     {
         return Quiz::query()
-            ->where('lesson_id', $this->getKey())
-            ->whereNull('topic_id')
+            ->where('module_id', $this->getKey())
+            ->whereNull('lesson_id')
             ->where('is_published', true)
             ->exists();
     }
@@ -53,10 +53,10 @@ class Lesson extends Model
     {
         // Append rather than collide on 0 when an author adds a module without
         // choosing a position.
-        static::creating(function (self $lesson): void {
-            if ($lesson->position === null || $lesson->position === 0) {
-                $lesson->position = (int) static::query()
-                    ->where('course_id', $lesson->course_id)
+        static::creating(function (self $module): void {
+            if ($module->position === null || $module->position === 0) {
+                $module->position = (int) static::query()
+                    ->where('course_id', $module->course_id)
                     ->max('position') + 1;
             }
         });
@@ -67,9 +67,9 @@ class Lesson extends Model
         return $this->belongsTo(Course::class);
     }
 
-    public function topics(): HasMany
+    public function lessons(): HasMany
     {
-        return $this->hasMany(Topic::class)->orderBy('position');
+        return $this->hasMany(Lesson::class)->orderBy('position');
     }
 
     public function quizzes(): HasMany
