@@ -46,14 +46,14 @@ class QuizForm
                             ->hiddenLabel()
                             ->options([
                                 Quiz::SCOPE_FINAL => 'Final exam for the whole course',
-                                Quiz::SCOPE_LESSON => 'End-of-module knowledge check',
-                                Quiz::SCOPE_TOPIC => 'Knowledge check on one lesson',
+                                Quiz::SCOPE_MODULE => 'End-of-module knowledge check',
+                                Quiz::SCOPE_LESSON => 'Knowledge check on one lesson',
                             ])
                             ->descriptions([
                                 Quiz::SCOPE_FINAL => 'Unlocks once every lesson is complete. Passing it '
                                     .'completes the course and issues the certificate.',
-                                Quiz::SCOPE_LESSON => 'Sits at the end of one module.',
-                                Quiz::SCOPE_TOPIC => 'Attached to a single lesson. Set that lesson\'s '
+                                Quiz::SCOPE_MODULE => 'Sits at the end of one module.',
+                                Quiz::SCOPE_LESSON => 'Attached to a single lesson. Set that lesson\'s '
                                     .'completion requirement to "quiz" to make it mandatory.',
                             ])
                             ->default(Quiz::SCOPE_FINAL)
@@ -75,7 +75,7 @@ class QuizForm
                                 : [])
                             ->searchable()
                             ->required()
-                            ->visible(fn (Get $get) => $get('scope') === Quiz::SCOPE_LESSON),
+                            ->visible(fn (Get $get) => $get('scope') === Quiz::SCOPE_MODULE),
 
                         Select::make('lesson_id')
                             ->label('Lesson')
@@ -88,7 +88,7 @@ class QuizForm
                                 : [])
                             ->searchable()
                             ->required()
-                            ->visible(fn (Get $get) => $get('scope') === Quiz::SCOPE_TOPIC),
+                            ->visible(fn (Get $get) => $get('scope') === Quiz::SCOPE_LESSON),
                     ]),
 
                 Section::make('Details')

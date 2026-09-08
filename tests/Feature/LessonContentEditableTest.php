@@ -136,7 +136,7 @@ class LessonContentEditableTest extends TestCase
     }
 
     /** A lesson with no source in the docs is left visibly open, not invented. */
-    public function test_an_unsourced_topic_is_marked_as_needing_input(): void
+    public function test_an_unsourced_lesson_is_marked_as_needing_input(): void
     {
         $lesson = Lesson::query()
             ->where('title', 'Explain what a Mapping Contract is and its use case')

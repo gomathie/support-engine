@@ -142,6 +142,7 @@ class CourseController extends Controller
                     'id' => $lesson->id,
                     'title' => $lesson->title,
                     'slug' => $lesson->slug,
+                    'summary' => $lesson->summary,
                     'type' => $lesson->type->value,
                     'type_label' => $lesson->type->label(),
                     'estimated_minutes' => $lesson->estimated_minutes,

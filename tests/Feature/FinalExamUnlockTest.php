@@ -90,7 +90,7 @@ class FinalExamUnlockTest extends TestCase
 
     // ─── THE GATE ────────────────────────────────────────────
 
-    public function test_the_final_is_locked_while_topics_are_unread(): void
+    public function test_the_final_is_locked_while_lessons_are_unread(): void
     {
         [$course, , , [$final]] = $this->scenario();
 

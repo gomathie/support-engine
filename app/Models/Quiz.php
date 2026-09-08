@@ -35,9 +35,9 @@ class Quiz extends Model
      */
     public const SCOPE_FINAL = 'final';
 
-    public const SCOPE_LESSON = 'module';
+    public const SCOPE_MODULE = 'module';
 
-    public const SCOPE_TOPIC = 'lesson';
+    public const SCOPE_LESSON = 'lesson';
 
     protected function casts(): array
     {
@@ -95,8 +95,8 @@ class Quiz extends Model
     public function scope(): string
     {
         return match (true) {
-            $this->lesson_id !== null => self::SCOPE_TOPIC,
-            $this->module_id !== null => self::SCOPE_LESSON,
+            $this->lesson_id !== null => self::SCOPE_LESSON,
+            $this->module_id !== null => self::SCOPE_MODULE,
             default => self::SCOPE_FINAL,
         };
     }
@@ -104,8 +104,8 @@ class Quiz extends Model
     public function scopeLabel(): string
     {
         return match ($this->scope()) {
-            self::SCOPE_TOPIC => 'Lesson check',
-            self::SCOPE_LESSON => 'Knowledge check',
+            self::SCOPE_LESSON => 'Lesson check',
+            self::SCOPE_MODULE => 'Knowledge check',
             default => 'Final exam',
         };
     }

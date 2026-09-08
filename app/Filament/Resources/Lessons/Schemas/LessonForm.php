@@ -10,6 +10,7 @@ use App\Support\Video\VideoEmbed;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -81,9 +82,25 @@ class LessonForm
                             ->default(CompletionRequirement::View->value)
                             ->required(),
 
+                        Textarea::make('summary')
+                            ->label('Short summary')
+                            ->rows(2)
+                            ->maxLength(500)
+                            ->columnSpanFull()
+                            ->helperText('One or two sentences. Shown under the title in the course outline and again at the top of the lesson. What will they be able to do afterwards?'),
+
                         Textarea::make('description')
                             ->rows(2)
                             ->columnSpanFull(),
+
+                        FileUpload::make('cover_image_path')
+                            ->label('Cover image')
+                            ->image()
+                            ->disk('public')
+                            ->directory('lesson-covers')
+                            ->maxSize(2048)
+                            ->columnSpanFull()
+                            ->helperText('Optional. A banner at the top of the lesson, shown when the lesson has no video.'),
 
                         // Everything authored here is run through HTMLPurifier's
                         // `lesson` allowlist before it is sent to a browser, so
@@ -177,6 +194,54 @@ class LessonForm
                         // field exists so the queued pipeline has somewhere to
                         // report without another migration.
                         Hidden::make('video_status'),
+                    ]),
+
+                /*
+                 * Where the lesson came from.
+                 *
+                 * Shown to the trainee after the lesson text, as source material
+                 * rather than as part of the teaching. A lesson is usually drawn
+                 * from more than one page, so this is a list — naming a chapter
+                 * and leaving somebody to search for it is not a reference.
+                 */
+                Section::make('Documentation links')
+                    ->description('Shown after the lesson text. Link to the pages on docs.pilot-gps.com this lesson was written from.')
+                    ->collapsed(fn (?Lesson $record) => blank($record?->documentationLinks()))
+                    ->collapsible()
+                    ->schema([
+                        Repeater::make('doc_links')
+                            ->hiddenLabel()
+                            ->columns(2)
+                            ->schema([
+                                TextInput::make('title')
+                                    ->label('Title')
+                                    ->required()
+                                    ->maxLength(160)
+                                    ->placeholder('Sensors → Calibration tables'),
+
+                                TextInput::make('url')
+                                    ->label('URL')
+                                    ->required()
+                                    ->url()
+                                    ->maxLength(500)
+                                    ->placeholder('https://docs.pilot-gps.com/sensors_1.html')
+
+                                    // An href is a script-capable sink: a
+                                    // `javascript:` URL in an anchor runs on
+                                    // click. Only http and https are rendered,
+                                    // and this refuses the rest at the form.
+                                    ->rule(fn () => function (string $attribute, $value, callable $fail): void {
+                                        $scheme = strtolower((string) parse_url((string) $value, PHP_URL_SCHEME));
+
+                                        if (filled($value) && ! in_array($scheme, ['http', 'https'], true)) {
+                                            $fail('Only http and https links are allowed.');
+                                        }
+                                    }),
+                            ])
+                            ->itemLabel(fn (array $state): ?string => $state['title'] ?? null)
+                            ->addActionLabel('Add a link')
+                            ->defaultItems(0)
+                            ->reorderable(),
                     ]),
 
                 Section::make('Video link')

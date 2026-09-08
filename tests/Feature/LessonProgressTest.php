@@ -13,7 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
-class TopicProgressTest extends TestCase
+class LessonProgressTest extends TestCase
 {
     use RefreshDatabase;
 

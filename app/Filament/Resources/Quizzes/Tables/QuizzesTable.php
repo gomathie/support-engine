@@ -32,7 +32,7 @@ class QuizzesTable
                     ->badge()
                     ->color(fn (Quiz $record) => match ($record->scope()) {
                         Quiz::SCOPE_FINAL => 'primary',
-                        Quiz::SCOPE_LESSON => 'warning',
+                        Quiz::SCOPE_MODULE => 'warning',
                         default => 'gray',
                     })
                     ->description(fn (Quiz $record) => $record->module?->title ?? $record->lesson?->title),

@@ -31,22 +31,22 @@ class QuizScopeTest extends TestCase
         $this->assertNull($data['lesson_id']);
     }
 
-    public function test_lesson_scope_keeps_the_lesson_and_clears_the_topic(): void
+    public function test_module_scope_keeps_the_module_and_clears_the_lesson(): void
     {
         $data = QuizResource::applyScope(
             ['course_id' => 1, 'module_id' => 7, 'lesson_id' => 9],
-            Quiz::SCOPE_LESSON,
+            Quiz::SCOPE_MODULE,
         );
 
         $this->assertSame(7, $data['module_id']);
         $this->assertNull($data['lesson_id']);
     }
 
-    public function test_topic_scope_keeps_the_topic_and_clears_the_lesson(): void
+    public function test_lesson_scope_keeps_the_lesson_and_clears_the_module(): void
     {
         $data = QuizResource::applyScope(
             ['course_id' => 1, 'module_id' => 7, 'lesson_id' => 9],
-            Quiz::SCOPE_TOPIC,
+            Quiz::SCOPE_LESSON,
         );
 
         $this->assertNull($data['module_id']);
@@ -61,23 +61,23 @@ class QuizScopeTest extends TestCase
 
         $final = Quiz::factory()->create(['course_id' => $course->id]);
 
-        $lessonQuiz = Quiz::factory()->create([
+        $moduleQuiz = Quiz::factory()->create([
             'course_id' => $course->id,
             'module_id' => $module->id,
         ]);
 
-        $topicQuiz = Quiz::factory()->create([
+        $lessonQuiz = Quiz::factory()->create([
             'course_id' => $course->id,
             'lesson_id' => $lesson->id,
         ]);
 
         $this->assertSame(Quiz::SCOPE_FINAL, $final->scope());
+        $this->assertSame(Quiz::SCOPE_MODULE, $moduleQuiz->scope());
         $this->assertSame(Quiz::SCOPE_LESSON, $lessonQuiz->scope());
-        $this->assertSame(Quiz::SCOPE_TOPIC, $topicQuiz->scope());
 
         $this->assertSame('Final exam', $final->scopeLabel());
-        $this->assertSame('Knowledge check', $lessonQuiz->scopeLabel());
-        $this->assertSame('Lesson check', $topicQuiz->scopeLabel());
+        $this->assertSame('Knowledge check', $moduleQuiz->scopeLabel());
+        $this->assertSame('Lesson check', $lessonQuiz->scopeLabel());
     }
 
     /**

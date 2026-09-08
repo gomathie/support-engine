@@ -106,6 +106,12 @@ function toggleComplete() {
                     {{ lesson.title }}
                 </h1>
 
+                <!-- The lead. One or two sentences on what this lesson is for,
+                     read before the trainee commits to the body. -->
+                <p v-if="lesson.summary" class="mb-4 text-lg leading-relaxed text-ink-sec">
+                    {{ lesson.summary }}
+                </p>
+
                 <p v-if="lesson.description" class="mb-4 text-base text-ink-sec">
                     {{ lesson.description }}
                 </p>
@@ -120,6 +126,15 @@ function toggleComplete() {
                         ~{{ lesson.estimated_minutes }} min
                     </span>
                 </div>
+
+                <!-- The cover, and it yields: a lesson with a video opens with
+                     the video, because two banners stacked is just scrolling. -->
+                <img
+                    v-if="lesson.cover_image && !lesson.video && !lesson.video_src"
+                    :src="lesson.cover_image"
+                    alt=""
+                    class="mb-8 max-h-80 w-full rounded-xl border border-line object-cover"
+                />
 
                 <!-- ═══ VIDEO ═══════════════════════════════════
                      Part of the lesson, not a lesson of its own. Any lesson may
@@ -240,6 +255,33 @@ function toggleComplete() {
                     >
                         This lesson has no inline content — see the resources below.
                     </p>
+                </div>
+
+                <!-- Where the lesson came from. After the text rather than in
+                     it: this is the authoritative version to check later, not
+                     something to go and read instead of the lesson.
+
+                     The server has already dropped anything that is not http or
+                     https — an href runs a javascript: URL on click. -->
+                <div v-if="lesson.doc_links?.length" class="mt-9 border-t border-line pt-6">
+                    <h2 class="mb-1 text-base font-bold text-navy">In the documentation</h2>
+                    <p class="mb-3 text-sm text-ink-dis">
+                        The reference pages this lesson is drawn from.
+                    </p>
+
+                    <ul class="flex flex-col gap-2">
+                        <li v-for="(link, i) in lesson.doc_links" :key="i">
+                            <a
+                                :href="link.url"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="flex items-center gap-3 rounded-xl border border-line px-4 py-3 text-sm font-medium text-ink-sec no-underline transition-colors hover:border-brand hover:text-brand"
+                            >
+                                <span class="min-w-0 flex-1 truncate">{{ link.title }}</span>
+                                <span class="shrink-0 text-ink-dis">↗</span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
 
                 <!-- ═══ RESOURCES ═══════════════════════════════ -->

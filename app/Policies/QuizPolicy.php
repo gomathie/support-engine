@@ -69,15 +69,15 @@ class QuizPolicy
     {
         $course = $quiz->course;
 
-        $publishedTopics = $course->lessons()->where('is_published', true)->pluck('id');
+        $publishedLessons = $course->lessons()->where('is_published', true)->pluck('id');
 
-        if ($publishedTopics->isNotEmpty()) {
+        if ($publishedLessons->isNotEmpty()) {
             $completed = $user->lessonProgress()
-                ->whereIn('lesson_id', $publishedTopics)
+                ->whereIn('lesson_id', $publishedLessons)
                 ->whereNotNull('completed_at')
                 ->count();
 
-            if ($completed < $publishedTopics->count()) {
+            if ($completed < $publishedLessons->count()) {
                 return false;
             }
         }

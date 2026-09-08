@@ -27,7 +27,7 @@ use Tests\TestCase;
  * course is not complete until every lesson is, this gates the course too —
  * by a different route from the module-level knowledge checks.
  */
-class TopicQuizGatesTopicTest extends TestCase
+class LessonQuizGatesLessonTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -39,7 +39,7 @@ class TopicQuizGatesTopicTest extends TestCase
     }
 
     /** @return array{0: Course, 1: Lesson, 2: Quiz, 3: QuizQuestion} */
-    private function topicWithQuiz(): array
+    private function lessonWithQuiz(): array
     {
         $course = Course::factory()->create();
         $module = Module::factory()->for($course)->create(['title' => 'Module 1']);
@@ -77,9 +77,9 @@ class TopicQuizGatesTopicTest extends TestCase
     // ─── THE GATE ────────────────────────────────────────────
 
     /** Opening it is not passing it. */
-    public function test_viewing_a_quiz_topic_does_not_complete_it(): void
+    public function test_viewing_a_quiz_lesson_does_not_complete_it(): void
     {
-        [$course, $lesson] = $this->topicWithQuiz();
+        [$course, $lesson] = $this->lessonWithQuiz();
         $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
@@ -95,7 +95,7 @@ class TopicQuizGatesTopicTest extends TestCase
     /** Nor can it be completed by posting at the completion endpoint. */
     public function test_it_cannot_be_completed_without_passing_the_quiz(): void
     {
-        [$course, $lesson] = $this->topicWithQuiz();
+        [$course, $lesson] = $this->lessonWithQuiz();
         $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
@@ -111,9 +111,9 @@ class TopicQuizGatesTopicTest extends TestCase
         $this->assertFalse($lesson->completedBy($user));
     }
 
-    public function test_failing_the_quiz_leaves_the_topic_open(): void
+    public function test_failing_the_quiz_leaves_the_lesson_open(): void
     {
-        [$course, $lesson, $quiz, $question] = $this->topicWithQuiz();
+        [$course, $lesson, $quiz, $question] = $this->lessonWithQuiz();
         $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
@@ -123,9 +123,9 @@ class TopicQuizGatesTopicTest extends TestCase
     }
 
     /** Passing it completes the lesson, with no further action from the trainee. */
-    public function test_passing_the_quiz_completes_the_topic(): void
+    public function test_passing_the_quiz_completes_the_lesson(): void
     {
-        [$course, $lesson, $quiz, $question] = $this->topicWithQuiz();
+        [$course, $lesson, $quiz, $question] = $this->lessonWithQuiz();
         $user = $this->trainee();
 
         app(EnrollEmployee::class)->handle($user, $course);
@@ -144,9 +144,9 @@ class TopicQuizGatesTopicTest extends TestCase
      * unpassed lesson quiz keeps the whole course open. This is the route the
      * per-lesson quizzes take, distinct from the module-level knowledge checks.
      */
-    public function test_an_unpassed_topic_quiz_keeps_the_course_incomplete(): void
+    public function test_an_unpassed_lesson_quiz_keeps_the_course_incomplete(): void
     {
-        [$course, $lesson, $quiz, $question] = $this->topicWithQuiz();
+        [$course, $lesson, $quiz, $question] = $this->lessonWithQuiz();
 
         // A second lesson that only needs reading, so the course hinges on the
         // quiz-gated one alone.
@@ -182,19 +182,19 @@ class TopicQuizGatesTopicTest extends TestCase
      * The authored curriculum, not a fixture: every lesson carrying a quiz must
      * be gated on it, or the quiz is decoration.
      */
-    public function test_every_seeded_topic_with_a_quiz_is_gated_on_it(): void
+    public function test_every_seeded_lesson_with_a_quiz_is_gated_on_it(): void
     {
         $this->seed(\Database\Seeders\TrainingContentSeeder::class);
         $this->seed(\Database\Seeders\LessonContentSeeder::class);
 
-        $gatedTopicIds = Quiz::query()
+        $gatedLessonIds = Quiz::query()
             ->whereNotNull('lesson_id')
             ->pluck('lesson_id');
 
-        $this->assertGreaterThan(20, $gatedTopicIds->count(), 'The curriculum should carry lesson quizzes.');
+        $this->assertGreaterThan(20, $gatedLessonIds->count(), 'The curriculum should carry lesson quizzes.');
 
         $notGated = Lesson::query()
-            ->whereIn('id', $gatedTopicIds)
+            ->whereIn('id', $gatedLessonIds)
             ->where('completion_requirement', '!=', CompletionRequirement::Quiz->value)
             ->pluck('title');
 

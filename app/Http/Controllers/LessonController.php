@@ -44,6 +44,17 @@ class LessonController extends Controller
                 'title' => $lesson->title,
                 'slug' => $lesson->slug,
                 'description' => $lesson->description,
+
+                // One or two sentences above the body: what the lesson is for,
+                // before the trainee commits to reading it.
+                'summary' => $lesson->summary,
+
+                'cover_image' => $lesson->coverImageUrl(),
+
+                // Filtered to http and https by the model. These are rendered
+                // into an href, and an href runs a javascript: URL on click.
+                'doc_links' => $lesson->documentationLinks(),
+
                 'type' => $lesson->type->value,
                 'type_label' => $lesson->type->label(),
 

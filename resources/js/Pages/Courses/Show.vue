@@ -149,11 +149,23 @@ const passedExams = computed(() => props.final_exams.filter((e) => e.passed).len
                             </svg>
                         </span>
 
-                        <span
-                            class="flex-1 text-sm"
-                            :class="lesson.completed ? 'text-ink-dis line-through' : 'text-ink'"
-                        >
-                            {{ lesson.title }}
+                        <span class="min-w-0 flex-1">
+                            <span
+                                class="block text-sm"
+                                :class="lesson.completed ? 'text-ink-dis line-through' : 'text-ink'"
+                            >
+                                {{ lesson.title }}
+                            </span>
+
+                            <!-- What they will be able to do afterwards, so the
+                                 outline reads as a syllabus rather than a list
+                                 of titles. -->
+                            <span
+                                v-if="lesson.summary"
+                                class="mt-0.5 line-clamp-1 block text-xs text-ink-dis"
+                            >
+                                {{ lesson.summary }}
+                            </span>
                         </span>
 
                         <span v-if="lesson.has_quiz" class="chip bg-violet-50 text-violet-600 dark:bg-violet-950 dark:text-violet-300">

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\CompletionRequirement;
 use App\Enums\LessonType;
 use App\Support\Video\VideoEmbed;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -21,6 +22,9 @@ use Illuminate\Support\Str;
     'title',
     'slug',
     'description',
+    'summary',
+    'cover_image_path',
+    'doc_links',
     'type',
     'content',
     'external_url',
@@ -49,6 +53,7 @@ class Lesson extends Model
             'type' => LessonType::class,
             'completion_requirement' => CompletionRequirement::class,
             'is_published' => 'boolean',
+            'doc_links' => 'array',
         ];
     }
 
@@ -155,6 +160,52 @@ class Lesson extends Model
     public function hasVideo(): bool
     {
         return $this->hasUploadedVideo() || $this->videoEmbed() !== null;
+    }
+
+    /**
+     * Links to the documentation this lesson was written from.
+     *
+     * Shown after the lesson text, as source material rather than as part of
+     * the teaching — a trainee who wants the authoritative version can follow
+     * one rather than being told a chapter name and left to search.
+     *
+     * **Only http and https survive.** These are author-supplied URLs rendered
+     * into an `href`, which is a script-capable sink: `javascript:alert(1)` in
+     * an anchor runs on click. The same discipline as the video URL, for the
+     * same reason.
+     *
+     * @return array<int, array{title: string, url: string}>
+     */
+    public function documentationLinks(): array
+    {
+        return collect($this->doc_links ?? [])
+            ->filter(function ($link): bool {
+                $url = trim((string) ($link['url'] ?? ''));
+
+                if (blank($link['title'] ?? null) || blank($url)) {
+                    return false;
+                }
+
+                return in_array(
+                    strtolower((string) parse_url($url, PHP_URL_SCHEME)),
+                    ['http', 'https'],
+                    true,
+                );
+            })
+            ->map(fn ($link) => [
+                'title' => trim((string) $link['title']),
+                'url' => trim((string) $link['url']),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /** The cover image URL, or null. Public disk — it is decoration on a card. */
+    public function coverImageUrl(): ?string
+    {
+        return $this->cover_image_path
+            ? Storage::disk('public')->url($this->cover_image_path)
+            : null;
     }
 
     /** "412 MB" — the size as the author needs to see it against the 500 MB cap. */
