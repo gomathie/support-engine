@@ -71,6 +71,11 @@ class LessonContentSeeder extends Seeder
             'track3_lesson_02.php',
             'track3_lesson_03.php',
             'track3_lesson_04.php',
+
+            // Onboarding (TRACK 4) — tooling and desk policy, not PILOT
+            'track4_lesson_01.php',
+            'track4_lesson_02.php',
+            'track4_lesson_03.php',
         ];
     }
 

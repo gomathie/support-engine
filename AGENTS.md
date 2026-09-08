@@ -184,9 +184,47 @@ header carries the rules. Three that matter:
    Reporting · Notifications · Escalation · Admin Panel. Seeded provisionally,
    awaiting Igor.
 4. **Retake cap** — currently 3, undecided.
-5. **The content is empty.** ~104 seeded lessons are titles with no body. The
-   assessment engine is built; the material to assess is not. This is the single
-   largest gap in the product and no amount of engineering closes it.
+5. ~~**The content is empty.**~~ — **CLOSED 2026-09-08.** All four courses are
+   written: 105 lessons, 103 with a body, 98 carrying a lesson quiz, 23 module
+   knowledge checks and 19 practical tasks. The two unwritten lessons are
+   `needs_input` topics, not gaps in the work.
+
+6. **Is this company the controller or the processor** for the data on the
+   platform — particularly drivers' location data? Nothing else in §5 blocks as
+   much: it decides who answers a data subject request and who may delete
+   anything. Blocks Support skills D5–D6 and Onboarding M3.
+
+7. **The data subject request route, and its deadline.** Where a request goes,
+   in what time, and what the person is told meanwhile. Statutory clocks can
+   start when the organisation becomes aware, which may be the agent who took
+   the call.
+
+8. **The security incident reporting path**, including out of hours. Onboarding
+   M3 teaches "report before you investigate" and cannot say to whom.
+
+9. **The approved caller-verification questions.** What a caller must produce
+   before account details are shared, and what to do when they cannot.
+
+10. **The severity scheme, and the required fields per severity.** The
+    curriculum contradicts itself — Onboarding M1 says Sev-1/Sev-3, M2 says
+    P1–P4. Somebody must say which is real before either is taught.
+
+11. **First-response and resolution targets per priority**, and whether the
+    clock runs on business or calendar hours. Commercial commitments; cannot be
+    inferred.
+
+12. **The team map** — who owns what — and the **escalation criteria** to second
+    line. Blocks Support skills C1 and C2, and Onboarding M2.
+
+13. **The desk's real five-point ticket standard.** The curriculum names it;
+    nothing defines it. The five points now taught were written for the lesson
+    and are marked as provisional.
+
+14. **Four PILOT topics the documentation does not support**, all flagged in the
+    Admin panel course: *stock account*, *account types*, and two speed
+    questions. The speed pair is a finding rather than a gap — there is no speed
+    configuration in PILOT, speeding is a notification, and the lessons say so.
+    They should probably be reworded or retired rather than answered.
 
 ---
 
@@ -536,3 +574,58 @@ never been asserted.
 
 **Still empty:** Onboarding (12 lessons) and Support skills (23). Neither has a
 single body, a quiz or a docs reference.
+
+### 2026-09-08 — Support skills and Onboarding written (Claude)
+
+Both remaining courses now have content. **Every lesson in the product has a
+body and, except where a topic is unwritable, a quiz.**
+
+**Support skills (23 lessons, all 23 with quizzes).** This course is not
+documentation — every topic is an exercise, so the lesson is the *brief*: what
+you do, what good looks like, how it is marked against the four rubric
+criteria, and what to submit. A role-play brief asserts no PILOT facts, so
+there is nothing in it to get wrong. Where a drill does need a platform fact it
+reuses one already sourced in the other courses — Audit, the two-day Raw data
+window, the five recalculation steps, CAN Mileage against Relative odometer,
+module gating, the two blocks, `Confirm adding vehicles to notifications`.
+
+Deliberately **not** written: the exact column names on the Sensors, Raw data
+and Audit screens. Those documentation pages are image-based and the text does
+not enumerate them. These are drills done at the live panel, so the trainee
+reads the real columns off the real screen — which is the skill anyway.
+
+**Onboarding (12 lessons, 10 with quizzes).** The hardest of the three to write
+honestly, because almost every topic needs a company fact this repository does
+not hold. The approach taken: teach the part that is generic and true in full,
+and stop where policy begins, with a `needs_input` note naming exactly the
+missing fact. A new starter learns how SLAs work now and fills in the figures
+when somebody supplies them.
+
+The tooling was recoverable — the module subtitle says **Zendesk and Jira**, so
+public reply against internal note, one Jira issue to many Zendesk tickets, and
+what belongs in which system are all teachable. Data privacy is the most
+complete module: verify before disclosing, never verify using the thing being
+requested, data minimisation, and report an incident before investigating it.
+
+**A contradiction inside the curriculum, surfaced rather than smoothed over:**
+Onboarding Module 1 says **Sev-1 / Sev-3** and Module 2 says **P1–P4**. Two
+severity schemes in one course. Neither is taught as fact until somebody says
+which is real.
+
+**Open items this added to §5** — all of them things an agent must not invent:
+
+| Needed | Blocks |
+| --- | --- |
+| Is this company controller or processor for driver data? | Support skills D5–D6, Onboarding M3 |
+| The data subject request route and its deadline | Onboarding M3, Support skills D6 |
+| The security incident reporting path, including out of hours | Onboarding M3 |
+| The approved caller-verification questions | Onboarding M3 |
+| The severity scheme, and the required fields per severity | Onboarding M1, M2 |
+| First-response and resolution targets; business or calendar hours | Onboarding M2 |
+| The team map — who owns what | Support skills C1 |
+| Escalation criteria to second line | Support skills C2, Onboarding M2 |
+| The desk's real five-point ticket standard | Support skills A5 |
+
+That table is the shopping list. Every row is a fact somebody at the company
+holds and nobody has written down, and every one of them is currently a hole a
+trainee can see.
