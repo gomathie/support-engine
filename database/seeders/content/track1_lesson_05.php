@@ -266,7 +266,7 @@ HTML,
     ],
 
     'quiz' => [
-        'title' => 'Lesson 5 — knowledge check',
+        'title' => 'Module 5 — knowledge check',
         'description' => 'Four questions on status colors, object groups, table column configuration, and list filters.',
         'passing_score' => 70,
         'max_attempts' => 3,

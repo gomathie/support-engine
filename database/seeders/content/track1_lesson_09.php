@@ -216,7 +216,7 @@ HTML,
     ],
 
     'quiz' => [
-        'title' => 'Lesson 9 — knowledge check',
+        'title' => 'Module 9 — knowledge check',
         'description' => 'Four questions on email verification, alert channels, speed notifications, and 2FA security.',
         'passing_score' => 70,
         'max_attempts' => 3,

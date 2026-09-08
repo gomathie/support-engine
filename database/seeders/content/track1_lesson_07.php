@@ -223,7 +223,7 @@ HTML,
     ],
 
     'quiz' => [
-        'title' => 'Lesson 7 — knowledge check',
+        'title' => 'Module 7 — knowledge check',
         'description' => 'Four questions on calibration curves, conversion formulas, and sensor template compatibility.',
         'passing_score' => 70,
         'max_attempts' => 3,

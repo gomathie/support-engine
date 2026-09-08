@@ -210,7 +210,7 @@ HTML,
     ],
 
     'quiz' => [
-        'title' => 'Lesson 10 — knowledge check',
+        'title' => 'Module 10 — knowledge check',
         'description' => 'Four questions on modular features, Monitor tokens vs Access tokens, and the Report Scheduler.',
         'passing_score' => 70,
         'max_attempts' => 3,

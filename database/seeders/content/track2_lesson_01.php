@@ -275,7 +275,7 @@ HTML,
      * misconception rather than filler.
      */
     'quiz' => [
-        'title' => 'Lesson 1 — knowledge check',
+        'title' => 'Module 1 — knowledge check',
         'description' => 'Four questions on the panel, contracts and configurations. '
             .'You need 70% to pass, and you may retake it.',
         'passing_score' => 70,

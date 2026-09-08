@@ -213,7 +213,7 @@ HTML,
     ],
 
     'quiz' => [
-        'title' => 'Lesson 8 — knowledge check',
+        'title' => 'Module 8 — knowledge check',
         'description' => 'Four questions on movement history, track player tools, report generation, and exports.',
         'passing_score' => 70,
         'max_attempts' => 3,

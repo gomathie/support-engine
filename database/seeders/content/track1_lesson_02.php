@@ -375,7 +375,7 @@ HTML,
     ],
 
     'quiz' => [
-        'title' => 'Lesson 2 — knowledge check',
+        'title' => 'Module 2 — knowledge check',
         'description' => 'Four questions on the interface layout and map tools. '
             .'You need 70% to pass, and you may retake it.',
         'passing_score' => 70,

@@ -214,7 +214,7 @@ HTML,
     ],
 
     'quiz' => [
-        'title' => 'Lesson 4 — knowledge check',
+        'title' => 'Module 4 — knowledge check',
         'description' => 'Four questions on creating objects, required parameters, tags, and map tracking tools.',
         'passing_score' => 70,
         'max_attempts' => 3,

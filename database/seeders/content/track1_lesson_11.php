@@ -247,7 +247,7 @@ HTML,
     ],
 
     'quiz' => [
-        'title' => 'Lesson 11 — knowledge check',
+        'title' => 'Module 11 — knowledge check',
         'description' => 'Four scenario-based diagnostic questions testing real-world support reasoning.',
         'passing_score' => 70,
         'max_attempts' => 3,

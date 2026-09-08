@@ -128,7 +128,7 @@ HTML,
     ],
 
     'quiz' => [
-        'title' => 'Lesson 12 — knowledge check',
+        'title' => 'Module 12 — knowledge check',
         'description' => 'Four questions assessing documentation lookup, support protocol, and competency certification readiness.',
         'passing_score' => 70,
         'max_attempts' => 3,

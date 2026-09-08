@@ -308,7 +308,7 @@ HTML,
     ],
 
     'quiz' => [
-        'title' => 'Lesson 3 — knowledge check',
+        'title' => 'Module 3 — knowledge check',
         'description' => 'Four questions on user roles, object permissions, rights templates, and account status.',
         'passing_score' => 70,
         'max_attempts' => 3,

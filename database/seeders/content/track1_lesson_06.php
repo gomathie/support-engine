@@ -179,7 +179,7 @@ HTML,
     ],
 
     'quiz' => [
-        'title' => 'Lesson 6 — knowledge check',
+        'title' => 'Module 6 — knowledge check',
         'description' => 'Five questions on sensor functions, two-position thresholds, discrete sensors, and fuel filtration settings.',
         'passing_score' => 70,
         'max_attempts' => 3,
