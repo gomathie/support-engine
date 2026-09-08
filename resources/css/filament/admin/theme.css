@@ -1,0 +1,33 @@
+/*
+   The admin panel's stylesheet.
+
+   Filament ships a *precompiled* stylesheet built from its own source files.
+   Tailwind utilities used only in this application's Blade views are therefore
+   not in it — `rounded-2xl`, `bg-emerald-50` and `blur-3xl` all resolve to
+   nothing, and a custom page written in them renders unstyled while looking
+   perfectly correct in the source.
+
+   That is what this file fixes. It re-runs Tailwind over the panel's own views,
+   so a class written in `resources/views/filament/**` exists in the CSS the
+   panel loads. Registered with `->viteTheme()` in AdminPanelProvider.
+
+   If you add a directory of Blade under the panel, add an `@source` for it.
+*/
+
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+/* Changelog and report bodies are rendered markdown. */
+@plugin '@tailwindcss/typography';
+
+@source '../../../../app/Filament/**/*.php';
+@source '../../../../resources/views/filament/**/*.blade.php';
+@source '../../../../vendor/filament/**/*.blade.php';
+
+/*
+   Filament defines no `x-cloak` rule of its own, so an element that starts
+   hidden flashes on screen for as long as Alpine takes to boot. One line, and
+   `x-cloak` means what everybody expects it to mean.
+*/
+[x-cloak] {
+    display: none !important;
+}

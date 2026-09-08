@@ -45,6 +45,17 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->brandName('Support Training Hub')
 
+            /*
+             * Filament's shipped stylesheet is precompiled from Filament's own
+             * source, so Tailwind utilities used only in this application's
+             * Blade views are absent from it â a custom page written in them
+             * renders unstyled while the source looks perfectly correct.
+             *
+             * This theme re-runs Tailwind over the panel's views. See the
+             * @source directives in the file itself.
+             */
+            ->viteTheme('resources/css/filament/admin/theme.css')
+
             // The light lockup is navy-on-transparent and vanishes against
             // Filament's dark sidebar, hence the separate dark asset.
             ->brandLogo(asset('images/logo.png'))

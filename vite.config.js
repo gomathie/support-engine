@@ -8,7 +8,15 @@ import vue from '@vitejs/plugin-vue';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
+            input: [
+                'resources/css/app.css',
+                'resources/js/app.js',
+
+                // The admin panel's own stylesheet. Filament's shipped CSS is
+                // precompiled from Filament's source only, so utilities used
+                // in this app's Blade views exist nowhere without this.
+                'resources/css/filament/admin/theme.css',
+            ],
             refresh: true,
             // Inter, self-hosted. The prototype pulled it from Google Fonts at
             // the top of styles/shared.css; serving it locally keeps the app off

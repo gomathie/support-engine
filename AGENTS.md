@@ -81,7 +81,18 @@ lists, blockquotes, tables, links and inline marks — **not `div`, `dl/dt/dd`,
 save, then loses structure with no warning. `LessonContentEditableTest` asserts
 no seeded body contains them; keep it that way when writing new lessons.
 
-**Bash eats backslashes.** Writing PHP namespaces through `echo`/`sed`/heredocs
+**Filament's stylesheet does not know about your markup.** Filament ships a
+*precompiled* CSS file built from its own source, so a Tailwind class used only
+in `resources/views/filament/**` compiles to nothing. Nothing errors and nothing
+warns — the page simply arrives unstyled while the source looks correct. Two
+custom pages were shipped this way; 215 of 257 classes on one of them did not
+exist. `resources/css/filament/admin/theme.css` re-runs Tailwind over the
+panel's views and is registered with `->viteTheme()`. **If you add Blade under a
+new directory in the panel, add an `@source` for it.** `AdminThemeTest` holds
+the three pieces together.
+
+**Bash eats backslashes.**
+ Writing PHP namespaces through `echo`/`sed`/heredocs
 in Git Bash has corrupted files repeatedly. Use the Write/Edit tools for PHP.
 
 **Tests run against `pilot_lms_testing`.** `TestCase` refuses to run unless the
@@ -131,6 +142,11 @@ header carries the rules. Three that matter:
   topic is not in the docs, set `needs_input` and leave the gap visible — see the
   "Mapping Contract" entry. An invented PILOT fact is worse than an obvious hole,
   because a trainee will carry it onto a call.
+- **Ignore the documentation's version numbers.** Do not hunt for "the 7.10
+  page" or hold a lesson up because you cannot confirm which release a page
+  belongs to. Take docs.pilot-gps.com as you find it: where there is a newer
+  page, use it; where there is not, the older one is the source. Version
+  numbers are not part of the content and do not need recording in the lesson.
 - **Use only markup the rich editor round-trips** (see §3).
 - **The seeder never overwrites existing content.** Once a lesson has a body it
   belongs to whoever has been maintaining it. `LESSON_CONTENT_OVERWRITE=1`
@@ -389,3 +405,65 @@ Redesigned the "What's new" admin page (`app/Filament/Pages/WhatsNew.php` and `r
 - **Timeline card layout:** Desktop connecting rail with milestone nodes, distinct category color coding (emerald, sky, amber, purple), left accent indicators, and enhanced typography for inline code, strong leads, and links in both light and dark modes.
 - **Cleaned test warnings:** Aligned class names with filenames in `TopicProgressTest`, `VideoTopicTest`, and `VideoUploadTopicTest` so the test suite runs with 0 warnings.
 
+
+### 2026-09-08 — A lesson gets a summary, a cover and its sources (Claude)
+
+Three fields from the reference screenshot the trainee had no way to see:
+
+| `summary` | one or two sentences, above the body and in the course outline |
+| `cover_image_path` | a banner, shown only when the lesson has no video |
+| `doc_links` | `[{title, url}]` — the docs.pilot-gps.com pages it came from |
+
+Migration `2026_09_08_000460`. All three are authorable in the admin panel —
+`doc_links` is a Repeater, so a lesson drawn from four pages links to four.
+
+**The link filter lives in the model, not the template.** `documentationLinks()`
+drops anything that is not http or https. These are author-supplied URLs going
+into an `href`, and an `href` runs a `javascript:` URL on click. The form
+refuses those too, but the form is not the only way a row gets written — a
+seeder, a console command and a tampered row all reach the same template.
+
+**Two pieces of rename fallout, both silent:**
+
+- `LessonProgressTest.php` still declared `class TopicProgressTest`, and
+  `LessonQuizGatesLessonTest.php` still declared `class TopicQuizGatesTopicTest`.
+  PHPUnit prints `WARN Class X cannot be found in …` and then **skips the whole
+  file**. 13 tests had not run since the rename. They pass. If you rename a test
+  file, rename the class in the same breath, and treat a WARN line as a failure.
+- `Quiz::SCOPE_LESSON` held `'module'` and `Quiz::SCOPE_TOPIC` held `'lesson'`
+  — the worst possible arrangement, and a trap for the next reader. Now
+  `SCOPE_MODULE` and `SCOPE_LESSON`. Stored values are unchanged.
+
+344 passed, 1185 assertions.
+
+### 2026-09-08 — The admin panel had no stylesheet of its own (Claude)
+
+The "What's new" and "Success metrics" pages were written in Tailwind classes
+that **did not exist in the CSS the panel loads**. Filament's shipped stylesheet
+is precompiled from Filament's own source; utilities used only in this app's
+Blade views are absent from it. Counted before the fix: **215 of 257** classes
+on What's new and **41 of 61** on the KPI dashboard resolved to nothing. Both
+pages had been rendering naked, and nothing anywhere said so.
+
+`resources/css/filament/admin/theme.css` now re-runs Tailwind over the panel's
+views (`@source` on `resources/views/filament/**` and `app/Filament/**`),
+registered with `->viteTheme()` and built by Vite. It also defines `[x-cloak]`,
+which Filament does not. `AdminThemeTest` pins all of it, because removing any
+one of the three pieces silently unstyles every custom page again.
+
+**What's new was then rebuilt.** The old version filtered only the *items*, so
+searching left empty section headings and empty month cards standing behind the
+results, and there was no empty state at all — `hasSearchResults()` was written
+and never called. Filtering now runs over a matrix built server-side, so a
+section with nothing left in it and a month with nothing left in it both
+disappear, and "nothing matches X" is said once. The dark gradient hero with
+radial glows and backdrop blur is gone: it contradicted the house style stated
+at the top of `resources/css/app.css`, and it duplicated the page title
+Filament already renders. 434 lines down to 215.
+
+The KPI page needed no redesign — it was already in the house style, and was
+only ever invisible.
+
+**One rule added to §4a, from the user:** ignore the documentation's version
+numbers. Take docs.pilot-gps.com as you find it — newer page where there is
+one, the older page where there is not.

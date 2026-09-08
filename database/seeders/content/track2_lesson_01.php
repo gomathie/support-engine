@@ -3,13 +3,13 @@
 /**
  * Admin panel — Lesson 1: Interface familiarisation and basic operations.
  *
- * Content drawn from docs.pilot-gps.com 7.10:
+ * Content drawn from docs.pilot-gps.com:
  *   · Admin Panel → Panel          /panel.html
  *   · Admin Panel → Account        /account.html
  *   · Admin Panel → Configuration  /configuration.html
  *
  * Two topics are deliberately unwritten. "Stock account" and the enumeration of
- * account types do not appear in the 7.10 documentation — the Contracts window
+ * account types do not appear in the documentation — the Contracts window
  * has an "account type" field but the docs never list what the types are. Those
  * are marked `needs_input` rather than filled with a plausible guess.
  *
@@ -148,13 +148,13 @@ HTML,
         'Answer: what is a stock account?' => [
             'docs' => null,
             'estimated_minutes' => 5,
-            'needs_input' => 'The term does not appear anywhere in the 7.10 documentation — not in '
+            'needs_input' => 'The term does not appear anywhere in the documentation — not in '
                 .'Admin Panel → Account, not in Configuration. Igor to confirm what a stock account '
                 .'is, or whether the topic should be retired.',
             'body' => <<<'HTML'
 <blockquote><p><strong>This topic is not written yet.</strong></p></blockquote>
 
-<p>"Stock account" comes from the original training plan, but it does not appear in the PILOT 7.10
+<p>"Stock account" comes from the original training plan, but it does not appear in the PILOT
 documentation — not under <em>Admin Panel → Account</em>, and not under <em>Configuration</em>.</p>
 
 <p>Rather than write a plausible-sounding definition, it has been left open. A confident but wrong
@@ -342,6 +342,19 @@ HTML,
                     ['text' => 'Their contract type does not permit creating further contracts', 'correct' => false],
                 ],
             ],
+        ],
+    ],
+
+    'practical_task' => [
+        'title' => 'Create and configure a Prepayment contract with Drivers module',
+        'lesson_title' => 'Create a Prepayment contract and activate the Drivers module',
+        'brief' => 'Create contract in the training PILOT account, activate Drivers module, verify in Contracts list.',
+        'submission_instructions' => 'Complete the contract creation in the training account, activate the module, and submit a screenshot showing the contract in the Contracts table.',
+        'requires_screenshot' => true,
+        'estimated_minutes' => 15,
+        'required_evidence' => [
+            ['key' => 'account_id', 'label' => 'Contract / Account ID generated in PILOT', 'hint' => 'The numeric ID generated upon saving the contract'],
+            ['key' => 'contract_name', 'label' => 'Name of the created contract', 'hint' => 'The exact name you gave the contract'],
         ],
     ],
 ];

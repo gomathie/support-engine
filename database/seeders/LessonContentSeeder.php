@@ -61,6 +61,9 @@ class LessonContentSeeder extends Seeder
 
             // Admin panel (TRACK 2)
             'track2_lesson_01.php',
+            'track2_lesson_02.php',
+            'track2_lesson_03.php',
+            'track2_lesson_04.php',
         ];
     }
 
