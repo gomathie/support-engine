@@ -84,17 +84,24 @@ class KpiTest extends TestCase
 
         $blocked = $kpis->where('status', 'not_measurable');
 
-        $this->assertCount(4, $blocked);
+        $this->assertCount(3, $blocked);
 
         foreach ($blocked as $kpi) {
             $this->assertNull($kpi['value'], $kpi['label'].' must not report a number it cannot compute.');
             $this->assertNotEmpty($kpi['note'], $kpi['label'].' must explain what is missing.');
         }
 
-        // The four, named, so a later change that quietly starts faking one
-        // of them fails here.
+        /*
+         * The three, named, so a later change that quietly starts faking one
+         * of them fails here.
+         *
+         * KPI 6 (90-day retention) was on this list until the refreshers
+         * arrived (PA-18). It is now merely *awaiting data* — it can be
+         * computed the moment somebody sits a 90-day refresher, which is a
+         * different and much better state than structurally impossible.
+         */
         $this->assertSame(
-            [2, 3, 4, 6],
+            [2, 3, 4],
             $blocked->pluck('number')->sort()->values()->all(),
         );
     }
@@ -305,7 +312,10 @@ class KpiTest extends TestCase
         $coverage = (new Kpis())->coverage();
 
         $this->assertSame(9, $coverage['total']);
-        $this->assertSame(4, $coverage['blocked']);
+
+        // Three, not four: KPI 6 became measurable when refreshers arrived.
+        $this->assertSame(3, $coverage['blocked']);
+
         $this->assertGreaterThan(0, $coverage['reporting']);
     }
 }
