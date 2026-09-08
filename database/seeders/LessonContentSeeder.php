@@ -65,6 +65,12 @@ class LessonContentSeeder extends Seeder
             'track2_lesson_02.php',
             'track2_lesson_03.php',
             'track2_lesson_04.php',
+
+            // Support skills (TRACK 3) — exercises, not documentation
+            'track3_lesson_01.php',
+            'track3_lesson_02.php',
+            'track3_lesson_03.php',
+            'track3_lesson_04.php',
         ];
     }
 
