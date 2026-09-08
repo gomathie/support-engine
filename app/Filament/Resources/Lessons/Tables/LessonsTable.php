@@ -1,75 +1,75 @@
 <?php
 
-namespace App\Filament\Resources\Lessons\Tables;
+namespace App\Filament\Resources\Topics\Tables;
 
+use App\Enums\CompletionRequirement;
+use App\Enums\TopicType;
 use App\Models\Course;
-use App\Models\Lesson;
+use App\Models\Topic;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
-class LessonsTable
+class TopicsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
+                TextColumn::make('title')
+                    ->searchable()
+                    ->weight('bold')
+                    ->wrap()
+                    ->description(fn (Topic $record) => $record->lesson?->title),
+
                 TextColumn::make('course.title')
                     ->label('Course')
                     ->badge()
                     ->sortable()
-                    ->searchable(),
+                    ->toggleable(),
 
-                TextColumn::make('title')
-                    ->searchable()
-                    ->weight('bold'),
+                TextColumn::make('type')
+                    ->badge()
+                    ->formatStateUsing(fn (TopicType $state) => $state->label())
+                    ->color('gray'),
 
-                TextColumn::make('subtitle')
-                    ->searchable()
-                    ->wrap()
-                    ->limit(60),
+                TextColumn::make('completion_requirement')
+                    ->label('Completed by')
+                    ->formatStateUsing(fn (CompletionRequirement $state) => $state->label())
+                    ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('lessons_count')
-                    ->label('Topics')
-                    ->counts('topics')
+                TextColumn::make('resources_count')
+                    ->label('Files')
+                    ->counts('resources')
                     ->alignEnd(),
 
-                /*
-                 * Every topic is meant to end with a knowledge check, and
-                 * passing it is required to finish the course. A topic without
-                 * one can be read and left — so the gap is shown here rather
-                 * than discovered when somebody completes a course having been
-                 * tested on nothing.
-                 */
-                TextColumn::make('knowledge_check')
-                    ->label('Knowledge check')
-                    ->state(fn (Lesson $record) => $record->hasKnowledgeCheck() ? 'Yes' : 'Missing')
-                    ->badge()
-                    ->color(fn ($state) => $state === 'Yes' ? 'success' : 'warning')
-                    ->tooltip(fn (Lesson $record) => $record->hasKnowledgeCheck()
-                        ? null
-                        : 'No published quiz at the end of this topic. Trainees can read it and move on.'),
+                TextColumn::make('progress_count')
+                    ->label('Completions')
+                    ->counts(['progress' => fn ($q) => $q->whereNotNull('completed_at')])
+                    ->alignEnd()
+                    ->toggleable(),
 
                 IconColumn::make('is_published')
                     ->label('Published')
                     ->boolean(),
-
-                TextColumn::make('position')
-                    ->alignEnd()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('course_id')
                     ->label('Course')
-                    ->options(fn () => Course::query()->orderBy('title')->pluck('title', 'id')->all()),
+                    ->options(fn () => Course::query()->orderBy('title')->pluck('title', 'id')->all())
+                    ->searchable(),
+
+                SelectFilter::make('type')->options(TopicType::options()),
+
+                TernaryFilter::make('is_published'),
             ])
-            // Drag to reorder, writing straight to the position column. The
-            // brief asks for reordering; this is the least fiddly way to give
-            // it without a bespoke screen.
+            // Position is scoped to the module, so reordering only makes sense
+            // once the list is filtered down to one course.
             ->reorderable('position')
             ->defaultSort('position')
             ->recordActions([
